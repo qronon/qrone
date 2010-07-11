@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.qrone.coder.QClass;
 import org.qrone.coder.QFunc;
@@ -12,6 +17,8 @@ import org.qrone.coder.QState;
 import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.handler.ImageHandler;
 import org.qrone.r7.handler.Scale9Handler;
+import org.qrone.r7.parser.CSS2Parser;
+import org.qrone.r7.parser.Delegate;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Selializer;
 import org.qrone.r7.parser.HTML5Template;
@@ -48,23 +55,6 @@ public class XOM extends HTML5OM{
 	}
 
 	public void process(HTML5Writer t){
-		String path = getMETAMap().get("include-in");
-		if(path != null){
-			String[] paths = path.split("#", 2);
-			if(paths.length == 2){
-				try {
-					File file = FileUtil.resolveRelativeUnixPath(
-							XCompiler.root, getFile().getParentFile(), paths[0]);
-					XOM xom = XCompiler.compile(file);
-					if(xom != null){
-						xom.process(t, true, this, paths[1]);
-						return;
-					}
-				} catch (IOException e) {
-				}
-			}
-		}
-		
 		process(t, false);
 	}
 
@@ -72,8 +62,32 @@ public class XOM extends HTML5OM{
 		process(t, bodyOnly, null, null);
 	}
 	
-	public void process(final HTML5Writer t, boolean bodyOnly, 
-			final XOM xom, final String target){
+	public void process(final HTML5Writer t, final boolean bodyOnly, 
+			final Stack<XOM> xomlist, final String target){
+		if(!bodyOnly){
+			String path = getMETAMap().get("include-in");
+			if(path != null){
+				String[] paths = path.split("#", 2);
+				if(paths.length == 2){
+					try {
+						File file = FileUtil.resolveRelativeUnixPath(
+								XCompiler.root, getFile().getParentFile(), paths[0]);
+						XOM xom = XCompiler.compile(file);
+						if(xom != null){
+							Stack<XOM> xoml = xomlist;
+							if(xomlist == null){
+								xoml = new Stack<XOM>();
+							}
+							xoml.push(this);
+							xom.process(t, false, xoml, paths[1]);
+							return;
+						}
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
+		
 		HTML5Selializer s = new HTML5Selializer() {
 			int formatting = 0;
 			boolean inBody;
@@ -90,14 +104,18 @@ public class XOM extends HTML5OM{
 				if(e.getNodeName().equals("head")){
 					start(e);
 					accept(e);
-					out(XCompiler.getRecurseHeader(file));
+					out(XCompiler.getRecurseHeader(file, xomlist));
 					end(e);
 				}else if(e.getNodeName().equals("body")){
-					start(e);
+					if(!bodyOnly){
+						start(e);
+					}
 					inBody = true;
 					accept(e);
 					inBody = false;
-					end(e);
+					if(!bodyOnly){
+						end(e);
+					}
 				}else if(e.getNodeName().equals("script")){
 					if(inBody){
 						start(e);
@@ -137,8 +155,32 @@ public class XOM extends HTML5OM{
 			
 			@Override
 			protected void out(Element e) {
-				if(target != null && e.getAttribute("id").equals(target)){
-					xom.process(t);
+				final String include = getProperty(e, "include");
+				if(include != null){
+					final String str = CSS2Parser.pullstring(include);
+					if(str != null && str.trim().length() > 0){
+						super.out(e,new Delegate() {
+							@Override
+							public void accept() {
+								XOM xom = XCompiler.compile(file, str);
+								xom.process(t, true);
+							}
+						});
+					}else{
+						try{
+							throw new IOException();
+						}catch(IOException e1){
+							e1.printStackTrace();
+						}
+					}
+				}else if(target != null && e.getAttribute("id").equals(target)){
+					super.out(e,new Delegate() {
+						@Override
+						public void accept() {
+							XOM xom = xomlist.pop();
+							xom.process(t, true);
+						}
+					});
 				}else{
 					super.out(e);
 				}

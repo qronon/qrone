@@ -239,7 +239,7 @@ public class ImageSpriter {
 		hHeight += file.h;
 		
 		String res = "height:" + file.h + "px;" 
-			 + "background: repeat-x 0px -" + (hHeight-file.h) + "px url(" + getPath(basedir, "hsprite.png") + ");";
+			 + "background: repeat-x 0px -" + (hHeight-file.h) + "px url(" + getPath(file.file, "hsprite.png") + ");";
 		hresults.put(file, res);
 		return res;
 	}

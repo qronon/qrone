@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.qrone.r7.parser.CSS2Parser;
 import org.qrone.r7.parser.JSParser;
@@ -28,7 +29,17 @@ public class XCompiler {
     	String[] a = {"-v", "site/test"};
     	QrONECompressor.main(a);
 	}
-    
+
+	public static XOM compile(File file, String path){
+		try {
+			return compile(
+					FileUtil.resolveRelativeUnixPath(root, file.getParentFile(), path)
+					);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	public static XOM compile(File f){
 		XOM o = map.get(f);
 		try {
@@ -48,9 +59,16 @@ public class XCompiler {
 		return o;
 	}
 	
-	public static HTML5Set getRecursive(File file){
+	public static HTML5Set getRecursive(File file, Stack<XOM> xomlist){
 		HTML5Set set = new HTML5Set();
-		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, new HashSet<File>(), true);
+		Set<File> s = new HashSet<File>();
+		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
+		if(xomlist != null){
+			for (Iterator<XOM> i = xomlist.iterator(); i.hasNext();) {
+				XOM xom = i.next();
+				getRecursive(xom.getFile(), set.js, set.css, set.jslibs, set.csslibs, s, true);
+			}
+		}
 		return set;
 	}
 
@@ -79,8 +97,8 @@ public class XCompiler {
 		}
 	}
 	
-	public static String getRecurseHeader(File file){
-		HTML5Set set = XCompiler.getRecursive(file);
+	public static String getRecurseHeader(File file, Stack<XOM> xomlist){
+		HTML5Set set = XCompiler.getRecursive(file, xomlist);
 		StringBuffer b = new StringBuffer();
 		
 		//---------------
@@ -141,7 +159,6 @@ public class XCompiler {
 		// css inline
 		//---------------
 		StringBuffer css = new StringBuffer();
-		css.append(set.css.toString());
 		for (Iterator<CSSStyleSheet> j = set.css.iterator(); j.hasNext();) {
 			CSSRuleList l = j.next().getCssRules();
 			for (int i = 0; i < l.getLength(); i++) {

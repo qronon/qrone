@@ -7,6 +7,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.mozilla.javascript.EvaluatorException;
 import org.w3c.css.sac.InputSource;
@@ -18,6 +20,20 @@ import com.steadystate.css.parser.CSSOMParser;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
 public class CSS2Parser{
+	public static Pattern strRegex = Pattern.compile("[\"'](.*?)[\"']");
+	public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
+	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
+	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
+	
+	public static String pullstring(String style){
+		Matcher mm = strRegex.matcher(style);
+		if(mm.find()){
+			return mm.group(1);
+		}else{
+			return null;
+		}
+	}
+	
 	public static String clean(String js){
 		return js
 			.replaceAll("^<!\\[CDATA\\[", "")

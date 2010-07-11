@@ -73,6 +73,9 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	}
 
 	protected void out(Element e){
+		out(e,null);
+	}
+	protected void out(Element e, Delegate d){
 		List<HTML5TagResult> r = om.getTagResult(e);
 		if(r != null){
 			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
@@ -86,7 +89,11 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 					.hasNext();) {
 				out(iterator.next().poststart());
 			}
-			accept(e);
+			if(d != null){
+				d.accept();
+			}else{
+				accept(e);
+			}
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
 					.hasNext();) {
 				out(iterator.next().preend());
@@ -99,7 +106,11 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 			}
 		}else{
 			start(e);
-			accept(e);
+			if(d != null){
+				d.accept();
+			}else{
+				accept(e);
+			}
 			if(!noendtaglist.contains(e.getNodeName()))
 				end(e);
 		}
