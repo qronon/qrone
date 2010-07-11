@@ -15,6 +15,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import fmpp.util.FileUtil;
+
 
 
 public class QrONECompressor {
@@ -27,7 +29,8 @@ public class QrONECompressor {
         CmdLineParser parser = new CmdLineParser();
         CmdLineParser.Option helpOpt = parser.addBooleanOption('h', "help");
         CmdLineParser.Option languageOpt = parser.addStringOption('l', "lang");
-        CmdLineParser.Option imagedirOpt = parser.addStringOption('i', "imgdir");
+        CmdLineParser.Option imagedirOpt = parser.addStringOption('i', "img-basedir");
+        CmdLineParser.Option imageurlOpt = parser.addStringOption('u', "img-baseurl");
         CmdLineParser.Option noImagesOpt = parser.addBooleanOption('n', "noimages");
         CmdLineParser.Option charsetOpt = parser.addStringOption("charset");
         CmdLineParser.Option verboseOpt = parser.addBooleanOption('v', "verbose");
@@ -74,6 +77,7 @@ public class QrONECompressor {
             System.exit(0);
 		}
         */
+        String imgurl = (String) parser.getOptionValue(imageurlOpt);
         String imgdir = (String) parser.getOptionValue(imagedirOpt);
 
         String[] fileArgs = parser.getRemainingArgs();
@@ -82,14 +86,29 @@ public class QrONECompressor {
             System.exit(0);
         }
         
-        File target = new File(fileArgs[0]);
-        target = target.getAbsoluteFile();
+        File target = new File(fileArgs[0]).getAbsoluteFile();
         if(target.isDirectory()){
-        	ImageSpriter.instance().setImageDir(target, imgdir);
         	XCompiler.root = target;
+        	if(imgdir != null){
+        		try {
+					target = FileUtil.resolveRelativeUnixPath(XCompiler.root, XCompiler.root, imgdir);
+				} catch (IOException e) {
+					e.printStackTrace();
+		            System.exit(0);
+				}
+        	}
+        	ImageSpriter.instance().setImageDir(target, imgurl);
         }else{
-        	ImageSpriter.instance().setImageDir(target.getParentFile(), imgdir);
         	XCompiler.root = target.getParentFile();
+        	if(imgdir != null){
+        		try {
+					target = FileUtil.resolveRelativeUnixPath(XCompiler.root, XCompiler.root, imgdir);
+				} catch (IOException e) {
+					e.printStackTrace();
+		            System.exit(0);
+				}
+        	}
+        	ImageSpriter.instance().setImageDir(target.getParentFile(), imgdir);
         }
         
         compile(new File(fileArgs[0]), lang);
@@ -169,7 +188,7 @@ public class QrONECompressor {
 	
     private static void usage() {
         System.out.println(
-                "\nUsage: java -jar qrone-x.y.z.jar [options] [input file]\n\n"
+                "\nUsage: java -jar qrone-x.y.z.jar [options] <file>\n\n"
 
                         + "Options\n"
                         + "  -h, --help                Displays this information\n"
@@ -177,6 +196,8 @@ public class QrONECompressor {
                         + "  --charset <charset>       Read the input file using <charset>\n"
                         + "\n"
                         + "  -l <language>             Output language, default is 'html'\n"
+                        + "  -i, --img-basedir <dir>   CSS Sprite image directory\n"
+                        + "  -u, --img-baseurl <url>   CSS Sprite image base url\n"
                         
                         );
     }

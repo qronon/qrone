@@ -1,1 +1,13 @@
-TEST
+QrONE - HTML5 Minifier
+  http://www.qrone.org
+
+Usage: java -jar qrone-x.y.z.jar [options] <file>
+
+Options
+  -h, --help                Displays this information
+  -v, --verbose             Display informational messages and warnings
+  --charset <charset>       Read the input file using <charset>
+
+  -l <language>             Output language, default is 'html'
+  -i, --img-basedir <dir>   CSS Sprite image directory
+  -u, --img-baseurl <url>   CSS Sprite image base url
