@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     2005/08/05 16:47:07                                                        
+
+     project    
+     description
+                   
+     Administrator                                                                
+     ====================================================================== -->
+<project name="project" default="default">
+    <description>
+            description
+    </description>
+	<property name="src" value="src"/>
+	<property name="bin" value="bin"/>
+	<property name="tmp" value="tmp"/>
+	<property name="lib.dir" value="C:\Users\Qronon\Java Libraries"/>
+	<property name="javadoc" value="doc"/>
+	<property name="outputjar" value="qrone-0.0.1.jar"/>
+
+
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="compile,jar">
+    </target>
+	
+
+    <!-- ================================= 
+          target: javadoc              
+         ================================= -->
+    <target name="javadoc">
+		<javadoc 
+    		sourcepath="${src}" 
+    		destdir="${javadoc}"
+			packagenames="org.qrone.*" >
+			
+			<doctitle><![CDATA[<h1>QrTools Library</h1>]]></doctitle>
+    		<bottom><![CDATA[<i>Copyright &#169; 2005 J.Tabuchi All Rights Reserved.</i>]]></bottom>
+
+		</javadoc>
+    </target>
+    	
+    <!-- ================================= 
+          target: jar              
+         ================================= -->
+    <target name="jar" depends="compile">
+
+        <mkdir dir="${tmp}"/>
+        <!-- The order is important here. Rhino MUST be unjarred first!
+             (some of our own classes will override the Rhino classes) -->
+        <unjar src="${lib.dir}/cssparser-0.9.5/cssparser-0.9.5.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/cssparser-0.9.5/css-selectors-1.0.1.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/cssparser-0.9.5/sac.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/htmlparser-1.2.1/htmlparser-1.2.1.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/yuicompressor-2.4.2/lib/jargs-1.0.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/yuicompressor-2.4.2/lib/rhino-1.6R7.jar" dest="${tmp}"/>
+        <copy todir="${bin}">
+            <fileset dir="${tmp}" includes="**/*"/>
+        </copy>
+    	
+		<jar basedir="${bin}" 
+			destfile="${outputjar}">
+			<manifest>
+				<attribute name="Main-Class" value="org.qrone.r7.QrONECompressor"/>
+			</manifest>
+    	</jar>
+    </target>
+
+    <!-- ================================= 
+          target: clean              
+         ================================= -->
+    <target name="clean">
+		<delete file="${outputjar}"/>
+		<delete dir="${javadoc}"/>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compile" depends="clean">
+    	<mkdir dir="${bin}"/>
+        <javac srcdir="${src}"
+         destdir="${bin}"
+         classpath="./"
+         debug="on"
+	/>
+    </target>
+</project>
+
