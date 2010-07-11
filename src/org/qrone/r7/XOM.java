@@ -22,15 +22,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+import fmpp.util.FileUtil;
+
 public class XOM extends HTML5OM{
 	private File file;
-	private HTML5Template t = new HTML5Template();
-	private QClass jqueryclass;
-	private QState jqueryhtml;
-	
-	private boolean inBody;
-	private boolean inScript;
-	
 	
 	public XOM() {
 		addTagHandler(new Scale9Handler(this));
@@ -50,16 +45,39 @@ public class XOM extends HTML5OM{
 		}
 		
 		parse(className, new FileReader(file));
-		
+	}
 
-		jqueryclass = new QClass(getClassName());
-		QFunc method = jqueryclass.constructor();
-		method.arg("String", "id");
-		jqueryhtml = method.state().returns();
+	public void process(HTML5Writer t){
+		String path = getMETAMap().get("include-in");
+		if(path != null){
+			String[] paths = path.split("#", 2);
+			if(paths.length == 2){
+				try {
+					File file = FileUtil.resolveRelativeUnixPath(
+							XCompiler.root, getFile().getParentFile(), paths[0]);
+					XOM xom = XCompiler.compile(file);
+					if(xom != null){
+						xom.process(t, true, this, paths[1]);
+						return;
+					}
+				} catch (IOException e) {
+				}
+			}
+		}
 		
+		process(t, false);
+	}
+
+	public void process(HTML5Writer t, boolean bodyOnly){
+		process(t, bodyOnly, null, null);
+	}
+	
+	public void process(final HTML5Writer t, boolean bodyOnly, 
+			final XOM xom, final String target){
 		HTML5Selializer s = new HTML5Selializer() {
-
 			int formatting = 0;
+			boolean inBody;
+			boolean inScript;
 			
 			@Override
 			public void visit(Document e) {
@@ -116,51 +134,54 @@ public class XOM extends HTML5OM{
 					write(n.getNodeValue());
 				}
 			}
+			
+			@Override
+			protected void out(Element e) {
+				if(target != null && e.getAttribute("id").equals(target)){
+					xom.process(t);
+				}else{
+					super.out(e);
+				}
+			}
 		};
-		
-		s.visit(this, new HTML5Writer() {
-			@Override
-			public void append(String key, String value) {
-				if(inBody)
-					jqueryhtml.var("String", key);
-			}
-			
-			@Override
-			public void append(String str) {
-				if(inBody)
-					jqueryhtml.str(str);
-			}
-			
-			@Override
-			public void append(char c) {
-				if(inBody)
-					jqueryhtml.str(String.valueOf(c));
-			}
-		}, t);
+		s.visit(this, bodyOnly ? body : document.getDocumentElement(), t);
 	}
 
-	public String serialize(){
-		return serialize(null);
-	}
-	
-	public String serialize(String lang){
-		if(lang != null && lang.equals("js")){
-			return getScripts(true);
-		}else{
-			return getHTML("");
-		}
-	}
-	
 	public String getHTML(String id){
+		HTML5Template t = new HTML5Template();
+		process(t);
 		t.setValue("id", id);
 		return t.toString();
 	}
-
+	
 	public String getHTML(){
 		return getHTML("");
 	}
 
 	public String getScripts(boolean html){
+
+		final QClass jqueryclass = new QClass(getClassName());
+		final QFunc method = jqueryclass.constructor();
+		method.arg("String", "id");
+		final QState jqueryhtml = method.state().returns();
+		
+		process(new HTML5Writer() {
+			@Override
+			public void append(String key, String value) {
+				jqueryhtml.var("String", key);
+			}
+			
+			@Override
+			public void append(String str) {
+				jqueryhtml.str(str);
+			}
+			
+			@Override
+			public void append(char c) {
+				jqueryhtml.str(String.valueOf(c));
+			}
+		}, true);
+		
 		StringBuilder b = new StringBuilder();
 		if(!html){
 			b.append("qrone." + getClassName() + "=function(){};");
@@ -182,5 +203,17 @@ public class XOM extends HTML5OM{
 	
 	public String getScripts() {
 		return getScripts(true);
+	}
+	
+	public String serialize(){
+		return serialize(null);
+	}
+	
+	public String serialize(String lang){
+		if(lang != null && lang.equals("js")){
+			return getScripts(true);
+		}else{
+			return getHTML("");
+		}
 	}
 }

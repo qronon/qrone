@@ -21,14 +21,14 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	protected HTML5OM om;
 	protected HTML5Writer b;
 
-	public void visit(HTML5OM om, HTML5Writer w){
+	public void visit(HTML5OM om, Element e, HTML5Writer w){
 		this.om = om;
 		this.b = w;
-		visit(om.document);
+		visit(e);
 	}
 	
-	public void visit(HTML5OM om, final HTML5Writer... w){
-		visit(om, new HTML5Writer() {
+	public void visit(HTML5OM om, Element e, final HTML5Writer... w){
+		visit(om, e, new HTML5Writer() {
 			@Override
 			public void append(String key, String value) {
 				for (int i = 0; i < w.length; i++) {
