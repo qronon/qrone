@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 
+  qrone - object-oriented html minifier
+  
+  It will minify html, minify JavaScript both in <script> tag and in event 
+  handlers, CSS is also minified and output in HTML, PHP or JavaScript.
+  See following site for more information.
+  
+    http://www.qrone.org/
+  
+   -Å@Junichi Tabuchi
+ -->
+ 
+<!-- 
+  Following JavaScript include is required.
+  If minified, following js/css will be replaced to real version.
+-->
+<script src="http://www.qrone.org/qrone.js"></script>
+<link href="http://www.qrone.org/qrn.css"></link>
+<style>
+/**
+ * CSS styles are compressed and concatenated but not processed.
+ *
+ * CSS is compressed so you feel free to write many comments as you need.
+ * If minified comments are removed and will not send.
+ *
+ * CSS is concatenated through entire HTML document, so you can write 
+ * style just needed to this html object.
+ * If you worry about confliction,Å@you should use object-specific prefix 
+ * to avoid css class confliction.
+ */
+
+.prefix-box{
+	margin:6px;
+	border:solid 1px gray;
+	padding:6px;
+}
+
+</style>
+<script>
+/**
+ * JavaScript are compressed, concatenated, and little-bit processed.
+ * I defined special symbol "qrone", that's all.
+Å@*
+ * This symbol qrone is a global object that will provide you to access
+ * other html objects.
+ * And also qrone object is used to to make this html 
+ * JavaScript object.
+ */
+ 
+/**
+ * qrone.require("CLASSNAME")
+ *   you can use class "CLASSNAME" after that.
+ *   If minified, CLASSNAME object will be real. otherwise it is dummy.
+ */
+
+qrone.require("path/to/CLASSNAME.html");
+var htmlparts = new CLASSNAME;
+
+/**
+ * qrone object is used to replace your program to make this html 
+ * JavaScript object.
+ *
+ * Dont worry about it, JavaScript is parsed right way and qrone symbol
+ * is replaced very carefully.
+ */
+
+/**
+ * qrone.METHOD = function(){}
+ *   to define class method of this object.
+ *   If minified, it will be replaced with THISCLASS.prototype.METHOD.
+ */
+qrone.METHOD = function(){/**
+	/**
+	 * One point.
+	 * You need to get element with
+	 *   this.$("test")
+	 * 
+	 * instead of
+	 *   document.getElementById("test")
+	 * 
+	 * If minified, every id in this document will be replaced
+	 * to avoid id cofliction when this object is created more than once.
+	 */
+	var e = this.qid("test"); // $("#test");
+
+	alert("qrone"); // this is safe.
+}
+
+</script>
+</head>
+<body>
+
+<a href="qrone.METHOD()"></a>
+
+<div id="test" style="prefix-box">
+</div>
+
+</body>
+</html>
