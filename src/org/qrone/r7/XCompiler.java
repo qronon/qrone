@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.qrone.r7.parser.CSS3OM;
 import org.qrone.r7.parser.CSS3Parser;
+import org.qrone.r7.parser.HTML5Writer;
 import org.qrone.r7.parser.JSParser;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
@@ -73,7 +75,7 @@ public class XCompiler {
 	}
 
 	public static void getRecursive(File file, 
-			StringBuffer js, List<CSSStyleSheet> css, 
+			StringBuffer js, List<CSS3OM> css, 
 			List<Element> jslibs, List<Element> csslibs, 
 			Set<File> clses, boolean first){
 		if(file == null || clses.contains(file)) return;
@@ -97,9 +99,9 @@ public class XCompiler {
 		}
 	}
 	
-	public static String getRecurseHeader(File file, Stack<XOM> xomlist){
+	public static String getRecurseHeader(HTML5Writer b, File file, Stack<XOM> xomlist){
 		HTML5Set set = XCompiler.getRecursive(file, xomlist);
-		StringBuffer b = new StringBuffer();
+		//StringBuffer b = new StringBuffer();
 		
 		//---------------
 		// script src
@@ -159,8 +161,8 @@ public class XCompiler {
 		// css inline
 		//---------------
 		StringBuffer css = new StringBuffer();
-		for (Iterator<CSSStyleSheet> j = set.css.iterator(); j.hasNext();) {
-			CSSRuleList l = j.next().getCssRules();
+		for (Iterator<CSS3OM> j = set.css.iterator(); j.hasNext();) {
+			CSSRuleList l = j.next().getStyleSheet().getCssRules();
 			for (int i = 0; i < l.getLength(); i++) {
 				css.append(l.item(i).getCssText());
 			}
@@ -178,7 +180,7 @@ public class XCompiler {
 	
 	public static class HTML5Set{
 		public StringBuffer js = new StringBuffer();
-		public List<CSSStyleSheet> css = new ArrayList<CSSStyleSheet>();
+		public List<CSS3OM> css = new ArrayList<CSS3OM>();
 		public List<Element> jslibs = new ArrayList<Element>();
 		public List<Element> csslibs = new ArrayList<Element>();
 	}

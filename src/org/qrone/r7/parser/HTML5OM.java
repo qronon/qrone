@@ -36,7 +36,7 @@ public class HTML5OM {
 	protected Element body;
 	private Map<Node, List<CSSStyleRule>> map = new Hashtable<Node, List<CSSStyleRule>>();
 	
-	protected List<CSSStyleSheet> stylesheets = new LinkedList<CSSStyleSheet>();
+	protected List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
 	protected List<String> javascripts = new LinkedList<String>();
 
 	protected List<String> requires = new LinkedList<String>();
@@ -60,8 +60,9 @@ public class HTML5OM {
 		return nodeselector.querySelectorAll(selector);
 	}
 	
-	public void parseStyleSheet(String css) throws IOException{
-		CSSStyleSheet s = CSS3Parser.parse(css);
+	public void parseStyleSheet(String path, String css) throws IOException{
+		CSS3OM s = new CSS3OM();
+		s.parse(path, css);
 		CSS3Visitor v = new CSS3Visitor(){
 
 			@Override
@@ -91,7 +92,7 @@ public class HTML5OM {
 				}
 			}
 		};
-		v.visit(s);
+		v.visit(s.getStyleSheet());
 		stylesheets.add(s);
 	}
 	
@@ -158,7 +159,7 @@ public class HTML5OM {
 					javascripts.add(JSParser.clean(n.getNodeValue()));
 				}else if(inStyle){
 					try {
-						parseStyleSheet(CSS3Parser.clean(n.getNodeValue()));
+						parseStyleSheet(null, CSS3Parser.clean(n.getNodeValue()));
 					} catch (DOMException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -207,7 +208,7 @@ public class HTML5OM {
 		return b.toString();
 	}
 	
-	public List<CSSStyleSheet> getStyles() {
+	public List<CSS3OM> getStyles() {
 		return stylesheets;
 	}
 	

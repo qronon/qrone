@@ -104,7 +104,7 @@ public class XOM extends HTML5OM{
 				if(e.getNodeName().equals("head")){
 					start(e);
 					accept(e);
-					out(XCompiler.getRecurseHeader(file, xomlist));
+					out(XCompiler.getRecurseHeader(b, file, xomlist));
 					end(e);
 				}else if(e.getNodeName().equals("body")){
 					if(!bodyOnly){
