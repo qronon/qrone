@@ -61,8 +61,8 @@ public class HTML5OM {
 	}
 	
 	public void parseStyleSheet(String css) throws IOException{
-		CSSStyleSheet s = CSS2Parser.parse(css);
-		CSS2Visitor v = new CSS2Visitor(){
+		CSSStyleSheet s = CSS3Parser.parse(css);
+		CSS3Visitor v = new CSS3Visitor(){
 
 			@Override
 			public void visit(CSSMediaRule rule){
@@ -158,7 +158,7 @@ public class HTML5OM {
 					javascripts.add(JSParser.clean(n.getNodeValue()));
 				}else if(inStyle){
 					try {
-						parseStyleSheet(CSS2Parser.clean(n.getNodeValue()));
+						parseStyleSheet(CSS3Parser.clean(n.getNodeValue()));
 					} catch (DOMException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -239,7 +239,7 @@ public class HTML5OM {
 		String attr = e.getAttribute("style");
 		if(attr != null){
 			try {
-				CSSStyleDeclaration style = CSS2Parser.parsestyle(attr);
+				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
 				CSSValue v = style.getPropertyCSSValue(prop);
 				if(v != null){
 					style.removeProperty(prop);
@@ -276,7 +276,7 @@ public class HTML5OM {
 		String attr = e.getAttribute("style");
 		if(attr != null){
 			try {
-				CSSStyleDeclaration style = CSS2Parser.parsestyle(attr);
+				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
 				if(style.getPropertyPriority(prop).equals("important")){
 					CSSValue v = style.getPropertyCSSValue(prop);
 					if(v != null)
@@ -296,7 +296,7 @@ public class HTML5OM {
 		String attr = e.getAttribute("style");
 		if(attr != null){
 			try {
-				CSSStyleDeclaration style = CSS2Parser.parsestyle(attr);
+				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
 				style.setProperty(prop, value, null);
 				e.setAttribute("style", style.getCssText());
 			} catch (IOException e1) {
@@ -323,7 +323,7 @@ public class HTML5OM {
 		String attr = e.getAttribute("style");
 		if(attr != null){
 			try {
-				CSSStyleDeclaration style = CSS2Parser.parsestyle(attr);
+				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
 				CSSValue v = style.getPropertyCSSValue(prop);
 				if(v != null){
 					style.setProperty(newprop, v.getCssText(), style.getPropertyPriority(prop));

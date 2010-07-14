@@ -19,7 +19,7 @@ import org.w3c.dom.css.CSSStyleSheet;
 import com.steadystate.css.parser.CSSOMParser;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
-public class CSS2Parser{
+public class CSS3Parser{
 	public static Pattern strRegex = Pattern.compile("[\"'](.*?)[\"']");
 	public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
 	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");

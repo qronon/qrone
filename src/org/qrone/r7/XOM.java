@@ -17,7 +17,7 @@ import org.qrone.coder.QState;
 import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.handler.ImageHandler;
 import org.qrone.r7.handler.Scale9Handler;
-import org.qrone.r7.parser.CSS2Parser;
+import org.qrone.r7.parser.CSS3Parser;
 import org.qrone.r7.parser.Delegate;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Selializer;
@@ -157,7 +157,7 @@ public class XOM extends HTML5OM{
 			protected void out(Element e) {
 				final String include = getProperty(e, "include");
 				if(include != null){
-					final String str = CSS2Parser.pullstring(include);
+					final String str = CSS3Parser.pullstring(include);
 					if(str != null && str.trim().length() > 0){
 						super.out(e,new Delegate() {
 							@Override

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.qrone.r7.parser.CSS2Parser;
+import org.qrone.r7.parser.CSS3Parser;
 import org.qrone.r7.parser.JSParser;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
@@ -166,7 +166,7 @@ public class XCompiler {
 			}
 		}
 		
-		String css2 = CSS2Parser.compress(css.toString());
+		String css2 = CSS3Parser.compress(css.toString());
 		if(css2.length() > 0){
 			b.append("<style>");
 			b.append(css2);

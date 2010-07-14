@@ -64,7 +64,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	}
 	
 	protected String cssmin(String css){
-		return CSS2Parser.compress(css);
+		return CSS3Parser.compress(css);
 	}
 	
 	protected void out(String str){

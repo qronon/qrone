@@ -10,7 +10,7 @@ import org.w3c.dom.css.CSSRuleList;
 import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
 
-public abstract class CSS2Visitor {
+public abstract class CSS3Visitor {
 
 	public void visit(CSSMediaRule rule){
 		

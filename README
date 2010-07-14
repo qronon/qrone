@@ -11,3 +11,7 @@ Options
   -l <language>             Output language, default is 'html'
   -i, --img-basedir <dir>   CSS Sprite image directory
   -u, --img-baseurl <url>   CSS Sprite image base url
+  
+
+Version 0.0.1:
+ - 
