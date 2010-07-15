@@ -12,16 +12,18 @@ public class HTML5Template implements HTML5Writer{
 	private Map<StringBuffer, String> rmap = new Hashtable<StringBuffer, String>();
 
 	public void append(String key, String value){
-		StringBuffer b = map.get(key);
-		if(b == null){
-			b = new StringBuffer();
-			map.put(key, b);
-			rmap.put(b, key);
-			list.add(b);
-		}else{
-			list.add(b);
+		if(value != null){
+			StringBuffer b = map.get(key);
+			if(b == null){
+				b = new StringBuffer();
+				map.put(key, b);
+				rmap.put(b, key);
+				list.add(b);
+			}else{
+				list.add(b);
+			}
+			b.append(value);
 		}
-		b.append(value);
 	}
 	
 	public void setValue(String key, String value){

@@ -1,4 +1,4 @@
-package org.qrone.r7;
+package org.qrone.r7.parser;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,22 +16,30 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.qrone.r7.QrONEUtils;
+
 import fmpp.util.FileUtil;
 
 public class ImageSpriter {
+	private String isprite = "isprite.png";
+	private String vsprite = "vsprite.png";
+	private String hsprite = "hsprite.png";
+	private String tsprite = "tsprite.png";
+	
+	
 	private static ImageSpriter ins;
-	private List<PartOfImage> isprites = new LinkedList<PartOfImage>();
-	private Map<PartOfImage, String> iresults = new Hashtable<PartOfImage, String>();
+	private List<ImagePart> isprites = new LinkedList<ImagePart>();
+	private Map<ImagePart, String> iresults = new Hashtable<ImagePart, String>();
 	private int iWidth;
 	private int iHeight;
 	
-	private List<PartOfImage> vsprites = new LinkedList<PartOfImage>();
-	private Map<PartOfImage, String> vresults = new Hashtable<PartOfImage, String>();
+	private List<ImagePart> vsprites = new LinkedList<ImagePart>();
+	private Map<ImagePart, String> vresults = new Hashtable<ImagePart, String>();
 	private int vWidth;
 	private int vHeight;
 	
-	private List<PartOfImage> hsprites = new LinkedList<PartOfImage>();
-	private Map<PartOfImage, String> hresults = new Hashtable<PartOfImage, String>();
+	private List<ImagePart> hsprites = new LinkedList<ImagePart>();
+	private Map<ImagePart, String> hresults = new Hashtable<ImagePart, String>();
 	private int hWidth;
 	private int hHeight;
 	
@@ -37,28 +47,34 @@ public class ImageSpriter {
 	
 	private Map<File, BufferedImage> map = new Hashtable<File, BufferedImage>();
 
-	private File basedir;
-	private String baseurl;
+	private URI basedir;
+	private URIResolver resolver;
 	
-	public BufferedImage getImage(File file) throws IOException{
-		if(map.containsKey(file)){
-			return map.get(file);
-		}else{
-			return ImageIO.read(file);
-		}
+	public ImageSpriter(URIResolver resolver) {
+		this.resolver = resolver;
 	}
-	
+	/*
 	public static ImageSpriter instance(){
 		if(ins == null) ins = new ImageSpriter();
 		return ins;
 	}
-	
-	public void setImageDir(File imgdir, String url){
-		basedir = imgdir;
-		baseurl = url;
+	*/
+	public BufferedImage getImage(URI file) throws IOException{
+		if(map.containsKey(file)){
+			return map.get(file);
+		}else{
+			return ImageIO.read(resolver.getInputStream(file));
+		}
 	}
 	
-	private String getPath(File from, String name){
+	public void setImageDir(URI imgdir){
+		basedir = imgdir;
+	}
+	
+	private URI getPath(URI from, String name){
+		return from.relativize(basedir.resolve(name));
+		/*
+		from.resolve(name);
 		if(baseurl != null){
 			return baseurl;
 		}
@@ -69,6 +85,7 @@ public class ImageSpriter {
 			e.printStackTrace();
 		}
 		return name;
+		*/
 	}
 	
 	public void create() throws IOException {
@@ -81,15 +98,15 @@ public class ImageSpriter {
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = iimage.getGraphics();
 			currentY = 0;
-			for (Iterator<PartOfImage> i = isprites.iterator(); i
+			for (Iterator<ImagePart> i = isprites.iterator(); i
 					.hasNext();) {
-				PartOfImage part = i.next();
+				ImagePart part = i.next();
 				g.drawImage(getImage(part.file), 
 						currentX, currentY, currentX + part.w, currentY + part.h, 
 						part.x, part.y, part.x+part.w, part.y+part.h, null);
 				currentY += part.h;
 			}
-			ImageIO.write(iimage, "png", new File(basedir, "isprite.png"));
+			ImageIO.write(iimage, "png", resolver.getOutputStream(basedir.resolve(isprite)));
 		}
 		
 		if(vsprites.size() > 0){
@@ -97,9 +114,9 @@ public class ImageSpriter {
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = vimage.getGraphics();
 			currentX = 0;
-			for (Iterator<PartOfImage> i = vsprites.iterator(); i
+			for (Iterator<ImagePart> i = vsprites.iterator(); i
 					.hasNext();) {
-				PartOfImage part = i.next();
+				ImagePart part = i.next();
 	
 				currentY = 0;
 				while (currentY < vWidth) {
@@ -125,7 +142,7 @@ public class ImageSpriter {
 	
 				currentX += part.w;
 			}
-			ImageIO.write(vimage, "png", new File(basedir, "vsprite.png"));
+			ImageIO.write(vimage, "png", resolver.getOutputStream(basedir.resolve(vsprite)));
 		}
 		
 		if(hsprites.size() > 0){
@@ -133,9 +150,9 @@ public class ImageSpriter {
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = himage.getGraphics();
 			currentY = 0;
-			for (Iterator<PartOfImage> i = hsprites.iterator(); i
+			for (Iterator<ImagePart> i = hsprites.iterator(); i
 					.hasNext();) {
-				PartOfImage part = i.next();
+				ImagePart part = i.next();
 	
 				currentX = 0;
 				while (currentX < hHeight) {
@@ -162,12 +179,12 @@ public class ImageSpriter {
 	
 				currentY += part.h;
 			}
-			ImageIO.write(himage, "png", new File(basedir, "hsprite.png"));
+			ImageIO.write(himage, "png", resolver.getOutputStream(basedir.resolve(hsprite)));
 		}
 		
 		if(useTransparentDot){
 			InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
-			FileOutputStream out = new FileOutputStream(new File(basedir, "tsprite.png"));
+			OutputStream out = resolver.getOutputStream(basedir.resolve(tsprite));
 			int buf;
 		    while ((buf = in.read()) >= 0)
 		        out.write(buf);
@@ -178,9 +195,9 @@ public class ImageSpriter {
 		
 	}
 	
-	public String addISprite(File file) throws IOException{
+	public String addISprite(URI file) throws IOException{
 		BufferedImage b = getImage(file);
-		isprites.add(new PartOfImage(file, 0, 0, b.getWidth(), b.getHeight()));
+		isprites.add(new ImagePart(file, 0, 0, b.getWidth(), b.getHeight()));
 		
 		if(iWidth < b.getWidth()){
 			iWidth = b.getWidth();
@@ -192,7 +209,7 @@ public class ImageSpriter {
 			 + "background: no-repeat 0px -" + (iHeight-b.getHeight()) + "px url(" + getPath(file, "isprite.png") + ");";
 	}
 
-	public String addISprite(PartOfImage file) throws IOException{
+	public String addISprite(ImagePart file) throws IOException{
 		if(iresults.containsKey(file)){
 			return iresults.get(file);
 		}
@@ -210,7 +227,7 @@ public class ImageSpriter {
 		iresults.put(file, res);
 		return res;
 	}
-	public String addVSprite(PartOfImage file) throws IOException{
+	public String addVSprite(ImagePart file) throws IOException{
 		if(vresults.containsKey(file)){
 			return vresults.get(file);
 		}
@@ -227,7 +244,7 @@ public class ImageSpriter {
 		return res;
 	}
 
-	public String addHSprite(PartOfImage file) throws IOException{
+	public String addHSprite(ImagePart file) throws IOException{
 		if(hresults.containsKey(file)){
 			return hresults.get(file);
 		}
@@ -244,10 +261,9 @@ public class ImageSpriter {
 		return res;
 	}
 	
-	public String addTransparentDot(){
+	public URI addTransparentDot(){
 		useTransparentDot = true;
-		return getPath(basedir, "tsprite.png");
+		return basedir.resolve(tsprite);
 	}
-
 	
 }

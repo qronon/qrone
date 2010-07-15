@@ -1,8 +1,9 @@
-package org.qrone.r7;
+package org.qrone.r7.parser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -12,43 +13,53 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.qrone.r7.parser.CSS3OM;
-import org.qrone.r7.parser.CSS3Parser;
-import org.qrone.r7.parser.HTML5Writer;
-import org.qrone.r7.parser.JSParser;
+import org.qrone.r7.QrONECompressor;
+import org.qrone.r7.QrONEUtils;
+import org.qrone.r7.handler.HTML5TagHandler;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
+import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
 import org.xml.sax.SAXException;
 
 import fmpp.util.FileUtil;
 
-public class XCompiler {
-	public static File root;
-	private static Map<File, XOM> map = new Hashtable<File, XOM>();
+public class HTML5Deck {
+	private URIResolver resolver;
+	private ImageSpriter spriter;
 	
-    public static void main(String[] args) {
-    	String[] a = {"-v", "site/test"};
-    	QrONECompressor.main(a);
+	private Map<URI, HTML5OM> map = new Hashtable<URI, HTML5OM>();
+	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
+	
+    
+    public HTML5Deck(URIResolver resolver){
+    	this.resolver = resolver;
+    	spriter = new ImageSpriter(resolver);
+    }
+    
+    public URIResolver getResolver(){
+    	return resolver;
+    }
+    
+    public ImageSpriter getSpriter(){
+    	return spriter;
+    }
+    
+	public void addTagHandler(HTML5TagHandler h){
+		handlers.add(h);
 	}
-
-	public static XOM compile(File file, String path){
-		try {
-			return compile(
-					FileUtil.resolveRelativeUnixPath(root, file.getParentFile(), path)
-					);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	
+	public List<HTML5TagHandler> getTagHandlers() {
+		return handlers;
 	}
-	public static XOM compile(File f){
-		XOM o = map.get(f);
+    
+	public HTML5OM compile(URI f){
+		HTML5OM o = map.get(f);
 		try {
 			if(o == null){
-				XOM xom = new XOM();
+				HTML5OM xom = new HTML5OM(this, f);
 				map.put(f, xom);
-				xom.parse(f);
+				xom.parse(resolver);
 				return xom;
 			}
 		} catch (FileNotFoundException e) {
@@ -61,31 +72,31 @@ public class XCompiler {
 		return o;
 	}
 	
-	public static HTML5Set getRecursive(File file, Stack<XOM> xomlist){
+	public HTML5Set getRecursive(URI file, Stack<HTML5OM> xomlist){
 		HTML5Set set = new HTML5Set();
-		Set<File> s = new HashSet<File>();
+		Set<URI> s = new HashSet<URI>();
 		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
 		if(xomlist != null){
-			for (Iterator<XOM> i = xomlist.iterator(); i.hasNext();) {
-				XOM xom = i.next();
-				getRecursive(xom.getFile(), set.js, set.css, set.jslibs, set.csslibs, s, true);
+			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
+				HTML5OM xom = i.next();
+				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true);
 			}
 		}
 		return set;
 	}
 
-	public static void getRecursive(File file, 
+	public void getRecursive(URI file, 
 			StringBuffer js, List<CSS3OM> css, 
 			List<Element> jslibs, List<Element> csslibs, 
-			Set<File> clses, boolean first){
+			Set<URI> clses, boolean first){
 		if(file == null || clses.contains(file)) return;
 		clses.add(file);
 		
-		XOM c = compile(file);
+		HTML5OM c = compile(file);
 		if(c != null){
 			String extend = c.getMETAMap().get("extends");
 			if(extend != null)
-				getRecursive(getFileByName(file.getParentFile(), extend), js, css, jslibs, csslibs, clses, false);
+				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false);
 			
 			js.append(c.getScripts(!first));
 			css.addAll(c.getStyles());
@@ -94,13 +105,13 @@ public class XCompiler {
 			csslibs.addAll(c.getCSSLibraries());
 	
 			for (Iterator<String> iter = c.getRequires().iterator(); iter.hasNext();) {
-				getRecursive(getFileByName(file.getParentFile(), iter.next()), js, css, jslibs, csslibs, clses, false);
+				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false);
 			}
 		}
 	}
 	
-	public static String getRecurseHeader(HTML5Writer b, File file, Stack<XOM> xomlist){
-		HTML5Set set = XCompiler.getRecursive(file, xomlist);
+	public String getRecurseHeader(HTML5Writer b, URI file, Stack<HTML5OM> xomlist){
+		HTML5Set set = getRecursive(file, xomlist);
 		//StringBuffer b = new StringBuffer();
 		
 		//---------------
@@ -130,7 +141,9 @@ public class XCompiler {
 				hash.add(el.getAttribute("src"));
 				if(el.hasAttribute("inline")){
 					try {
-						js.append(QrONEUtils.getContent(file.getParentFile(), el.getAttribute("src")));
+						js.append(QrONEUtils.convertStreamToString(
+								resolver.getInputStream(
+										file.resolve(el.getAttribute("src")))));
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -183,13 +196,5 @@ public class XCompiler {
 		public List<CSS3OM> css = new ArrayList<CSS3OM>();
 		public List<Element> jslibs = new ArrayList<Element>();
 		public List<Element> csslibs = new ArrayList<Element>();
-	}
-
-	private static File getFileByName(File file, String name){
-		try {
-			return FileUtil.resolveRelativeUnixPath(root, file, name);
-		} catch (IOException e) {
-		}
-		return null;
 	}
 }

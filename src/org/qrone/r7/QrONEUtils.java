@@ -9,6 +9,16 @@ import java.io.InputStreamReader;
 
 public class QrONEUtils{
 
+    public static void main(String[] args) {
+    	String[] a = {"-v", "site/test"};
+    	QrONECompressor.main(a);
+	}
+    
+	private static int uniquekey = 0;
+	public static String uniqueid(){
+		return "qid" + (++uniquekey);
+	}
+
 	public static InputStream getResourceAsStream(String name) throws IOException {
 		InputStream in = QrONEUtils.class.getResourceAsStream("resource/" + name);
 		if(in != null){

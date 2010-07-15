@@ -20,13 +20,16 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	
 	protected HTML5OM om;
 	protected HTML5Writer b;
+	protected String id;
 
-	public void visit(HTML5OM om, Element e, HTML5Writer w){
+	public void visit(HTML5OM om, Element e, String id, HTML5Writer w){
 		this.om = om;
 		this.b = w;
+		this.id = id;
 		visit(e);
 	}
 	
+	/*
 	public void visit(HTML5OM om, Element e, final HTML5Writer... w){
 		visit(om, e, new HTML5Writer() {
 			@Override
@@ -51,6 +54,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 			}
 		});
 	}
+	*/
 
 	protected String jsmin(String js){
 		return jsmin(js, null);
@@ -124,7 +128,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		String[] jslist = js.split("__QRONE_ID__");
 		for (int j = 0; j < jslist.length; j++) {
 			if(j != 0){
-				b.append("id","");
+				b.append("id",id);
 			}
 			b.append(jslist[j]);
 		}
@@ -144,19 +148,19 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				b.append(n.getNodeName());
 				b.append('=');
 				b.append('"');
-				b.append("id","");
+				b.append("id",id);
 				write(n.getNodeValue());
 				b.append('"');
 				
 			}else if(n.getNodeName().startsWith("on")){
 				writejs(n.getNodeName(), jsmin(n.getNodeValue(),
-						"qrone('" + om.getClassName() + "','__QRONE_ID__')"));
+						"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
 			}else if(n.getNodeName().equals("href") && n.getNodeValue().startsWith("javascript:")){
 				String js = n.getNodeValue();
 				if(js.startsWith("javascript:")){
 					js = js.substring("javascript:".length());
 					writejs(n.getNodeName(), "javascript:" + jsmin(js,
-							"qrone('" + om.getClassName() + "','__QRONE_ID__')"));
+							"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
 				}
 			}else{
 				write((Attr)map.item(i));

@@ -10,6 +10,10 @@ public class HTML5Element {
 		this.om = om;
 		this.e = e;
 	}
+	
+	public HTML5OM getOM(){
+		return om;
+	}
 
 	public Element get(){
 		return e;

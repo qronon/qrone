@@ -3,15 +3,17 @@ package org.qrone.r7.handler;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.qrone.r7.ImageSpriter;
-import org.qrone.r7.PartOfImage;
-import org.qrone.r7.XOM;
+import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
+import org.qrone.r7.parser.HTML5OM;
+import org.qrone.r7.parser.ImageSpriter;
+import org.qrone.r7.parser.ImagePart;
 import org.w3c.dom.css.CSSValue;
 
 public class Scale9Handler extends HTML5TagHandler {
@@ -19,10 +21,10 @@ public class Scale9Handler extends HTML5TagHandler {
 	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
 	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
 	
-	private XOM xom;
+	private HTML5Deck deck;
 	
-	public Scale9Handler(XOM xom) {
-		this.xom = xom;
+	public Scale9Handler(HTML5Deck deck) {
+		this.deck = deck;
 	}
 	
 	@Override
@@ -70,14 +72,14 @@ public class Scale9Handler extends HTML5TagHandler {
 			final String c = "background-color:" + bgcolor;
 			final String u = url;
 			final String w = "width:" + widthValue;
-			final File   f = xom.getFile();
+			final URI    f = e.getOM().getURI();
 			if(l.size() == 4){
 				return new HTML5TagResult() {
 					
 					@Override
 					public String prestart() {
 						try {
-							return startScale9(new File(f.getParentFile(), u),
+							return startScale9(f.resolve(u),
 									l.get(0), l.get(1), l.get(2), l.get(3), c, w);
 						} catch (IOException e) {
 							return null;
@@ -97,7 +99,7 @@ public class Scale9Handler extends HTML5TagHandler {
 					@Override
 					public String postend() {
 						try {
-							return endScale9(new File(f.getParentFile(), u),
+							return endScale9(f.resolve(u),
 									l.get(0), l.get(1), l.get(2), l.get(3));
 						} catch (IOException e) {
 							return null;
@@ -110,7 +112,7 @@ public class Scale9Handler extends HTML5TagHandler {
 					@Override
 					public String prestart() {
 						try {
-							return startScale3(new File(f.getParentFile(), u),
+							return startScale3(f.resolve(u),
 									l.get(0), l.get(1), c);
 						} catch (IOException e) {
 							return null;
@@ -130,7 +132,7 @@ public class Scale9Handler extends HTML5TagHandler {
 					@Override
 					public String postend() {
 						try {
-							return endScale3(new File(f.getParentFile(), u),
+							return endScale3(f.resolve(u),
 									l.get(0), l.get(1));
 						} catch (IOException e) {
 							return null;
@@ -142,17 +144,17 @@ public class Scale9Handler extends HTML5TagHandler {
 		return null;
 	}
 
-	public String startScale3(File file, int left, int right, String color) throws IOException{
-		BufferedImage image = ImageSpriter.instance().getImage(file);
+	public String startScale3(URI file, int left, int right, String color) throws IOException{
+		BufferedImage image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 
 		b.append("<table style=\"width:100%;\" cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, 0, 0, left, height)));
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, 0, left, height)));
 		b.append("\"></td><td valign=\"top\" style=\"" + color);
-		b.append(ImageSpriter.instance().addHSprite(new PartOfImage(file, left, 0, right-left, height)));
+		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, 0, right-left, height)));
 		b.append("\"><div style=\"position:relative;margin-left:-"+left+"px;margin-right:-"+(width-right)+"px;\">");
 		
 		
@@ -164,54 +166,54 @@ public class Scale9Handler extends HTML5TagHandler {
 		return b.toString();
 	}
 	
-	public String endScale3(File file, int left, int right) throws IOException{
-		BufferedImage image = ImageSpriter.instance().getImage(file);
+	public String endScale3(URI file, int left, int right) throws IOException{
+		BufferedImage image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 		b.append("</td><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, right, 0, width-right, height)));		
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, right, 0, width-right, height)));		
 		b.append("\"></td></tr></table>");
 		return b.toString();
 	}
 
-	public String startScale9(File file, int left, int right, int top, int bottom, String color, String w) throws IOException{
+	public String startScale9(URI file, int left, int right, int top, int bottom, String color, String w) throws IOException{
 		
-		BufferedImage image = ImageSpriter.instance().getImage(file);
+		BufferedImage image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 		b.append("<table" + ( w != null ? " style=\"" + w + "\"" : "" ) + " cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, 0, 0, left, top)));
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, 0, left, top)));
 		b.append("\"></td><td style=\"");
-		b.append(ImageSpriter.instance().addHSprite(new PartOfImage(file, left, 0, right-left, top)));
+		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, 0, right-left, top)));
 		b.append("\"></td><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, right, 0, width-right, top)));
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, right, 0, width-right, top)));
 		b.append("\"></td></tr><tr><td style=\"");
 		
 		
-		b.append(ImageSpriter.instance().addVSprite(new PartOfImage(file, 0, top, left, bottom-top)));
+		b.append(deck.getSpriter().addVSprite(new ImagePart(file, 0, top, left, bottom-top)));
 		b.append("\"></td><td valign=\"top\"" + ( color != null ? " style=\"" + color + "\"" : "" ) +
 				"><div style=\"position:relative;margin-left:-"+left+"px;margin-top:-"+top+"px;margin-right:-"+(width-right)+"px;margin-bottom:-"+(height-bottom)+"px;\">");
 		return b.toString();
 	}
 
-	public String endScale9(File file, int left, int right, int top, int bottom) throws IOException{
-		BufferedImage image = ImageSpriter.instance().getImage(file);
+	public String endScale9(URI file, int left, int right, int top, int bottom) throws IOException{
+		BufferedImage image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 		b.append("</div></td><td style=\"");
-		b.append(ImageSpriter.instance().addVSprite(new PartOfImage(file, right, top, width-right, bottom-top)));
+		b.append(deck.getSpriter().addVSprite(new ImagePart(file, right, top, width-right, bottom-top)));
 		b.append("\"></td></tr><tr><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, 0, bottom, left, height-bottom)));
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, bottom, left, height-bottom)));
 		b.append("\"></td><td style=\"");
-		b.append(ImageSpriter.instance().addHSprite(new PartOfImage(file, left, bottom, right-left, height-bottom)));
+		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, bottom, right-left, height-bottom)));
 		b.append("\"></td><td style=\"");
-		b.append(ImageSpriter.instance().addISprite(new PartOfImage(file, right, bottom, width-right, height-bottom)));
+		b.append(deck.getSpriter().addISprite(new ImagePart(file, right, bottom, width-right, height-bottom)));
 		b.append("\"></td></tr></table>");
 		return b.toString();
 	}
