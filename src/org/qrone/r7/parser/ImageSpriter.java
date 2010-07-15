@@ -201,7 +201,7 @@ public class ImageSpriter {
 		
 		return "width:" + b.getWidth() + "px;" 
 			 + "height:" + b.getHeight() + "px;" 
-			 + "background: no-repeat 0px -" + (iHeight-b.getHeight()) + "px url(" + getPath(file, "isprite.png") + ");";
+			 + "background: no-repeat 0px -" + (iHeight-b.getHeight()) + "px url(" + getPath(file, isprite) + ");";
 	}
 
 	public String addISprite(ImagePart file) throws IOException{
@@ -218,7 +218,7 @@ public class ImageSpriter {
 		String res = "width:" + file.w + "px;" 
 			 + "height:" + file.h + "px;" 
 			 + "background: no-repeat 0px -" 
-			 	+ (iHeight-file.h) + "px url(" + getPath(file.file, "isprite.png") + ");";
+			 	+ (iHeight-file.h) + "px url(" + getPath(file.file, isprite) + ");";
 		iresults.put(file, res);
 		return res;
 	}
@@ -234,7 +234,7 @@ public class ImageSpriter {
 		vWidth += file.w;
 		
 		String res = "width:" + file.w + "px;" 
-			 + "background: repeat-y -" + (vWidth-file.w) + "px 0px url(" + getPath(file.file, "vsprite.png") + ");";
+			 + "background: repeat-y -" + (vWidth-file.w) + "px 0px url(" + getPath(file.file, vsprite) + ");";
 		vresults.put(file, res);
 		return res;
 	}
@@ -251,7 +251,7 @@ public class ImageSpriter {
 		hHeight += file.h;
 		
 		String res = "height:" + file.h + "px;" 
-			 + "background: repeat-x 0px -" + (hHeight-file.h) + "px url(" + getPath(file.file, "hsprite.png") + ");";
+			 + "background: repeat-x 0px -" + (hHeight-file.h) + "px url(" + getPath(file.file, hsprite) + ");";
 		hresults.put(file, res);
 		return res;
 	}

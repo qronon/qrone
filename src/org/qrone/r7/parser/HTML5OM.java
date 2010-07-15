@@ -39,16 +39,16 @@ import se.fishtank.css.selectors.dom.DOMNodeSelector;
 public class HTML5OM {
 	private HTML5Deck deck;
 	
-	protected Document document;
-	protected Element body;
+	private Document document;
+	private Element body;
 	private Map<Node, List<CSSStyleRule>> map = new Hashtable<Node, List<CSSStyleRule>>();
 	
-	protected List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
-	protected List<String> javascripts = new LinkedList<String>();
+	private List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
+	private List<String> javascripts = new LinkedList<String>();
 
-	protected List<String> requires = new LinkedList<String>();
-	protected List<Element> jslibs = new LinkedList<Element>();
-	protected List<Element> csslibs = new LinkedList<Element>();
+	private List<String> requires = new LinkedList<String>();
+	private List<Element> jslibs = new LinkedList<Element>();
+	private List<Element> csslibs = new LinkedList<Element>();
 
 	private Map<String, String> metamap = new Hashtable<String, String>();
 	
@@ -67,7 +67,7 @@ public class HTML5OM {
 		return nodeselector.querySelectorAll(selector);
 	}
 	
-	public void parseStyleSheet(String path, String css) throws IOException{
+	public void parseStyleSheet(URI path, String css) throws IOException{
 		CSS3OM s = new CSS3OM();
 		s.parse(path, css);
 		CSS3Visitor v = new CSS3Visitor(){

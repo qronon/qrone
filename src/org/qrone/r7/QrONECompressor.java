@@ -36,7 +36,6 @@ public class QrONECompressor {
         CmdLineParser.Option languageOpt = parser.addStringOption('l', "lang");
         CmdLineParser.Option recurseOpt  = parser.addBooleanOption('r', "recurse");
         CmdLineParser.Option imagedirOpt = parser.addStringOption('i', "img-basedir");
-        CmdLineParser.Option imageurlOpt = parser.addStringOption('u', "img-baseurl");
         CmdLineParser.Option noImagesOpt = parser.addBooleanOption('n', "noimages");
         CmdLineParser.Option charsetOpt  = parser.addStringOption("charset");
         CmdLineParser.Option verboseOpt  = parser.addBooleanOption('v', "verbose");
@@ -83,7 +82,6 @@ public class QrONECompressor {
             System.exit(0);
 		}
         */
-        String imgurl = (String) parser.getOptionValue(imageurlOpt);
         String imgdir = (String) parser.getOptionValue(imagedirOpt);
 
         boolean recurse = parser.getOptionValue(recurseOpt) != null;
