@@ -1,13 +1,10 @@
 package org.qrone.r7.handler;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
-import org.qrone.r7.parser.HTML5OM;
-import org.qrone.r7.parser.ImageSpriter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 

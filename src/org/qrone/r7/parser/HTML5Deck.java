@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -13,16 +12,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.qrone.r7.QrONECompressor;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.handler.HTML5TagHandler;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
-import org.w3c.dom.css.CSSStyleRule;
-import org.w3c.dom.css.CSSStyleSheet;
 import org.xml.sax.SAXException;
-
-import fmpp.util.FileUtil;
 
 public class HTML5Deck {
 	private URIResolver resolver;

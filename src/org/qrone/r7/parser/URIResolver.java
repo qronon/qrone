@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
-import javax.imageio.stream.ImageOutputStream;
-
 public interface URIResolver {
 	public boolean exist( URI uri );
 	public InputStream getInputStream( URI uri ) throws FileNotFoundException;

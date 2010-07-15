@@ -1,7 +1,6 @@
 package org.qrone.r7.handler;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
@@ -11,8 +10,6 @@ import java.util.regex.Pattern;
 
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
-import org.qrone.r7.parser.HTML5OM;
-import org.qrone.r7.parser.ImageSpriter;
 import org.qrone.r7.parser.ImagePart;
 import org.w3c.dom.css.CSSValue;
 

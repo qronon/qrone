@@ -2,7 +2,6 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.Writer;
 
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRuleList;

@@ -3,7 +3,6 @@ package org.qrone.r7.parser;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,16 +17,12 @@ import javax.imageio.ImageIO;
 
 import org.qrone.r7.QrONEUtils;
 
-import fmpp.util.FileUtil;
-
 public class ImageSpriter {
-	private String isprite = "isprite.png";
-	private String vsprite = "vsprite.png";
-	private String hsprite = "hsprite.png";
-	private String tsprite = "tsprite.png";
+	private String isprite = "sprite-i.png";
+	private String vsprite = "sprite-v.png";
+	private String hsprite = "sprite-h.png";
+	private String tsprite = "sprite-t.png";
 	
-	
-	private static ImageSpriter ins;
 	private List<ImagePart> isprites = new LinkedList<ImagePart>();
 	private Map<ImagePart, String> iresults = new Hashtable<ImagePart, String>();
 	private int iWidth;

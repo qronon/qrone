@@ -22,8 +22,6 @@ import org.qrone.r7.handler.Scale9Handler;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 
-import fmpp.util.FileUtil;
-
 
 
 public class QrONECompressor {

@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.io.File;
 import java.net.URI;
 
 

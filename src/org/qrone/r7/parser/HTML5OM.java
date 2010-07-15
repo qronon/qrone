@@ -1,7 +1,6 @@
 package org.qrone.r7.parser;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -29,7 +28,6 @@ import org.w3c.dom.Text;
 import org.w3c.dom.css.CSSMediaRule;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSStyleRule;
-import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.stylesheets.MediaList;
 import org.xml.sax.InputSource;
