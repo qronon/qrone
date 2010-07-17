@@ -184,15 +184,15 @@ public class QrONECompressor {
 		        }
 				
 				HTML5OM xom = deck.compile(new URI(path));
-				//out.write(xom.serialize(lang));
-				xom.serialize(lang);
+				out.write(xom.serialize(lang));
+				//xom.serialize(lang);
 				if (verbose) {
 		            System.err.println("[INFO] Writing " + outfile.getName() + " done.");
 		        }
-			//} catch (IOException e) {
-			//	e.printStackTrace();
-		      //  System.err.println("[ERROR] Parsing file " + file.getName());
-		        //System.exit(0);
+			} catch (IOException e) {
+				e.printStackTrace();
+		        System.err.println("[ERROR] Parsing file " + file.getName());
+		        System.exit(0);
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 		        System.err.println("[ERROR] Parsing file " + file.getName());
