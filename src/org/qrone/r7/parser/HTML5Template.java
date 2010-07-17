@@ -63,7 +63,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		return b.toString();
 	}
 
-	private boolean initialized = true;
+	private boolean initialized = false;
 	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
 	private Map<Element, NodeLister> nodemap;
 
