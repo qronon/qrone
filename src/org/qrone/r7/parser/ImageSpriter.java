@@ -40,7 +40,7 @@ public class ImageSpriter {
 	
 	private boolean useTransparentDot = false;
 	
-	private Map<File, BufferedImage> map = new Hashtable<File, BufferedImage>();
+	private Map<URI, BufferedImage> map = new Hashtable<URI, BufferedImage>();
 
 	private URI basedir;
 	private URIResolver resolver;
@@ -58,7 +58,9 @@ public class ImageSpriter {
 		if(map.containsKey(file)){
 			return map.get(file);
 		}else{
-			return ImageIO.read(resolver.getInputStream(file));
+			BufferedImage i = ImageIO.read(resolver.getInputStream(file));
+			map.put(file, i);
+			return i;
 		}
 	}
 	

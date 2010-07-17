@@ -59,8 +59,8 @@ public class QState extends QCodeBase {
 	}
 	
 	public QState str(String str){
-		if(peek() instanceof QStr){
-			((QStr)peek()).str.append(str);
+		if(peek instanceof QStr){
+			((QStr)peek).str.append(str);
 		}else{
 			add(new QStr(str));
 		}
@@ -68,7 +68,7 @@ public class QState extends QCodeBase {
 	}
 	
 	public QState var(String type, String name){
-		if(peek() instanceof QVar || peek() instanceof QCall){
+		if(peek instanceof QVar || peek instanceof QCall){
 			ops("->");
 		}
 		
@@ -89,7 +89,7 @@ public class QState extends QCodeBase {
 	}
 
 	public QState call(String name, QState... call){
-		if(peek() instanceof QVar || peek() instanceof QCall){
+		if(peek instanceof QVar || peek instanceof QCall){
 			ops("->");
 		}
 		add(new QCall(name, call));

@@ -26,7 +26,9 @@ import org.qrone.r7.parser.HTML5OM;
 
 public class QrONECompressor {
 	
+	public static HTML5Deck deck;
 	public static boolean verbose;
+	
 
     public static void main(String args[]) {
     	long timer = System.currentTimeMillis();
@@ -116,7 +118,8 @@ public class QrONECompressor {
             System.exit(0);
 		}
 
-        HTML5Deck deck = new HTML5Deck(new FileURIResolver(basedir));
+        if(deck == null)
+        	deck = new HTML5Deck(new FileURIResolver(basedir));
     	deck.getSpriter().setImageDir(imgbaseuri);
     	
     	deck.addTagHandler(new Scale9Handler(deck));
@@ -181,14 +184,15 @@ public class QrONECompressor {
 		        }
 				
 				HTML5OM xom = deck.compile(new URI(path));
-				out.write(xom.serialize(lang));
+				//out.write(xom.serialize(lang));
+				xom.serialize(lang);
 				if (verbose) {
 		            System.err.println("[INFO] Writing " + outfile.getName() + " done.");
 		        }
-			} catch (IOException e) {
-				e.printStackTrace();
-		        System.err.println("[ERROR] Parsing file " + file.getName());
-		        System.exit(0);
+			//} catch (IOException e) {
+			//	e.printStackTrace();
+		      //  System.err.println("[ERROR] Parsing file " + file.getName());
+		        //System.exit(0);
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 		        System.err.println("[ERROR] Parsing file " + file.getName());

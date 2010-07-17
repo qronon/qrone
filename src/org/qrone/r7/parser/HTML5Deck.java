@@ -103,8 +103,14 @@ public class HTML5Deck {
 		}
 	}
 	
+	private Map<URI, HTML5Set> recursecache = new Hashtable<URI, HTML5Set>();
 	public String getRecurseHeader(HTML5Writer b, URI file, Set<HTML5OM> xomlist){
-		HTML5Set set = getRecursive(file, xomlist);
+		
+		HTML5Set set = recursecache.get(file);
+		if(set == null){
+			set = getRecursive(file, xomlist);
+			recursecache.put(file, set);
+		}
 		//StringBuffer b = new StringBuffer();
 		
 		//---------------

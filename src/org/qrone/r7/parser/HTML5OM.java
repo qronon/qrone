@@ -20,9 +20,11 @@ import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.handler.HTML5TagHandler;
 import org.qrone.r7.handler.HTML5TagResult;
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.w3c.dom.css.CSSMediaRule;
@@ -135,6 +137,24 @@ public class HTML5OM {
 							extmap.put(e, l);
 						}
 						l.add(r);
+					}
+				}
+				
+				NamedNodeMap map = e.getAttributes();
+				for (int i = 0; i < map.getLength(); i++) {
+					Node n = map.item(i);
+					if(n.getNodeName().startsWith("on")){
+						e.setAttribute(n.getNodeName(), JSParser.compress(n.getNodeValue(),true)
+								.replace("__QRONE_PREFIX_NAME__", 
+								"qrone('" + getURI().toString() + "','__QRONE_ID__')"));
+					}else if(n.getNodeName().equals("href") && n.getNodeValue().startsWith("javascript:")){
+						String js = n.getNodeValue();
+						if(js.startsWith("javascript:")){
+							js = js.substring("javascript:".length());
+							e.setAttribute(n.getNodeName(), "javascript:" + JSParser.compress(js,true)
+									.replace("__QRONE_PREFIX_NAME__", 
+									  "qrone('" + getURI().toString() + "','__QRONE_ID__')"));
+						}
 					}
 				}
 				

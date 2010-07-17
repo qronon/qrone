@@ -10,7 +10,8 @@ import java.io.InputStreamReader;
 public class QrONEUtils{
 
     public static void main(String[] args) {
-    	String[] a = {"-v", "site/test"};
+    	String[] a = {"-v", "-n", "site/test"};
+    	QrONECompressor.main(a);
     	QrONECompressor.main(a);
 	}
     

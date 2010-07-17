@@ -160,7 +160,9 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				write(n.getNodeValue());
 				b.append('"');
 				
-			}else if(n.getNodeName().startsWith("on")){
+			}
+			/*
+			else if(n.getNodeName().startsWith("on")){
 				writejs(n.getNodeName(), jsmin(n.getNodeValue(),
 						"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
 			}else if(n.getNodeName().equals("href") && n.getNodeValue().startsWith("javascript:")){
@@ -170,7 +172,8 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 					writejs(n.getNodeName(), "javascript:" + jsmin(js,
 							"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
 				}
-			}else{
+			}*/
+			else{
 				write((Attr)map.item(i));
 			}
 		}
@@ -236,6 +239,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	}
 	
 	protected void write(String str){
+		StringBuilder b = new StringBuilder();
 		boolean white = false;
 		char[] ch = str.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
@@ -272,5 +276,6 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				break;
 			}
 		}
+		this.b.append(b.toString());
 	}
 }
