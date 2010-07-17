@@ -30,7 +30,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		visit(e);
 	}
 
-	public void visit(HTML5OM om, Element e, String id, HTML5Writer w){
+	public void visit(HTML5OM om, Node e, String id, HTML5Writer w){
 		this.om = om;
 		this.b = w;
 		this.id = id;

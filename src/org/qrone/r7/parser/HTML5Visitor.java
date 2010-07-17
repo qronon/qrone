@@ -34,7 +34,10 @@ public abstract class HTML5Visitor {
 	public void visit(DocumentType n) {
 		System.err.println("DocumentType found = " + n.getNodeValue());
 	}
-	
+
+	public void visit(Node n) {
+		dispatch(n);
+	}
 	
 	protected void accept(Document e){
 		visit(e.getDocumentElement());

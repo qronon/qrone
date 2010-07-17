@@ -68,12 +68,15 @@ public class HTML5OM {
 		return deck;
 	}
 	
-	public Set<Node> select(String selector) throws NodeSelectorException{
-		Set<Node> nodes = selectcache.get(selector);
-		if(nodes == null){
-			nodes = nodeselector.querySelectorAll(selector);
-		}
-		return nodes;
+	public Set<Node> select(String selector){
+		try{
+			Set<Node> nodes = selectcache.get(selector);
+			if(nodes == null){
+				nodes = nodeselector.querySelectorAll(selector);
+			}
+			return nodes;
+		}catch(NodeSelectorException e){}
+		return null;
 	}
 	
 	public void parseStyleSheet(URI path, String css) throws IOException{
@@ -91,8 +94,8 @@ public class HTML5OM {
 			
 			@Override
 			public void visit(CSSStyleRule style) {
-				try {
-					Set<Node> set = select(style.getSelectorText());
+				Set<Node> set = select(style.getSelectorText());
+				if(set != null){
 					for (Iterator<Node> i = set.iterator(); i
 							.hasNext();) {
 						Node node = i.next();
@@ -103,7 +106,6 @@ public class HTML5OM {
 						}
 						list.add(style);
 					}
-				} catch (NodeSelectorException e) {
 				}
 			}
 		};
@@ -372,10 +374,10 @@ public class HTML5OM {
 	//		final Stack<HTML5OM> xomlist, final String target, String id){
 	
 
-	public void process(final HTML5Template t){
+	public void process(final HTML5Template t, final Set<HTML5OM> xomlist){
 		
-		final HTML5Template bodyt = new HTML5Template();
-		final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
+		final HTML5Template bodyt = new HTML5Template(this);
+		//final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
 		process(bodyt, t, body, null, xomlist);
 		
 		
@@ -422,10 +424,10 @@ public class HTML5OM {
 		s.visit(this, document, null, t);
 	}
 	
-	private void process(final HTML5Writer t, final NodeProcessor p,
-			Element element, String id, final Set<HTML5OM> xomlist){
-		if(element == null)
-			element = body;
+	public void process(final HTML5Writer t, final NodeProcessor p,
+			Node node, String id, final Set<HTML5OM> xomlist){
+		if(node == null)
+			node = body;
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
 
@@ -530,12 +532,12 @@ public class HTML5OM {
 				}
 			}
 		};
-		s.visit(this, element, null, t);
+		s.visit(this, node, id, t);
 	}
 
 	public String getHTML(){
-		HTML5Template t = new HTML5Template();
-		return t.process(this);
+		HTML5Template t = new HTML5Template(this);
+		return t.output();
 	}
 
 	public String getScripts(boolean html){
