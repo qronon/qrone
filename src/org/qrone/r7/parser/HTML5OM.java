@@ -3,13 +3,13 @@ package org.qrone.r7.parser;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +55,8 @@ public class HTML5OM {
 	private DOMNodeSelector nodeselector;
 
 	private Map<Element, List<HTML5TagResult>> extmap = new Hashtable<Element, List<HTML5TagResult>>();
-
+	private Map<String, Set<Node>> selectcache = new Hashtable<String, Set<Node>>();
+	
 	private URI uri;
 	
 	public HTML5OM(HTML5Deck deck, URI uri){
@@ -63,8 +64,16 @@ public class HTML5OM {
 		this.deck = deck;
 	}
 	
+	public HTML5Deck getDeck(){
+		return deck;
+	}
+	
 	public Set<Node> select(String selector) throws NodeSelectorException{
-		return nodeselector.querySelectorAll(selector);
+		Set<Node> nodes = selectcache.get(selector);
+		if(nodes == null){
+			nodes = nodeselector.querySelectorAll(selector);
+		}
+		return nodes;
 	}
 	
 	public void parseStyleSheet(URI path, String css) throws IOException{
@@ -92,7 +101,6 @@ public class HTML5OM {
 							list = new ArrayList<CSSStyleRule>();
 							map.put(node, list);
 						}
-						//System.out.println(node.getAttributes().getNamedItem("class"));
 						list.add(style);
 					}
 				} catch (NodeSelectorException e) {
@@ -345,41 +353,33 @@ public class HTML5OM {
 	}
 	
 	//---
-
-	public void process(HTML5Writer t){
+	/*
+	private void process(HTML5Writer t){
 		process(t, false, null);
 	}
 
-	public void process(HTML5Writer t, boolean bodyOnly, String id){
+	private void process(HTML5Writer t, boolean bodyOnly, String id){
 		process(t, bodyOnly, null, null, null);
 	}
-	
-	public void process(final HTML5Writer t, final boolean bodyOnly, 
+
+	private void process(final HTML5Writer t, final boolean bodyOnly, 
 			final Stack<HTML5OM> xomlist, final String target, String id){
-		if(!bodyOnly){
-			String path = getMETAMap().get("include-in");
-			if(path != null){
-				String[] paths = path.split("#", 2);
-				if(paths.length == 2){
-					HTML5OM xom = deck.compile(getURI().resolve(paths[0]));
-					if(xom != null){
-						Stack<HTML5OM> xoml = xomlist;
-						if(xomlist == null){
-							xoml = new Stack<HTML5OM>();
-						}
-						xoml.push(this);
-						xom.process(t, false, xoml, paths[1], null);
-						return;
-					}
-				}
-			}
-		}
+		process(t, bodyOnly ? body : document.getDocumentElement(),
+				xomlist, target, id);
+	}
+	*/
+	//private void process(final HTML5Writer t, final Element element, 
+	//		final Stack<HTML5OM> xomlist, final String target, String id){
+	
+
+	public void process(final HTML5Template t){
+		
+		final HTML5Template bodyt = new HTML5Template();
+		final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
+		process(bodyt, t, body, null, xomlist);
+		
 		
 		HTML5Selializer s = new HTML5Selializer() {
-			int formatting = 0;
-			boolean inBody;
-			boolean inScript;
-			
 			@Override
 			public void visit(Document e) {
 				out("<!DOCTYPE html>");
@@ -391,26 +391,83 @@ public class HTML5OM {
 				if(e.getNodeName().equals("head")){
 					start(e);
 					accept(e);
-					out(deck.getRecurseHeader(b, getURI(), xomlist));
+					deck.getRecurseHeader(b, getURI(), xomlist);
 					end(e);
 				}else if(e.getNodeName().equals("body")){
-					if(!bodyOnly){
-						start(e);
-					}
-					inBody = true;
-					accept(e);
-					inBody = false;
-					if(!bodyOnly){
-						end(e);
-					}
+
+					start(e);
+					t.append(bodyt);
+					end(e);
+					
 				}else if(e.getNodeName().equals("script")){
-					if(inBody){
+				}else if(e.getNodeName().equals("style")){
+				}else if(e.getNodeName().equals("link")){
+				}else if(e.getNodeName().equals("meta")){
+					if(e.getAttribute("name").equals("extends")){
+					}else{
 						start(e);
-						inScript = true;
 						accept(e);
-						inScript = false;
 						end(e);
 					}
+				}else{
+					out(e);
+				}
+			}
+
+			@Override
+			public void visit(Text n) {
+			}
+		};
+		
+		s.visit(this, document, null, t);
+	}
+	
+	private void process(final HTML5Writer t, final NodeProcessor p,
+			Element element, String id, final Set<HTML5OM> xomlist){
+		if(element == null)
+			element = body;
+		if(xomlist != null && !xomlist.contains(this)){
+			xomlist.add(this);
+
+			String path = getMETAMap().get("include-in");
+			if(path != null){
+				final String[] paths = path.split("#", 2);
+				if(paths.length == 2){
+					HTML5OM xom = deck.compile(getURI().resolve(paths[0]));
+					if(xom != null){
+						xomlist.add(this);
+						xom.process(t, new NodeProcessor() {
+							@Override
+							public void processTarget(HTML5OM om, Element node) {
+								HTML5OM.this.process(t, p, null, null, xomlist);
+							}
+							
+							@Override
+							public boolean isTarget(Element node) {
+								String id = node.getAttribute("id");
+								return id != null && id.equals(paths[1]);
+							}
+						}, null, null, xomlist);
+						return;
+					}
+				}
+			}
+		}
+		
+		HTML5Selializer s = new HTML5Selializer() {
+			int formatting = 0;
+			boolean inScript;
+			
+			@Override
+			public void visit(Element e) {
+				if(e.getNodeName().equals("body")){
+					accept(e);
+				}else if(e.getNodeName().equals("script")){
+					start(e);
+					inScript = true;
+					accept(e);
+					inScript = false;
+					end(e);
 				}else if(e.getNodeName().equals("style")){
 				}else if(e.getNodeName().equals("link")){
 				}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code")){
@@ -435,13 +492,13 @@ public class HTML5OM {
 					out(jsmin(n.getNodeValue(), "qrone[\"" + getURI().toString() + "\"]"));
 				}else if(formatting>0){
 					writeraw(n.getNodeValue());
-				}else if(inBody){
+				}else{
 					write(n.getNodeValue());
 				}
 			}
 			
 			@Override
-			protected void out(Element e) {
+			protected void out(final Element e) {
 				final String include = getProperty(e, "include");
 				final String uniqueid = QrONEUtils.uniqueid();
 				if(include != null){
@@ -451,7 +508,7 @@ public class HTML5OM {
 							@Override
 							public void accept() {
 								HTML5OM xom = deck.compile(getURI().resolve(path));
-								xom.process(t, true, uniqueid);
+								xom.process(t, p, null, uniqueid, xomlist);
 							}
 						});
 					}else{
@@ -461,12 +518,11 @@ public class HTML5OM {
 							e1.printStackTrace();
 						}
 					}
-				}else if(target != null && e.getAttribute("id").equals(target)){
+				}else if(p != null && p.isTarget(e)){
 					super.out(e,new Delegate() {
 						@Override
 						public void accept() {
-							HTML5OM xom = xomlist.pop();
-							xom.process(t, true, uniqueid);
+							p.processTarget(HTML5OM.this, e);
 						}
 					});
 				}else{
@@ -474,13 +530,12 @@ public class HTML5OM {
 				}
 			}
 		};
-		s.visit(this, bodyOnly ? body : document.getDocumentElement(), null, t);
+		s.visit(this, element, null, t);
 	}
 
 	public String getHTML(){
 		HTML5Template t = new HTML5Template();
-		process(t);
-		return t.toString();
+		return t.process(this);
 	}
 
 	public String getScripts(boolean html){
@@ -505,7 +560,7 @@ public class HTML5OM {
 			public void append(char c) {
 				jqueryhtml.str(String.valueOf(c));
 			}
-		}, true, null);
+		}, null, body, null, null);
 		
 		StringBuilder b = new StringBuilder();
 		if(!html){

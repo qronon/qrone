@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.handler.HTML5TagHandler;
@@ -66,7 +65,7 @@ public class HTML5Deck {
 		return o;
 	}
 	
-	public HTML5Set getRecursive(URI file, Stack<HTML5OM> xomlist){
+	public HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist){
 		HTML5Set set = new HTML5Set();
 		Set<URI> s = new HashSet<URI>();
 		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
@@ -104,7 +103,7 @@ public class HTML5Deck {
 		}
 	}
 	
-	public String getRecurseHeader(HTML5Writer b, URI file, Stack<HTML5OM> xomlist){
+	public String getRecurseHeader(HTML5Writer b, URI file, Set<HTML5OM> xomlist){
 		HTML5Set set = getRecursive(file, xomlist);
 		//StringBuffer b = new StringBuffer();
 		

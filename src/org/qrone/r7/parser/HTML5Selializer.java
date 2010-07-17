@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.qrone.r7.handler.HTML5TagResult;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -21,6 +22,13 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	protected HTML5OM om;
 	protected HTML5Writer b;
 	protected String id;
+
+	public void visit(HTML5OM om, Document e, String id, HTML5Writer w){
+		this.om = om;
+		this.b = w;
+		this.id = id;
+		visit(e);
+	}
 
 	public void visit(HTML5OM om, Element e, String id, HTML5Writer w){
 		this.om = om;
