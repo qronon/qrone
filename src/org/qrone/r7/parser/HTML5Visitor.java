@@ -47,6 +47,7 @@ public abstract class HTML5Visitor {
 		}
 	}
 	
+	
 	protected void dispatch(Node n){
 		if(n instanceof Element)
 			visit((Element)n);
