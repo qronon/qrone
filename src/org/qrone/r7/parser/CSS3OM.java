@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.qrone.r7.QrONEUtils;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRuleList;
 import org.w3c.dom.css.CSSStyleSheet;
@@ -45,7 +46,7 @@ public class CSS3OM {
 			while(m.find()){
 				try {
 					URI uri = new URI(m.group(2));
-					m.appendReplacement(c, m.group(1) + path.relativize(uri) + m.group(3));
+					m.appendReplacement(c, m.group(1) + QrONEUtils.relativize(path,uri) + m.group(3));
 				} catch (URISyntaxException e) {}
 			}
 			

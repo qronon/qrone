@@ -1,5 +1,6 @@
 package org.qrone.r7.parser;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.handler.HTML5TagHandler;
+import org.qrone.r7.resolver.FileURIResolver;
+import org.qrone.r7.resolver.URIResolver;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
 import org.xml.sax.SAXException;
@@ -24,10 +27,21 @@ public class HTML5Deck {
 	private Map<URI, HTML5OM> map = new Hashtable<URI, HTML5OM>();
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	
+	public HTML5Deck(File file){
+		this(new FileURIResolver(file));
+	}
     
     public HTML5Deck(URIResolver resolver){
     	this.resolver = resolver;
     	spriter = new ImageSpriter(resolver);
+    }
+    
+    public void update(URI uri){
+    	try {
+			spriter.update(uri);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
     public URIResolver getResolver(){
@@ -49,18 +63,15 @@ public class HTML5Deck {
 	public HTML5OM compile(URI f){
 		HTML5OM o = map.get(f);
 		try {
-			if(o == null){
+			if(o == null || resolver.updated(f)){
 				HTML5OM xom = new HTML5OM(this, f);
 				map.put(f, xom);
 				xom.parse(resolver);
 				return xom;
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (SAXException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return o;
 	}
@@ -103,14 +114,8 @@ public class HTML5Deck {
 		}
 	}
 	
-	private Map<URI, HTML5Set> recursecache = new Hashtable<URI, HTML5Set>();
 	public String getRecurseHeader(HTML5Writer b, URI file, Set<HTML5OM> xomlist){
-		
-		HTML5Set set = recursecache.get(file);
-		if(set == null){
-			set = getRecursive(file, xomlist);
-			recursecache.put(file, set);
-		}
+		HTML5Set set = getRecursive(file, xomlist);
 		//StringBuffer b = new StringBuffer();
 		
 		//---------------

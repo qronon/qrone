@@ -21,6 +21,7 @@ import org.qrone.r7.handler.ImageHandler;
 import org.qrone.r7.handler.Scale9Handler;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
+import org.qrone.r7.resolver.FileURIResolver;
 
 
 
@@ -105,23 +106,18 @@ public class QrONECompressor {
         	path = target.getName();
         }
         
-        URI imgbaseuri = null;
+        if(deck == null)
+        	deck = new HTML5Deck(new FileURIResolver(basedir));
+        
         try {
 	    	if(imgdir != null){
-					imgbaseuri = new URI(fileArgs[0]).relativize(new URI(imgdir));
-	    	}else{
-	    		imgbaseuri = new URI(".");
+	    		deck.getSpriter().setBaseURI(QrONEUtils.relativize(new URI(fileArgs[0]),new URI(imgdir)));
 	    	}
-	    	
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
             System.exit(0);
 		}
-
-        if(deck == null)
-        	deck = new HTML5Deck(new FileURIResolver(basedir));
-    	deck.getSpriter().setImageDir(imgbaseuri);
-    	
+		
     	deck.addTagHandler(new Scale9Handler(deck));
     	deck.addTagHandler(new ImageHandler(deck));
         

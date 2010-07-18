@@ -3,6 +3,7 @@ package org.qrone.r7.handler;
 import java.io.IOException;
 import java.net.URI;
 
+import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.w3c.dom.DOMException;
@@ -31,7 +32,7 @@ public class ImageHandler extends HTML5TagHandler {
 				String style = e.getAttribute("style");
 				e.setAttribute("style", deck.getSpriter().addISprite(uri) + style);
 				
-				e.setAttribute("src", file.relativize(deck.getSpriter().addTransparentDot()).toString());
+				e.setAttribute("src", QrONEUtils.relativize(file,deck.getSpriter().addTransparentDot()).toString());
 			}
 		} catch (DOMException e1) {
 			e1.printStackTrace();

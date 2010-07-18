@@ -2,11 +2,11 @@ package org.qrone.r7.parser;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,29 +16,39 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.qrone.r7.QrONEUtils;
+import org.qrone.r7.resolver.URIResolver;
 
 public class ImageSpriter {
 	private String isprite = "sprite-i.png";
 	private String vsprite = "sprite-v.png";
 	private String hsprite = "sprite-h.png";
 	private String tsprite = "sprite-t.png";
+
+	private URI ispriteURI;
+	private URI vspriteURI;
+	private URI hspriteURI;
+	private URI tspriteURI;
 	
 	private List<ImagePart> isprites = new LinkedList<ImagePart>();
 	private Map<ImagePart, String> iresults = new Hashtable<ImagePart, String>();
 	private int iWidth;
 	private int iHeight;
+	private int ilastsize = -1;
 	
 	private List<ImagePart> vsprites = new LinkedList<ImagePart>();
 	private Map<ImagePart, String> vresults = new Hashtable<ImagePart, String>();
 	private int vWidth;
 	private int vHeight;
+	private int vlastsize = -1;
 	
 	private List<ImagePart> hsprites = new LinkedList<ImagePart>();
 	private Map<ImagePart, String> hresults = new Hashtable<ImagePart, String>();
 	private int hWidth;
 	private int hHeight;
+	private int hlastsize = -1;
 	
 	private boolean useTransparentDot = false;
+	private boolean outTransparentDot = false;
 	
 	private Map<URI, BufferedImage> map = new Hashtable<URI, BufferedImage>();
 
@@ -47,6 +57,10 @@ public class ImageSpriter {
 	
 	public ImageSpriter(URIResolver resolver) {
 		this.resolver = resolver;
+		
+		try {
+			setBaseURI(new URI("."));
+		} catch (URISyntaxException e) {}
 	}
 	/*
 	public static ImageSpriter instance(){
@@ -64,33 +78,44 @@ public class ImageSpriter {
 		}
 	}
 	
-	public void setImageDir(URI imgdir){
+	public void setBaseURI(URI imgdir){
 		basedir = imgdir;
+		ispriteURI = basedir.resolve(isprite);
+		tspriteURI = basedir.resolve(tsprite);
+		vspriteURI = basedir.resolve(vsprite);
+		hspriteURI = basedir.resolve(hsprite);
+	}
+	
+	public void update(URI uri) throws IOException{
+		if(uri.equals(ispriteURI)){
+			createi();
+		}else if(uri.equals(hspriteURI)){
+			createh();
+		}else if(uri.equals(vspriteURI)){
+			createv();
+		}else if(uri.equals(tspriteURI)){
+			createt();
+		}
 	}
 	
 	private URI getPath(URI from, String name){
-		return from.relativize(basedir.resolve(name));
-		/*
-		from.resolve(name);
-		if(baseurl != null){
-			return baseurl;
-		}
-		
-		try {
-			return FileUtil.getRelativePath(from.getParentFile(), new File(basedir, name));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return name;
-		*/
+		return QrONEUtils.relativize(from,basedir.resolve(name));
 	}
 	
 	public void create() throws IOException {
+		createi();
+		createh();
+		createv();
+		createt();
+	}
+
+	public void createi() throws IOException {
 		Graphics g;
 		int currentY = 0;
 		int currentX = 0;
-		
-		if(isprites.size() > 0){
+		if(isprites.size() > 0 && ilastsize != isprites.size()){
+			ilastsize = isprites.size();
+			
 			BufferedImage iimage = new BufferedImage(iWidth, iHeight,
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = iimage.getGraphics();
@@ -103,10 +128,17 @@ public class ImageSpriter {
 						part.x, part.y, part.x+part.w, part.y+part.h, null);
 				currentY += part.h;
 			}
-			ImageIO.write(iimage, "png", resolver.getOutputStream(basedir.resolve(isprite)));
+			ImageIO.write(iimage, "png", resolver.getOutputStream(ispriteURI));
 		}
-		
-		if(vsprites.size() > 0){
+	}
+	
+	public void createv() throws IOException {
+		Graphics g;
+		int currentY = 0;
+		int currentX = 0;
+		if(vsprites.size() > 0 && vlastsize != vsprites.size()){
+			vlastsize = vsprites.size();
+			
 			BufferedImage vimage = new BufferedImage(vWidth, vHeight,
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = vimage.getGraphics();
@@ -139,10 +171,18 @@ public class ImageSpriter {
 	
 				currentX += part.w;
 			}
-			ImageIO.write(vimage, "png", resolver.getOutputStream(basedir.resolve(vsprite)));
+			ImageIO.write(vimage, "png", resolver.getOutputStream(vspriteURI));
 		}
+	}
+	
+	public void createh() throws IOException {
+		Graphics g;
+		int currentY = 0;
+		int currentX = 0;
 		
-		if(hsprites.size() > 0){
+		if(hsprites.size() > 0 && hlastsize != hsprites.size()){
+			hlastsize = hsprites.size();
+			
 			BufferedImage himage = new BufferedImage(hWidth, hHeight,
 					BufferedImage.TYPE_4BYTE_ABGR);
 			g = himage.getGraphics();
@@ -176,20 +216,21 @@ public class ImageSpriter {
 	
 				currentY += part.h;
 			}
-			ImageIO.write(himage, "png", resolver.getOutputStream(basedir.resolve(hsprite)));
+			ImageIO.write(himage, "png", resolver.getOutputStream(hspriteURI));
 		}
-		
-		if(useTransparentDot){
+	}
+	
+	public void createt() throws IOException {
+		if(useTransparentDot && !outTransparentDot){
+			outTransparentDot = true;
 			InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
-			OutputStream out = resolver.getOutputStream(basedir.resolve(tsprite));
+			OutputStream out = resolver.getOutputStream(tspriteURI);
 			int buf;
 		    while ((buf = in.read()) >= 0)
 		        out.write(buf);
 		    in.close();
 		    out.close();
 		}
-		
-		
 	}
 	
 	public String addISprite(URI file) throws IOException{

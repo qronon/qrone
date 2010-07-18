@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="include-in" content="qrone-frame.html#content"/>
+<style>
+
+.codebox{
+	font-family:'Courier New';
+	font-size:10pt;
+	color:white;
+	
+	scale9:url(qrblackback.png) 15px 50px 15px 25px;
+	width:500px;
+	background-color:#312525;
+	padding:15px;
+}
+
+</style>
+</head>
+<body>
+
+
+
+<h2>Minimization</h2>
+
+<div class="codebox">
+&lt;html&gt;<br/>
+  &lt;head&gt;<br/>
+  &lt;/head&gt;<br/>
+  &lt;body&gt;<br/>
+  &lt;/body&gt;<br/>
+&lt;/html&gt;<br/>
+</div>
+
+
+<h2>CSS Sprite : &lt;img&gt;</h2>
+
+CSS Sprite is a well known technique for optimizing which reduces HTTP Request while loading web pages. This makes faster the web page.<br>
+<br>
+You have to do isags to make it use background-image and background-position with measuring image size and lo creating image which concatenates all images in your web site and rewrite all &lt;img&gt; tcation of your concatenated image, instead of simple src attributes.<br>
+
+<h3>syntax</h3>
+
+<div class="codebox">
+&lt;img src="file"&gt;<br/>
+</div>
+
+<h3>sample</h3>
+
+All you need to write is image tag. QrONE do that automatically.<br/>
+<br/>
+<div class="codebox">
+&lt;img src="image.png" align="absmiddle"&gt;<br/>
+</div>
+
+<br/>
+QrONE will measure your images and add images to concatenated image, then rewrite your tag using background properties.<br/>
+<br/>
+
+<div class="codebox">
+&lt;img src="dummy.png" style="width:67px;height:39px;background: no-repeat 0px -881px url(isprite.png);" align="absmiddle"&gt;<br/>
+</div>
+
+<h3>do without ...</h3>
+
+You have to do is to make it use background-image and background-position with measuring image size and lo creating image which concatenates all images in your web site and rewrite all &lt;img&gt; tcation of your concatenated image, instead of simple src attributes.<br>
+
+
+
+</body></html>

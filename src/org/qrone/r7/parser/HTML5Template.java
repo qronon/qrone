@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import se.fishtank.css.selectors.NodeSelectorException;
-
 public class HTML5Template implements HTML5Writer, NodeProcessor{
 	private List<Object> list = new ArrayList<Object>();
 	private StringBuilder b = new StringBuilder();

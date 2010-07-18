@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="include-in" content="qrone-frame.html#content"/>
+<style>
+
+.codebox{
+	font-family:'Courier New';
+	font-size:10pt;
+	color:white;
+	
+	scale9:url(qrblackback.png) 15px 50px 15px 25px;
+	width:500px;
+	background-color:#312525;
+	padding:15px;
+}
+
+</style>
+</head>
+<body>
+
+<h3>make jQuery Plugin.</h3>
+
+<div class="codebox">
+java -jar qrone-x.y.z.jar -l js parts.html -o parts.js<br/>
+</div>
+
+
+<h3>include it</h3>
+
+<div class="codebox">
+&lt;script src="jquery.min.js"&gt;&lt;/script&gt;<br/>
+&lt;script src="parts.js"&gt;&lt;/script&gt;<br/>
+</div>
+
+<h3>use it</h3>
+
+<div class="codebox">
+jQuery("#someid").qrone('parts');<br/>
+<span style="color:lightgreen">// insert contents of parts.html into #someid element. </span><br/>
+<br/>
+jQuery(".cssclass").append(qrone('parts'));<br/>
+<span style="color:lightgreen">// append contents of parts.html into all element with 'cssclass' class. </span>
+<br/>
+qrone('parts').appendTo(jQuery(".class"));<br/>
+<span style="color:lightgreen">// return value of qrone() is also a jQuery object. </span>
+
+</div>
+
+
+
+<div class="codebox">
+require('CLASS');<br/>
+<br/>
+jQuery(".class").qrone('CLASS');<br/>
+<br/>
+jQuery(".class").append(qrone('CLASS'));<br/>
+</div>
+
+
+
+
+</body></html>
