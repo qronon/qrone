@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+import org.qrone.r7.app.QrONEApp;
 import org.qrone.r7.handler.ImageHandler;
 import org.qrone.r7.handler.Scale9Handler;
 import org.qrone.r7.parser.HTML5Deck;
@@ -32,6 +33,12 @@ public class QrONECompressor {
 	
 
     public static void main(String args[]) {
+    	if(args.length == 0 
+    			&& System.getProperty("os.name").toLowerCase().indexOf("windows") >= 0){
+    		QrONEApp.main(args);
+            System.exit(0); 
+    	} 
+    	
     	long timer = System.currentTimeMillis();
 
         CmdLineParser parser = new CmdLineParser();

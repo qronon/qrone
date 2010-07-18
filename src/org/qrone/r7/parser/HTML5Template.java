@@ -28,9 +28,18 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public HTML5Template(HTML5OM om){
 		this(om, new HashSet<HTML5OM>());
 	}
-	
+
+	public HTML5Template append(){
+		HTML5Template t = new HTML5Template(om, xomlist);
+		list.add(t);
+		b = new StringBuilder();
+		list.add(b);
+		return t;
+	}
+
 	public void append(String key, String value){
-		b.append(value);
+		if(value != null)
+			b.append(value);
 	}
 	
 	public void append(HTML5Template t){
@@ -85,12 +94,12 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 
 	@Override
-	public void processTarget(HTML5OM om, Element node) {
+	public void processTarget(HTML5Writer w, HTML5OM om, Element node) {
 		NodeLister o = nodemap.get(node);
 		if(o != null){
 			HTML5Template t = new HTML5Template(om, xomlist);
 			o.accept(t, new HTML5Element(om, (Element)node));
-			append(t);
+			w.append(t);
 		}
 	}
 	
@@ -115,16 +124,19 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 				selecting.put(selector, null);
 			}
 		}
+		selectmap = new Hashtable<String, NodeLister>();
 	}
 	
 	public void visit(HTML5Element e){
 		initialize(om);
 		e.getOM().process(this, this, e.get(), null, xomlist);
+		selectmap = new Hashtable<String, NodeLister>();
 	}
 
 	public void visit(HTML5OM om) {
 		initialize(om);
 		om.process(this, this, null, null, xomlist);
+		selectmap = new Hashtable<String, NodeLister>();
 	}
 	
 	public String output() {

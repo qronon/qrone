@@ -459,7 +459,7 @@ public class HTML5OM {
 						xomlist.add(this);
 						xom.process(t, new NodeProcessor() {
 							@Override
-							public void processTarget(HTML5OM om, Element node) {
+							public void processTarget(HTML5Writer w, HTML5OM om, Element node) {
 								HTML5OM.this.process(t, p, null, null, xomlist);
 							}
 							
@@ -543,7 +543,7 @@ public class HTML5OM {
 					super.out(e,new Delegate() {
 						@Override
 						public void accept() {
-							p.processTarget(HTML5OM.this, e);
+							p.processTarget(t, HTML5OM.this, e);
 						}
 					});
 				}else{
@@ -591,6 +591,10 @@ public class HTML5OM {
 			@Override
 			public void append(char c) {
 				jqueryhtml.str(String.valueOf(c));
+			}
+
+			@Override
+			public void append(HTML5Template t) {
 			}
 		}, null, body, null, null);
 		

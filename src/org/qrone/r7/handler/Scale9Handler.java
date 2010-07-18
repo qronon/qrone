@@ -151,8 +151,8 @@ public class Scale9Handler extends HTML5TagHandler {
 		b.append("<table style=\"width:100%;\" cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");
 		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, 0, left, height)));
 		b.append("\"></td><td valign=\"top\" style=\"" + color);
-		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, 0, right-left, height)));
-		b.append("\"><div style=\"position:relative;margin-left:-"+left+"px;margin-right:-"+(width-right)+"px;\">");
+		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, 0, right-left, height)) + "\">");
+		//b.append("<div style=\"position:relative;margin-left:-"+left+"px;margin-right:-"+(width-right)+"px;\">");
 		
 		
 		
@@ -169,6 +169,7 @@ public class Scale9Handler extends HTML5TagHandler {
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
+		//b.append("</div>");
 		b.append("</td><td style=\"");
 		b.append(deck.getSpriter().addISprite(new ImagePart(file, right, 0, width-right, height)));		
 		b.append("\"></td></tr></table>");
@@ -192,8 +193,8 @@ public class Scale9Handler extends HTML5TagHandler {
 		
 		
 		b.append(deck.getSpriter().addVSprite(new ImagePart(file, 0, top, left, bottom-top)));
-		b.append("\"></td><td valign=\"top\"" + ( color != null ? " style=\"" + color + "\"" : "" ) +
-				"><div style=\"position:relative;margin-left:-"+left+"px;margin-top:-"+top+"px;margin-right:-"+(width-right)+"px;margin-bottom:-"+(height-bottom)+"px;\">");
+		b.append("\"></td><td valign=\"top\"" + ( color != null ? " style=\"" + color + "\"" : "" ) + "\">");
+		//b.append("&nbsp;<div style=\"position:relative;left:-"+left+"px;top:-"+top+"px;margin-right:-"+(width-right+left)+"px;margin-bottom:-"+(height-bottom+top)+"px;\">");
 		return b.toString();
 	}
 
@@ -203,7 +204,8 @@ public class Scale9Handler extends HTML5TagHandler {
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
-		b.append("</div></td><td style=\"");
+		//b.append("</div>");
+		b.append("</td><td style=\"");
 		b.append(deck.getSpriter().addVSprite(new ImagePart(file, right, top, width-right, bottom-top)));
 		b.append("\"></td></tr><tr><td style=\"");
 		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, bottom, left, height-bottom)));

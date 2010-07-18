@@ -16,6 +16,7 @@ public abstract class HTML5Visitor {
 		accept(e);
 	}
 	
+	
 	public abstract void visit(Element e);
 	public abstract void visit(Text n);
 

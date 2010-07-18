@@ -16,7 +16,7 @@
 	<property name="tmp" value="tmp"/>
 	<property name="lib.dir" value="C:\Users\Qronon\Java Libraries"/>
 	<property name="javadoc" value="doc"/>
-	<property name="outputjar" value="bin\qrone-0.0.2.jar"/>
+	<property name="outputjar" value="qrone-0.0.2.jar"/>
 
 
     <!-- ================================= 
@@ -55,6 +55,10 @@
         <unjar src="${lib.dir}/htmlparser-1.2.1/htmlparser-1.2.1.jar" dest="${tmp}"/>
         <unjar src="${lib.dir}/yuicompressor-2.4.2/lib/jargs-1.0.jar" dest="${tmp}"/>
         <unjar src="${lib.dir}/yuicompressor-2.4.2/lib/rhino-1.6R7.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/jetty-6.1.24/jetty-6.1.24.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/jetty-6.1.24/jetty-util-6.1.24.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/jetty-6.1.24/servlet-api-2.5-20081211.jar" dest="${tmp}"/>
+        <unjar src="${lib.dir}/swt-3.5.2-win32-win32-x86/swt.jar" dest="${tmp}"/>
         <copy todir="${bin}">
             <fileset dir="${tmp}" includes="**/*"/>
         </copy>
