@@ -114,6 +114,8 @@ public class HTML5Deck {
 		}
 	}
 	
+	private Map<String, String> inlineJSMap = new Hashtable<String, String>();
+	
 	public String getRecurseHeader(HTML5Writer b, URI file, Set<HTML5OM> xomlist){
 		HTML5Set set = getRecursive(file, xomlist);
 		//StringBuffer b = new StringBuffer();
@@ -144,12 +146,21 @@ public class HTML5Deck {
 			if(!hash.contains(el.getAttribute("src"))){
 				hash.add(el.getAttribute("src"));
 				if(el.hasAttribute("inline")){
-					try {
-						js.append(QrONEUtils.convertStreamToString(
-								resolver.getInputStream(
-										file.resolve(el.getAttribute("src")))));
-					} catch (IOException e1) {
-						e1.printStackTrace();
+					String key = el.getAttribute("src");
+					String ijsc = inlineJSMap.get(key);
+					if(ijsc == null){
+						try {
+							String ijs = JSParser.compress(
+									QrONEUtils.convertStreamToString(
+											resolver.getInputStream(
+													file.resolve(key))));
+							inlineJSMap.put(key, ijs);
+							js.append(ijs);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}else{
+						js.append(ijsc);
 					}
 				}
 			}
@@ -159,11 +170,9 @@ public class HTML5Deck {
 		// css href
 		//---------------
 		js.append(set.js.toString());
-		String js2 = JSParser.compress(js.toString());
-
-		if(js2.length() > 0){
+		if(js.length() > 0){
 			b.append("<script>");
-			b.append(js2);
+			b.append(js.toString());
 			b.append("</script>");
 		}
 		

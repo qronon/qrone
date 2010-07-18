@@ -559,7 +559,18 @@ public class HTML5OM {
 		return t.output();
 	}
 
+	private String scriptCache = null;
+	private String scriptCacheNoHTML = null;
 	public String getScripts(boolean html){
+		if(html){
+			if(scriptCache != null){
+				return scriptCache;
+			}
+		}else{
+			if(scriptCacheNoHTML != null){
+				return scriptCacheNoHTML;
+			}
+		}
 
 		final QClass jqueryclass = new QClass(getURI().toString());
 		final QFunc method = jqueryclass.constructor();
@@ -599,6 +610,12 @@ public class HTML5OM {
 				.replace("__QRONE_PREFIX_NAME__","qrone[\"" + getURI().toString() + "\"]"));
 		}
 		
+
+		if(html){
+			scriptCache = b.toString();
+		}else{
+			scriptCacheNoHTML = b.toString();
+		}
 		return b.toString();
 	}
 	
