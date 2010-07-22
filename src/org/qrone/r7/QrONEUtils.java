@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -15,14 +16,15 @@ public class QrONEUtils{
     	String[] a = {"-v", "-n", "site/test"};
     	/*
     	try{
-    		URI from = new URI("from/file.html");
-    		URI to = new URI("to/file.png");
-    		System.out.println(relativize(from.toString(), to.toString()));
-    		from.relativize(from)
+    		URI from = new URI("file.html/");
+    		URI to = new URI("to/../path/to/../path/to/file.png");
+    		System.out.println(from.resolve(to));
+    		//System.out.println(relativize(from.toString(), to.toString()));
+    		//from.relativize(from)
     	}catch(Exception e){
     		e.printStackTrace();
-    	}
-    	*/
+    	}*/
+    	
     	QrONECompressor.main(a);
     	QrONECompressor.main(a);
 	}
@@ -154,5 +156,12 @@ public class QrONEUtils{
 			}
 		}
 		return b.toString();
+	}
+
+	public static void copy(InputStream in, OutputStream out) throws IOException {
+		int buf;
+		while ((buf = in.read()) != -1) {
+			out.write(buf);
+		}
 	}
 }

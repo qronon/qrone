@@ -2,6 +2,7 @@ package org.qrone.r7.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
@@ -12,13 +13,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.r7.handler.ImageHandler;
-import org.qrone.r7.handler.Scale9Handler;
+import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.NodeLister;
+import org.qrone.r7.resolver.CascadeResolver;
+import org.qrone.r7.resolver.FileResolver;
+import org.qrone.r7.resolver.FilteredResolver;
+import org.qrone.r7.resolver.MemoryResolver;
+import org.qrone.r7.resolver.QrONEResolver;
+import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ScriptDeck;
+import org.qrone.r7.script.ScriptOM;
+import org.qrone.r7.tag.ImageHandler;
+import org.qrone.r7.tag.Scale9Handler;
 
 /**
  * Servlet implementation class QrONEServer
@@ -26,12 +36,21 @@ import org.qrone.r7.parser.NodeLister;
 public class QrONEServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static QrONEURIResolver resolver = new QrONEURIResolver(new File("."));
-	private static HTML5Deck deck = new HTML5Deck(resolver);
+	private static CascadeResolver resolver;
+	private static HTML5Deck deck;
+	private static ScriptDeck vm;
 	
 	static{
+		resolver = new CascadeResolver();
+		resolver.add(new FilteredResolver("qrone-server/", new QrONEResolver()));
+		resolver.add(new MemoryResolver());
+		resolver.add(new FileResolver(new File(".")));
+		
+		deck = new HTML5Deck(resolver);
 		deck.addTagHandler(new Scale9Handler(deck));
     	deck.addTagHandler(new ImageHandler(deck));
+    	
+    	vm = new ScriptDeck(resolver);
 	}
 	
     /**
@@ -46,10 +65,42 @@ public class QrONEServer extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
-			URI uri = new URI(request.getPathInfo().substring(1));
-			deck.update(uri);
+			URI uri = new URI("index.html").resolve(
+					new URI(request.getPathInfo().substring(1)));
+			String uristr = uri.toString();
 			
-			if(uri.toString().equals("qrone-server/index.html")){
+			String[] paths = uristr.split("/");
+			String path = "";
+			String args = "";
+			for (int i = 0; i < paths.length; i++) {
+				path += paths[i];
+				
+				if(resolver.exist(path + ".js")){
+					path += ".js";
+					uri = new URI(path);
+					uristr = path;
+					
+					if(paths.length > i+1){
+						for (int j = i+1; j < paths.length; j++) {
+							args += "/" + paths[j];
+						}
+					}
+					
+					ScriptOM om = vm.compile(uri);
+					if(om != null){
+						om.run(request, response);
+					}else{
+						response.sendError(404);
+					}
+					
+					return;
+				}
+				
+				path += "/";
+			}
+			
+			
+			if(uristr.equals("qrone-server/index.html")){
 				Writer out = response.getWriter();
 				HTML5OM om = deck.compile(uri);
 				if(om != null){
@@ -66,30 +117,40 @@ public class QrONEServer extends HttpServlet {
 							}
 						}
 					});
-					deck.getSpriter().create();
 					
 					out.append(t.output());
+					deck.getSpriter().create();
 					out.flush();
 					out.close();
 				}else{
 					response.sendError(404);
 				}
 				
-			}else if(resolver.hasBuffer(uri)){
+			}else if(resolver.exist(uristr)){
+				deck.update(uri);
+				
+				InputStream in = resolver.getInputStream(uri);
 				OutputStream out = response.getOutputStream();
-				resolver.writeTo(uri, response.getOutputStream());
+				QrONEUtils.copy(in, out);
 				out.flush();
 				out.close();
+				in.close();
 			}else{
-				Writer out = response.getWriter();
-				HTML5OM om = deck.compile(uri);
-				if(om != null){
-					deck.getSpriter().create();
-					
-					out.append(om.serialize());
-					out.flush();
-					out.close();
-					
+				
+				
+				if(resolver.exist(uri.toString())){
+					Writer out = response.getWriter();
+					HTML5OM om = deck.compile(uri);
+					if(om != null){
+						deck.getSpriter().create();
+						
+						out.append(om.serialize());
+						out.flush();
+						out.close();
+						
+					}else{
+						response.sendError(404);
+					}
 				}else{
 					response.sendError(404);
 				}

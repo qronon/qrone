@@ -18,11 +18,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
 import org.qrone.r7.app.QrONEApp;
-import org.qrone.r7.handler.ImageHandler;
-import org.qrone.r7.handler.Scale9Handler;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
-import org.qrone.r7.resolver.FileURIResolver;
+import org.qrone.r7.resolver.FileResolver;
+import org.qrone.r7.tag.ImageHandler;
+import org.qrone.r7.tag.Scale9Handler;
 
 
 
@@ -114,7 +114,7 @@ public class QrONECompressor {
         }
         
         if(deck == null)
-        	deck = new HTML5Deck(new FileURIResolver(basedir));
+        	deck = new HTML5Deck(new FileResolver(basedir));
         
         try {
 	    	if(imgdir != null){

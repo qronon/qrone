@@ -1,4 +1,4 @@
-package org.qrone.r7.handler;
+package org.qrone.r7.tag;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,7 +27,7 @@ public class ImageHandler extends HTML5TagHandler {
 			URI uri = file.resolve(src);
 			if(e.getNodeName().equals("img") 
 					&& src != null
-					&& deck.getResolver().exist(uri)){
+					&& deck.getResolver().exist(uri.toString())){
 				
 				String style = e.getAttribute("style");
 				e.setAttribute("style", deck.getSpriter().addISprite(uri) + style);

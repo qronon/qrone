@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.qrone.r7.QrONEUtils;
-import org.qrone.r7.handler.HTML5TagHandler;
-import org.qrone.r7.resolver.FileURIResolver;
+import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.tag.HTML5TagHandler;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
 import org.xml.sax.SAXException;
@@ -28,7 +28,7 @@ public class HTML5Deck {
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	
 	public HTML5Deck(File file){
-		this(new FileURIResolver(file));
+		this(new FileResolver(file));
 	}
     
     public HTML5Deck(URIResolver resolver){

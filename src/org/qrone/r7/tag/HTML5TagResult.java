@@ -1,4 +1,4 @@
-package org.qrone.r7.handler;
+package org.qrone.r7.tag;
 
 public interface HTML5TagResult {
 	public String prestart();

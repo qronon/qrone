@@ -4,45 +4,43 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
 
-
-
-public class FileURIResolver implements URIResolver {
+public class FileResolver implements URIResolver {
 	private File root;
-	private Map<URI, Long> lastModifiedMap = new Hashtable<URI, Long>();
+	private Map<String, Long> lastModifiedMap = new Hashtable<String, Long>();
 	
-	public FileURIResolver(File basedir) {
+	public FileResolver(File basedir) {
 		root = basedir;
 	}
 
 	@Override
-	public boolean exist(URI uri) {
-		return new File(root, uri.toString()).exists();
+	public boolean exist(String uri) {
+		return new File(root, uri).exists();
 	}
 
 	@Override
 	public InputStream getInputStream(URI uri) throws FileNotFoundException {
-		return new FileInputStream(new File(root, uri.toString()));
-	}
-
-	@Override
-	public OutputStream getOutputStream(URI uri) throws FileNotFoundException {
-		return new FileOutputStream(new File(root, uri.toString()));
+		return new FileInputStream(new File(root, uri.getPath()));
 	}
 
 	@Override
 	public boolean updated(URI uri) {
-		File f = new File(root, uri.toString());
+		File f = new File(root, uri.getPath());
 		Long l = lastModifiedMap.get(uri);
 		if(l == null){
 			return false;
 		}
 		return l > f.lastModified();
+	}
+	@Override
+	public OutputStream getOutputStream(URI uri) throws FileNotFoundException {
+		return new FileOutputStream(new File(root, uri.getPath()));
 	}
 
 }

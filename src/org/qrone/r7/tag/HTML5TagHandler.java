@@ -1,4 +1,4 @@
-package org.qrone.r7.handler;
+package org.qrone.r7.tag;
 
 import org.qrone.r7.parser.HTML5Element;
 

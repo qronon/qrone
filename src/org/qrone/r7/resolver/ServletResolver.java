@@ -8,19 +8,17 @@ import java.net.URI;
 
 import javax.servlet.ServletContext;
 
-
-
-public class ServletURIResolver implements URIResolver{
+public class ServletResolver implements URIResolver{
 
 	private ServletContext context;
-	public ServletURIResolver(ServletContext context) {
+	public ServletResolver(ServletContext context) {
 		this.context = context;
 	}
 	
 	@Override
-	public boolean exist(URI uri) {
+	public boolean exist(String uri) {
 		try {
-			return context.getResource(uri.toString()) != null;
+			return context.getResource(uri) != null;
 		} catch (MalformedURLException e) {
 			return false;
 		}
@@ -28,17 +26,15 @@ public class ServletURIResolver implements URIResolver{
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
-		return context.getResourceAsStream(uri.toString());
+		return context.getResourceAsStream(uri.getPath());
 	}
-
-	@Override
-	public OutputStream getOutputStream(URI resolve) throws IOException {
-		throw new IOException("Can't output to servletcontext.");
-	}
-
+	
 	@Override
 	public boolean updated(URI uri) {
 		return false;
 	}
-
+	@Override
+	public OutputStream getOutputStream(URI uri) throws IOException {
+		return null;
+	}
 }
