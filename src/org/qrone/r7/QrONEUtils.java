@@ -159,6 +159,7 @@ public class QrONEUtils{
 	}
 
 	public static void copy(InputStream in, OutputStream out) throws IOException {
+		if(in == null || out == null) throw new IOException();
 		int buf;
 		while ((buf = in.read()) != -1) {
 			out.write(buf);

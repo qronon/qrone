@@ -22,9 +22,8 @@ import org.qrone.r7.parser.NodeLister;
 import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.FilteredResolver;
+import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.MemoryResolver;
-import org.qrone.r7.resolver.QrONEResolver;
-import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ScriptDeck;
 import org.qrone.r7.script.ScriptOM;
 import org.qrone.r7.tag.ImageHandler;
@@ -42,7 +41,7 @@ public class QrONEServer extends HttpServlet {
 	
 	static{
 		resolver = new CascadeResolver();
-		resolver.add(new FilteredResolver("qrone-server/", new QrONEResolver()));
+		resolver.add(new FilteredResolver("qrone-server/", new InternalResourceResolver()));
 		resolver.add(new MemoryResolver());
 		resolver.add(new FileResolver(new File(".")));
 		
