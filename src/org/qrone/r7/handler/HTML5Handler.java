@@ -14,6 +14,7 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.LocalWindow;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.Window;
 import org.qrone.r7.tag.ImageHandler;
@@ -23,6 +24,7 @@ public class HTML5Handler implements URIHandler{
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
+	private Object global;
 	
 	public HTML5Handler(URIResolver resolver) {
 		this.resolver = resolver;
@@ -58,7 +60,7 @@ public class HTML5Handler implements URIHandler{
 					ss.vm = vm;
 					ss.deck = deck;
 					ss.resolver = resolver;
-					om.run(new Window(ss), scope);
+					om.run(scope, new Window(ss), new LocalWindow(ss));
 					return true;
 				}
 			}

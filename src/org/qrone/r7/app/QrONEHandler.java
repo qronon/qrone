@@ -15,7 +15,7 @@ import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.MemoryResolver;
 
-public class QrONEHandler extends StandaloneURIHandler {
+public class QrONEHandler extends LocalURIHandler {
 	public QrONEHandler() {
 		resolver = new CascadeResolver();
 		resolver.add(0,new FilteredResolver("/qrone-server/", new InternalResourceResolver()));

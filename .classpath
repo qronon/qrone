@@ -16,6 +16,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Commons Codec"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Memcached"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MongoDB"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MongoDB Rhino"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

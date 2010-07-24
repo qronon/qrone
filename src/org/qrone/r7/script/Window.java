@@ -11,14 +11,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
+import org.ho.yaml.Yaml;
 import org.qrone.kvs.KVSService;
 import org.qrone.kvs.MongoService;
+import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.JSOM;
 
 import com.mongodb.MongoException;
@@ -33,7 +39,7 @@ public class Window extends JSObject{
 		super(ss);
 		document = new Document(ss);
 	}
-
+	
 	public void require_once(String path) throws IOException, URISyntaxException{
 		JSOM om = ss.vm.compile(new URI(path));
 		if(!ss.required.contains(om)){
@@ -42,64 +48,41 @@ public class Window extends JSObject{
 		}
 	}
 	
+	public String load_file(String path) throws IOException, URISyntaxException{
+		if(ss.resolver.exist(path)){
+			return QrONEUtils.convertStreamToString(ss.resolver.getInputStream(new URI(path)));
+		}
+		return null;
+	}
+
+	public Object load_properties(String path) throws IOException, URISyntaxException{
+		if(ss.resolver.exist(path)){
+			Properties p = new Properties();
+			p.load(ss.resolver.getInputStream(new URI(path)));
+			Map<Object, Object> map = new Hashtable<Object, Object>();
+			for (Iterator<Entry<Object, Object>> i = p.entrySet().iterator(); i
+					.hasNext();) {
+				Entry<Object, Object> t = i.next();
+				map.put(t.getKey(), t.getValue());
+			}
+			return map;
+		}
+		return null;
+	}
+	
+	public Object load_yaml(String path) throws IOException, URISyntaxException{
+		if(ss.resolver.exist(path)){
+			return Yaml.load(ss.resolver.getInputStream(new URI(path)));
+		}
+		return null;
+	}
+	
 	public void require(String path) throws IOException, URISyntaxException{
 		JSOM om = ss.vm.compile(new URI(path));
 		if(!ss.required.contains(om)){
 			ss.required.add(om);
 		}
 		om.run(ss.scope);
-	}
-
-	public KVSService mongo_connect(String host, String schema)
-			throws UnknownHostException, MongoException{
-        return new MongoService(ss, host, schema);
-	}
-	
-	public KVSService mongo_connect(String host, String schema, 
-			String user, String password) throws UnknownHostException, MongoException{
-        return new MongoService(ss, host, schema, user, password);
-	}
-
-	public Connection jdbc_connect(String cls, String url) throws SQLException{
-		try {
-			Class.forName(cls).newInstance();
-		} catch (Exception e) {
-			return null;
-		}
-		
-		return DriverManager.getConnection(url);
-	}
-	
-	public Connection jdbc_connect(String cls, String url, Properties info) throws SQLException{
-		try {
-			Class.forName(cls).newInstance();
-		} catch (Exception e) {
-			return null;
-		}
-		
-		return DriverManager.getConnection(url, info);
-	}
-	
-	public Connection derby_connect(String file, 
-			String user, String password) throws SQLException{
-		Properties props = new Properties();
-        props.put("user", user);
-        props.put("password", password);
-        
-		return jdbc_connect("org.apache.derby.jdbc.EmbeddedDriver", 
-				"jdbc:derby:" + file + ";create=true", props);
-	}
-	
-	public Connection mysql_connect(String host, String schema, 
-			String user, String password) throws SQLException{
-		Properties props = new Properties();		
-        props.put("user", user);		
-        props.put("password", password);	
-        props.put("useUnicode", "true");	
-        props.put("characterEncoding", "utf8");		
-
-		return jdbc_connect("com.mysql.jdbc.Driver", 
-				"jdbc:mysql://" + host + "/" + schema, props);
 	}
 	
 	public byte[] base64_decode(String base64String){

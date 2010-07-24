@@ -3,6 +3,7 @@ package org.qrone.r7.script;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
@@ -16,7 +17,7 @@ public class JSObject {
 		this.ss = ss;
 	}
 	
-	protected void callJSFunction(FunctionObject func, Object thisObj, Object ... args){
+	protected void callJSFunction(Callable func, Object thisObj, Object ... args){
 		func.call(ss.vm.getContext(), ss.scope, 
 				(Scriptable)Context.javaToJS(thisObj,ss.scope), args);
 	}

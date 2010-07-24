@@ -1,6 +1,7 @@
 package org.qrone.kvs;
 
 import org.bson.BSON;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -11,6 +12,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 public class MongoCursor extends JSObject implements KVSCursor {
 	private DBCursor c;
@@ -18,12 +20,14 @@ public class MongoCursor extends JSObject implements KVSCursor {
 		super(ss);
 		this.c = c;
 	}
+	
 	@Override
-	public void forEach(FunctionObject func) {
+	public void forEach(Callable func) {
 		while(hasNext()){
 			callJSFunction(func, this, next());
 		}
 	}
+	
 	@Override
 	public boolean hasNext() {
 		return c.hasNext();
@@ -34,7 +38,7 @@ public class MongoCursor extends JSObject implements KVSCursor {
 	}
 	@Override
 	public Object next() {
-		return c.next();
+		return BSONConverter.from(c.next());
 	}
 	@Override
 	public KVSCursor skip(Number o) {

@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.parser.HTML5Element;
@@ -47,7 +48,7 @@ public class Document extends JSObject{
 		t.set(selector, value);
 	}
 	
-	public void set(String selector, final FunctionObject func){
+	public void set(String selector, final Callable func){
 		t.set(selector, new NodeLister() {
 			@Override
 			public void accept(HTML5Template t, HTML5Element e) {

@@ -19,13 +19,13 @@ public class MongoService extends JSScriptable implements KVSService{
 	private DB db;
 	private Map<String, MongoTable> map = new Hashtable<String, MongoTable>();
 
-	public MongoService(ServletScope ss, String host, String schema) throws UnknownHostException, MongoException {
-		this(ss, new Mongo(host, 27017), schema);
+	public MongoService(ServletScope ss, String host, Number port, String schema) throws UnknownHostException, MongoException {
+		this(ss, new Mongo(host, port.intValue()), schema);
 	}
 	
-	public MongoService(ServletScope ss, String host, String schema, 
+	public MongoService(ServletScope ss, String host, Number port, String schema, 
 			String user, String password) throws UnknownHostException, MongoException {
-		this(ss, new Mongo(host, 27017), schema);
+		this(ss, new Mongo(host, port.intValue()), schema);
 		db.authenticate(user, password.toCharArray());
 	}
 	

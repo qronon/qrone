@@ -7,26 +7,24 @@ import java.util.Set;
 
 public interface MemcachedService {
 	public void clearAll();
-	public boolean contains(Object key);
-	public boolean delete(Object key);
-	public boolean delete(Object key, long millisNoReAdd);
-	public Set<Object> deleteAll(Collection<Object> keys);
-	public Set<Object> deleteAll(Collection<Object> keys, long millisNoReAdd);
-	public Object get(Object key);
-	public Map<Object, Object> getAll(Collection<Object> keys);
-	public String getNamespace();
-	public long increment(Object key, long delta);
-	public void put(Object key, Object value);
-	public void put(Object key, Object value, int ttlmillis);
-	public void put(Object key, Object value, Date expire);
-	public void put(Object key, Object value, int ttlmillis, SetPolicy polocy);
-	public void put(Object key, Object value, Date expire, SetPolicy polocy);
-	public void putAll(Map<Object, Object> values);
-	public void putAll(Map<Object, Object> values, int ttlmillis);
-	public void putAll(Map<Object, Object> values, Date expire);
-	public void putAll(Map<Object, Object> values, int ttlmillis, SetPolicy polocy);
-	public void putAll(Map<Object, Object> values, Date expire, SetPolicy polocy);
-	public void setNamespace(String newNamespace);
+	public boolean contains(String key);
+	public boolean delete(String key);
+	public boolean delete(String key, long millisNoReAdd);
+	public Set<String> deleteAll(Collection<String> keys);
+	public Set<String> deleteAll(Collection<String> keys, long millisNoReAdd);
+	public Object get(String key);
+	public Map<String, Object> getAll(Collection<String> keys);
+	public long increment(String key, long delta);
+	public void put(String key, Object value);
+	public void put(String key, Object value, int ttlmillis);
+	public void put(String key, Object value, Date expire);
+	public void put(String key, Object value, int ttlmillis, SetPolicy polocy);
+	public void put(String key, Object value, Date expire, SetPolicy polocy);
+	public void putAll(Map<String, Object> values);
+	public void putAll(Map<String, Object> values, int ttlmillis);
+	public void putAll(Map<String, Object> values, Date expire);
+	public void putAll(Map<String, Object> values, int ttlmillis, SetPolicy polocy);
+	public void putAll(Map<String, Object> values, Date expire, SetPolicy polocy);
 	
 	public enum SetPolicy{
 		SET_ALWAYS,

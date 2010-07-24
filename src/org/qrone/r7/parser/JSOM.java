@@ -41,11 +41,15 @@ public class JSOM {
 		script.exec(deck.getContext(), scope);
 	}
 
-	public void run(Object prototype, Scriptable scope) {
-		Scriptable window = (Scriptable)Context.javaToJS(prototype, scope);
-		scope.setPrototype(window);
-		scope.put("window", scope, scope);
+	public void run(Scriptable scope, Object... prototypes) {
+		Scriptable parent = scope;
+		for (int i = 0; i < prototypes.length; i++) {
+			Scriptable window = (Scriptable)Context.javaToJS(prototypes[i], scope);
+			parent.setPrototype(window);
+			parent = window;
+		}
 		
+		scope.put("window", scope, scope);
 		script.exec(deck.getContext(), scope);
 	}
 
