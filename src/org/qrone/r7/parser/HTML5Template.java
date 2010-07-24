@@ -139,7 +139,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		selectmap = new Hashtable<String, NodeLister>();
 	}
 	
-	public String output() {
+	public String out() {
 		initialize(om);
 		om.process(this, xomlist);
 		return toString();

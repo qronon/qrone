@@ -59,7 +59,7 @@ public class QrONEApp {
 		}
 		
 		shell.open();
-		browser.setUrl("http://localhost:9601/qrone-server/index.html");
+		browser.setUrl("http://localhost:9601/qrone-server/index");
 		browser.addLocationListener(new LocationListener() {
 			@Override
 			public void changing(LocationEvent event) {

@@ -14,18 +14,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.qrone.r7.QrONEUtils;
+import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
+import org.qrone.r7.parser.JSDeck;
+import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.parser.NodeLister;
 import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.MemoryResolver;
-import org.qrone.r7.script.ScriptDeck;
-import org.qrone.r7.script.ScriptOM;
 import org.qrone.r7.tag.ImageHandler;
 import org.qrone.r7.tag.Scale9Handler;
 
@@ -34,23 +35,7 @@ import org.qrone.r7.tag.Scale9Handler;
  */
 public class QrONEServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	private static CascadeResolver resolver;
-	private static HTML5Deck deck;
-	private static ScriptDeck vm;
-	
-	static{
-		resolver = new CascadeResolver();
-		resolver.add(new FilteredResolver("qrone-server/", new InternalResourceResolver()));
-		resolver.add(new MemoryResolver());
-		resolver.add(new FileResolver(new File(".")));
-		
-		deck = new HTML5Deck(resolver);
-		deck.addTagHandler(new Scale9Handler(deck));
-    	deck.addTagHandler(new ImageHandler(deck));
-    	
-    	vm = new ScriptDeck(resolver);
-	}
+	private URIHandler handler = new QrONEHandler();
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -63,6 +48,9 @@ public class QrONEServer extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		handler.handle(request, response);
+		/*
 		try {
 			URI uri = new URI("index.html").resolve(
 					new URI(request.getPathInfo().substring(1)));
@@ -159,6 +147,7 @@ public class QrONEServer extends HttpServlet {
 		} catch (IOException e){
 			
 		}
+		*/
 	}
 
 	/**

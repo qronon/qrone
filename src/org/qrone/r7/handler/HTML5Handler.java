@@ -8,32 +8,63 @@ import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
+import org.qrone.r7.parser.JSDeck;
+import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.Window;
 import org.qrone.r7.tag.ImageHandler;
 import org.qrone.r7.tag.Scale9Handler;
 
 public class HTML5Handler implements URIHandler{
 	private URIResolver resolver;
 	private HTML5Deck deck;
+	private JSDeck vm;
 	
 	public HTML5Handler(URIResolver resolver) {
 		this.resolver = resolver;
 		deck = new HTML5Deck(resolver);
 		deck.addTagHandler(new Scale9Handler(deck));
     	deck.addTagHandler(new ImageHandler(deck));
+		vm = new JSDeck(resolver, deck);
 	}
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
+		
 		try {
 			String path = request.getPathInfo();
+			deck.update(new URI(path));
+			
+
+			
+			if(resolver.exist(path + ".js")){
+				path += ".js"; 
+			}
+			
+			if(path.endsWith(".js") && resolver.exist(path)){
+				URI uri = new URI(path);
+				JSOM om = vm.compile(uri);
+				if(om != null){
+					Scriptable scope = om.createScope();
+					ServletScope ss = new ServletScope();
+					ss.path = path;
+					ss.request = request;
+					ss.response = response;
+					ss.scope = scope;
+					ss.vm = vm;
+					ss.deck = deck;
+					ss.resolver = resolver;
+					om.run(new Window(ss), scope);
+					return true;
+				}
+			}
+			
 			if(resolver.exist(path + ".html")){
 				path += ".html"; 
-			}
-			if(resolver.exist(path + ".htm")){
-				path += ".htm"; 
 			}
 			
 			if((path.endsWith(".html") || path.endsWith(".htm")) 

@@ -19,10 +19,10 @@ import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
 
 public class ImageSpriter {
-	private String isprite = "sprite-i.png";
-	private String vsprite = "sprite-v.png";
-	private String hsprite = "sprite-h.png";
-	private String tsprite = "sprite-t.png";
+	private String isprite = "/sprite-i.png";
+	private String vsprite = "/sprite-v.png";
+	private String hsprite = "/sprite-h.png";
+	private String tsprite = "/sprite-t.png";
 
 	private URI ispriteURI;
 	private URI vspriteURI;

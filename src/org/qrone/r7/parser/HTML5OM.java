@@ -556,7 +556,11 @@ public class HTML5OM {
 
 	public String getHTML(){
 		HTML5Template t = new HTML5Template(this);
-		return t.output();
+		String o = t.out();
+		try {
+			deck.getSpriter().create();
+		} catch (IOException e) {}
+		return o;
 	}
 
 	private String scriptCache = null;
