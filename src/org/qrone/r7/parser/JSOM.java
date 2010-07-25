@@ -1,21 +1,16 @@
 package org.qrone.r7.parser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.Window;
+import org.mozilla.javascript.WrappedException;
 
-public class JSOM {
+public class JSOM implements Comparable<JSOM>{
 	private URI uri;
 	private JSDeck deck;
 	private Script script;
@@ -25,10 +20,12 @@ public class JSOM {
 	}
 	
 	public void parser(URI uri) throws IOException{
+		InputStream in = deck.getResolver().getInputStream(uri);
 		this.uri = uri;
-			script = deck.getContext().compileReader(new InputStreamReader(
-					deck.getResolver().getInputStream(uri), "utf8"), 
-					uri.toString(), 0, null);
+		script = deck.getContext().compileReader(new InputStreamReader(
+				in, "utf8"), 
+				uri.toString(), 0, null);
+		in.close();
 	}
 	
 	public Scriptable createScope(){
@@ -50,7 +47,17 @@ public class JSOM {
 		}
 		
 		scope.put("window", scope, scope);
-		script.exec(deck.getContext(), scope);
+		
+		try{
+			script.exec(deck.getContext(), scope);
+		}catch(WrappedException e){
+			e.getWrappedException().printStackTrace();
+		}
+	}
+
+	@Override
+	public int compareTo(JSOM o) {
+		return uri.compareTo(o.uri);
 	}
 
 }

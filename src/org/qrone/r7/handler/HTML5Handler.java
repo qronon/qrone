@@ -36,7 +36,8 @@ public class HTML5Handler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-		
+
+		response.setCharacterEncoding("utf8");
 		try {
 			String path = request.getPathInfo();
 			deck.update(new URI(path));

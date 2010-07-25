@@ -1,16 +1,12 @@
 package org.qrone.r7.script;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,22 +18,54 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.ho.yaml.Yaml;
-import org.qrone.kvs.KVSService;
-import org.qrone.kvs.MongoService;
+import org.mozilla.javascript.Scriptable;
+import org.qrone.kvs.BSONConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.JSOM;
-
-import com.mongodb.MongoException;
 
 
 public class Window extends JSObject{
 	public PrintStream in = System.out;
 	public PrintStream out = System.out;
 	public Document document;
+	public Location location;
+	public Object query;
+	public JSON JSON;
 	
 	public Window(ServletScope ss) throws IOException{
 		super(ss);
 		document = new Document(ss);
+		
+		location = new Location(ss);
+		document.location = location;
+		
+		query = getQuery();
+		document.query = query;
+		document.location.query = query;
+		JSON = new JSON(ss);
+	}
+
+	public String stringify(Object out){
+		return BSONConverter.stringify(out);
+	}
+	
+	public Object getQuery(){
+		Scriptable o = newScriptable();
+		Map<String, String[]> map = ss.request.getParameterMap();
+		for (Iterator<Entry<String, String[]>> i = map.entrySet().iterator(); i
+				.hasNext();) {
+			Entry<String, String[]> e = i.next();
+			if(e.getValue().length == 1){
+				o.put(e.getKey(), o, e.getValue()[0]);
+			}else if(e.getValue().length > 1){
+				Scriptable l = newScriptable();
+				for (int j = 0; j < e.getValue().length; j++) {
+					l.put(j, l, e.getValue()[j]);
+				}
+				o.put(e.getKey(), o, l);
+			}
+		}
+		return o;
 	}
 	
 	public void require_once(String path) throws IOException, URISyntaxException{
@@ -57,8 +85,10 @@ public class Window extends JSObject{
 
 	public Object load_properties(String path) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(path)){
+			InputStream in = ss.resolver.getInputStream(new URI(path));
 			Properties p = new Properties();
-			p.load(ss.resolver.getInputStream(new URI(path)));
+			p.load(in);
+			in.close();
 			Map<Object, Object> map = new Hashtable<Object, Object>();
 			for (Iterator<Entry<Object, Object>> i = p.entrySet().iterator(); i
 					.hasNext();) {
@@ -72,7 +102,10 @@ public class Window extends JSObject{
 	
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(path)){
-			return Yaml.load(ss.resolver.getInputStream(new URI(path)));
+			InputStream in = ss.resolver.getInputStream(new URI(path));
+			Object o = Yaml.load(in);
+			in.close();
+			return o;
 		}
 		return null;
 	}

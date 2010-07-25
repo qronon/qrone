@@ -25,17 +25,19 @@ public class FileResolver implements URIResolver {
 
 	@Override
 	public InputStream getInputStream(URI uri) throws FileNotFoundException {
-		return new FileInputStream(new File(root, uri.getPath()));
+		File f = new File(root, uri.getPath());
+		lastModifiedMap.put(uri.getPath(), f.lastModified());
+		return new FileInputStream(f);
 	}
 
 	@Override
 	public boolean updated(URI uri) {
 		File f = new File(root, uri.getPath());
-		Long l = lastModifiedMap.get(uri);
+		Long l = lastModifiedMap.get(uri.getPath());
 		if(l == null){
 			return false;
 		}
-		return l > f.lastModified();
+		return l < f.lastModified();
 	}
 	@Override
 	public OutputStream getOutputStream(URI uri) throws FileNotFoundException {

@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 public class HTML5Parser {
 	public static Document parse(InputSource source) throws SAXException, IOException{
 		HtmlDocumentBuilder parser = new HtmlDocumentBuilder();
+		source.setEncoding("utf8");
 		parser.setXmlPolicy(XmlViolationPolicy.ALLOW);
 		parser.setScriptingEnabled(true);
 		return parser.parse(source);

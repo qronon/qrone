@@ -1,6 +1,7 @@
 package org.qrone.r7.parser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -115,7 +116,10 @@ public class HTML5OM {
 	}
 	
 	public void parse(URIResolver resolver) throws SAXException, IOException{
-		document = HTML5Parser.parse(new InputSource(resolver.getInputStream(uri)));
+		InputStream in = resolver.getInputStream(uri);
+		document = HTML5Parser.parse(new InputSource(in));
+		in.close();
+		
 		nodeselector = new DOMNodeSelector(document);
 		HTML5Visitor visitor = new HTML5Visitor() {
 			
@@ -437,6 +441,7 @@ public class HTML5OM {
 
 			@Override
 			public void visit(Text n) {
+				out(n.getNodeValue());
 			}
 		};
 		

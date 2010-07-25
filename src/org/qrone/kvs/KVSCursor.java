@@ -1,7 +1,6 @@
 package org.qrone.kvs;
 
 import org.mozilla.javascript.Callable;
-import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
 
 public interface KVSCursor {

@@ -72,7 +72,9 @@ public class ImageSpriter {
 		if(map.containsKey(file)){
 			return map.get(file);
 		}else{
-			BufferedImage i = ImageIO.read(resolver.getInputStream(file));
+			InputStream in = resolver.getInputStream(file);
+			BufferedImage i = ImageIO.read(in);
+			in.close();
 			map.put(file, i);
 			return i;
 		}

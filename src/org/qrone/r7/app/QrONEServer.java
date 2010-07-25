@@ -1,34 +1,13 @@
 package org.qrone.r7.app;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.handler.URIHandler;
-import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.HTML5Element;
-import org.qrone.r7.parser.HTML5OM;
-import org.qrone.r7.parser.HTML5Template;
-import org.qrone.r7.parser.JSDeck;
-import org.qrone.r7.parser.JSOM;
-import org.qrone.r7.parser.NodeLister;
-import org.qrone.r7.resolver.CascadeResolver;
-import org.qrone.r7.resolver.FileResolver;
-import org.qrone.r7.resolver.FilteredResolver;
-import org.qrone.r7.resolver.InternalResourceResolver;
-import org.qrone.r7.resolver.MemoryResolver;
-import org.qrone.r7.tag.ImageHandler;
-import org.qrone.r7.tag.Scale9Handler;
 
 /**
  * Servlet implementation class QrONEServer

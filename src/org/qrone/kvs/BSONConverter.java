@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.BSONObject;
+import org.bson.types.BasicBSONList;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
@@ -12,7 +13,9 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.UniqueTag;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -25,6 +28,16 @@ import com.mongodb.DBObject;
  */
 public class BSONConverter
 {
+	
+	public static String stringify( Object s){
+		if(s.getClass().getName().equals("org.mozilla.javascript.xmlimpl.XML")){
+			return s.toString();
+		}
+		if(s instanceof Scriptable){
+			return BSONConverter.to((Scriptable)s).toString();
+		}
+		return s.toString();
+	}
 	//
 	// Static operations
 	//
@@ -36,19 +49,40 @@ public class BSONConverter
 	 *        A Rhino native object
 	 * @return A BSON object
 	 */
-	public static DBObject to( Scriptable object )
+	public static BSONObject to( Scriptable object )
 	{
-		BasicDBObject bson = new BasicDBObject();
-
 		Object[] ids = object.getIds();
-		for( Object id : ids )
-		{
-			String key = id.toString();
-			Object value = forBson( ScriptableObject.getProperty( object, key ) );
-			bson.put( key, value );
+		
+		boolean isArray = true;
+		for (int i = 0; i < ids.length; i++) {
+			if(!(ids[i] instanceof Integer)) isArray = false;
 		}
+		
+		if(isArray){
+			BasicBSONList bson = new BasicBSONList();
+			for( Object id : ids )
+			{
+				if(id instanceof Integer){
+					bson.put((Integer)id, forBson( ScriptableObject.getProperty( object, (Integer)id )));
+				}
+			}
+			return bson;
+		}else{
 
-		return bson;
+			BasicDBObject bson = new BasicDBObject();
+
+			for( Object id : ids )
+			{
+				String key = id.toString();
+				if(id instanceof String){
+					bson.put( key, forBson( ScriptableObject.getProperty( object, key )));
+				}
+				if(id instanceof Integer){
+					bson.put( key, forBson( ScriptableObject.getProperty( object, (Integer)id )));
+				}
+			}
+			return bson;
+		}
 	}
 
 	/**

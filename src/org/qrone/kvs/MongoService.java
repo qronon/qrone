@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.script.JSObject;
 import org.qrone.r7.script.JSScriptable;
 import org.qrone.r7.script.ServletScope;
 

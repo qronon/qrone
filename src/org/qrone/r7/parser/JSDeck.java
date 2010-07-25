@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Window;

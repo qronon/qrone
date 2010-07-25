@@ -46,7 +46,7 @@ public class QrONEApp {
 		Display display = new Display();
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
-		shell.setText("QrONE WebApplication Server");
+		shell.setText("QrONE JavaScript Server");
 		shell.setSize((int) (240 * 1.618), 240);
 		final Browser browser;
 		try {

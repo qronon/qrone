@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mozilla.javascript.Callable;
-import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.qrone.kvs.BSONConverter;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
@@ -19,6 +20,9 @@ import org.qrone.r7.parser.NodeLister;
 public class Document extends JSObject{
 	private Writer writer;
 	private HTML5Template t;
+	
+	public Location location;
+	public Object query;
 	
 	public Document(ServletScope ss) throws IOException{
 		super(ss);
@@ -32,6 +36,7 @@ public class Document extends JSObject{
 			} catch (URISyntaxException e) {}
 		}
 	}
+	
 
 	public void load(String uri) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(uri)){
@@ -59,6 +64,10 @@ public class Document extends JSObject{
 	
 	public void out() throws IOException{
 		writer.append(t.out());
+	}
+
+	public void write(Object out) throws IOException{
+		writer.append(BSONConverter.stringify(out));
 	}
 	
 	public void write(String out) throws IOException{
