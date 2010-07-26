@@ -65,7 +65,7 @@
     	<unjar src="${lib.dir}/mongodb-mongo-java-driver-2.0/mongo-2.0.jar" dest="${bin}"/>
     	    	
     </target>
-    <target name="jar" depends="compile">
+    <target name="jar" depends="unjar,compile">
 		<jar basedir="${bin}" 
 			destfile="${outputjar}">
 			<manifest>

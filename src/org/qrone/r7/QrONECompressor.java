@@ -17,8 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-import org.qrone.img.AwtImageBufferService;
-import org.qrone.r7.app.QrONEApp;
+import org.qrone.r7.app.AwtImageBufferService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.resolver.FileResolver;

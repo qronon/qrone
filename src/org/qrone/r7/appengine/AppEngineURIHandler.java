@@ -1,10 +1,9 @@
-package org.qrone.r7.app;
+package org.qrone.r7.appengine;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.img.AppEngineImageBufferService;
 import org.qrone.r7.handler.CascadeHandler;
 import org.qrone.r7.handler.HTML5Handler;
 import org.qrone.r7.handler.ResolverHandler;

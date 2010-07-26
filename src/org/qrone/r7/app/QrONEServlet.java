@@ -12,14 +12,14 @@ import org.qrone.r7.handler.URIHandler;
 /**
  * Servlet implementation class QrONEServer
  */
-public class QrONEServer extends HttpServlet {
+public class QrONEServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private URIHandler handler = new QrONEHandler();
 	
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public QrONEServer() {
+    public QrONEServlet() {
         super();
     }
 

@@ -1,4 +1,4 @@
-package org.qrone.img;
+package org.qrone.r7.app;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
+
+import org.qrone.img.ImageBuffer;
+import org.qrone.img.ImageRect;
 
 public class AwtImageBuffer implements ImageBuffer{
 	private BufferedImage image;

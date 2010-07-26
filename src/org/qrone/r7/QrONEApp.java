@@ -1,4 +1,4 @@
-package org.qrone.r7.app;
+package org.qrone.r7;
 
 import java.io.File;
 
@@ -15,6 +15,7 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
+import org.qrone.r7.app.QrONEServlet;
 
 public class QrONEApp {
 	private static Server server = null;
@@ -26,7 +27,7 @@ public class QrONEApp {
 		server.addConnector(connector);
 
 		ServletHandler handler = new ServletHandler();
-		handler.addServletWithMapping(QrONEServer.class, "/*");
+		handler.addServletWithMapping(QrONEServlet.class, "/*");
 		server.addHandler(handler);
 
 		Runnable runnable = new Runnable() {

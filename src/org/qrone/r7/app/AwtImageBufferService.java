@@ -1,4 +1,4 @@
-package org.qrone.img;
+package org.qrone.r7.app;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+
+import org.qrone.img.ImageBuffer;
+import org.qrone.img.ImageBufferService;
 
 public class AwtImageBufferService implements ImageBufferService{
 

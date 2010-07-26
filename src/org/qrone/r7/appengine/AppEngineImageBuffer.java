@@ -1,4 +1,4 @@
-package org.qrone.img;
+package org.qrone.r7.appengine;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import org.qrone.img.ImageBuffer;
+import org.qrone.img.ImageRect;
 
 import com.google.appengine.api.images.Composite;
 import com.google.appengine.api.images.Image;
@@ -33,11 +36,17 @@ public class AppEngineImageBuffer implements ImageBuffer{
 		AppEngineImageBuffer buf = (AppEngineImageBuffer)img;
 		int w = img.getWidth();
 		int h = img.getHeight();
-		Transform t = ImagesServiceFactory.makeCrop(
-				w/from.x, h/from.y, w/(from.x+from.w), h/(from.y+from.h));
-		Image i = ImagesServiceFactory.getImagesService().applyTransform(t, buf.image);
-		Composite c = ImagesServiceFactory.makeComposite(i, to.x, to.y, 1, Composite.Anchor.TOP_LEFT);
-		composites.add(c);
+		double x1 = ((double)from.x)/((double)w);
+		double y1 = ((double)from.y)/((double)h);
+		double x2 = ((double)(from.x+from.w))/((double)w);
+		double y2 = ((double)(from.y+from.h))/((double)h);
+		try{
+			Transform t = ImagesServiceFactory.makeCrop(x1,y1,x2,y2);
+			Image a = ImagesServiceFactory.makeImage(buf.image.getImageData());
+			Image i = ImagesServiceFactory.getImagesService().applyTransform(t, a);
+			Composite c = ImagesServiceFactory.makeComposite(i, to.x, to.y, 1, Composite.Anchor.TOP_LEFT);
+			composites.add(c);
+		}catch(Exception e){}
 	}
 
 	@Override
