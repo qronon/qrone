@@ -1,0 +1,55 @@
+QrONE JavaScript Server
+
+All code specific to QrONE JavaScript Server is issued under a Apache License Version 2.0.
+http://commons.apache.org/license.html
+
+QrONE JavaScript Server extends and implements code from YUI Compressor, Rhino and css-selectors, and also makes use of and distributes a binary of following libraries.
+
+-----------------------------------------------------------------------------------
+Jetty - Apache License 2.0 / Eclipse Public License 1.0
+http://jetty.codehaus.org/jetty/
+http://www.eclipse.org/jetty/licenses.php
+
+Rhino - MPL 1.1 / GPL 2.0 license
+http://www.mozilla.org/rhino/
+https://developer.mozilla.org/en/Rhino_License
+
+Apache Commons - Apache License Version 2.0
+http://commons.apache.org/
+http://commons.apache.org/license.html
+
+YUI Compressor - BSD license
+http://developer.yahoo.com/yui/compressor/
+http://developer.yahoo.com/yui/license.html
+
+JArgs - BSD license
+http://jargs.sourceforge.net/
+
+Validator.nu HTML Parser - Mixed license
+http://about.validator.nu/htmlparser/
+
+mongo-java-driver - Apache License Version 2.0
+http://www.mongodb.org/display/DOCS/Java+Language+Center
+http://github.com/mongodb/mongo-java-driver/blob/master/LICENSE.txt
+
+Steady State CSS2 Parser - LGPL 3.0
+http://cssparser.sourceforge.net/
+http://www.gnu.org/copyleft/lesser.html
+
+css-selectors - MIT License
+http://github.com/chrsan/css-selectors/tree
+http://github.com/chrsan/css-selectors/blob/master/LICENSE
+
+JDBC Driver for MySQL - GPL2.0
+http://www.mysql.com/downloads/connector/j/
+http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+memcached-java-client - Mixed license
+http://wiki.github.com/gwhalin/Memcached-Java-Client/
+http://github.com/gwhalin/Memcached-Java-Client/blob/master/doc/LICENSE.txt
+
+JYaml - BSD style open-source license.
+http://jyaml.sourceforge.net/
+
+JDBM - Mixed license
+http://jdbm.sourceforge.net/

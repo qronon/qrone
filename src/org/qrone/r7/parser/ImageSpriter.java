@@ -163,7 +163,7 @@ public class ImageSpriter {
 								part.w, 
 								part.h));
 					}
-					currentY += part.h;
+					currentY += part.h-1;
 				}
 	
 				currentX += part.w;
@@ -205,7 +205,7 @@ public class ImageSpriter {
 								part.w, 
 								part.h));
 					}
-					currentX += part.w;
+					currentX += part.w-1;
 				}
 	
 				currentY += part.h;
