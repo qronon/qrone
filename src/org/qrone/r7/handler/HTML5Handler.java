@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Scriptable;
+import org.qrone.img.ImageBufferService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
@@ -26,9 +27,9 @@ public class HTML5Handler implements URIHandler{
 	private JSDeck vm;
 	private Object global;
 	
-	public HTML5Handler(URIResolver resolver) {
+	public HTML5Handler(URIResolver resolver, ImageBufferService service) {
 		this.resolver = resolver;
-		deck = new HTML5Deck(resolver);
+		deck = new HTML5Deck(resolver, service);
 		deck.addTagHandler(new Scale9Handler(deck));
     	deck.addTagHandler(new ImageHandler(deck));
 		vm = new JSDeck(resolver, deck);

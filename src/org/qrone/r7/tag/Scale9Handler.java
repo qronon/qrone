@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.qrone.img.ImageBuffer;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.ImagePart;
@@ -142,7 +143,7 @@ public class Scale9Handler extends HTML5TagHandler {
 	}
 
 	public String startScale3(URI file, int left, int right, String color) throws IOException{
-		BufferedImage image = deck.getSpriter().getImage(file);
+		ImageBuffer image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -164,7 +165,7 @@ public class Scale9Handler extends HTML5TagHandler {
 	}
 	
 	public String endScale3(URI file, int left, int right) throws IOException{
-		BufferedImage image = deck.getSpriter().getImage(file);
+		ImageBuffer image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -178,7 +179,7 @@ public class Scale9Handler extends HTML5TagHandler {
 
 	public String startScale9(URI file, int left, int right, int top, int bottom, String color, String w) throws IOException{
 		
-		BufferedImage image = deck.getSpriter().getImage(file);
+		ImageBuffer image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -199,7 +200,7 @@ public class Scale9Handler extends HTML5TagHandler {
 	}
 
 	public String endScale9(URI file, int left, int right, int top, int bottom) throws IOException{
-		BufferedImage image = deck.getSpriter().getImage(file);
+		ImageBuffer image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		

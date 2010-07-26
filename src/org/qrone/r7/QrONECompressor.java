@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+import org.qrone.img.AwtImageBufferService;
 import org.qrone.r7.app.QrONEApp;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
@@ -114,7 +115,7 @@ public class QrONECompressor {
         }
         
         if(deck == null)
-        	deck = new HTML5Deck(new FileResolver(basedir));
+        	deck = new HTML5Deck(new FileResolver(basedir), new AwtImageBufferService());
         
         try {
 	    	if(imgdir != null){

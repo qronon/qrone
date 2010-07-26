@@ -17,5 +17,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Memcached"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MongoDB"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AppEngine SDK"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

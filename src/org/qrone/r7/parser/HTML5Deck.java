@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.qrone.img.ImageBufferService;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
@@ -27,13 +28,13 @@ public class HTML5Deck {
 	private Map<URI, HTML5OM> map = new Hashtable<URI, HTML5OM>();
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	
-	public HTML5Deck(File file){
-		this(new FileResolver(file));
+	public HTML5Deck(File file, ImageBufferService service){
+		this(new FileResolver(file), service);
 	}
     
-    public HTML5Deck(URIResolver resolver){
+    public HTML5Deck(URIResolver resolver, ImageBufferService service){
     	this.resolver = resolver;
-    	spriter = new ImageSpriter(resolver);
+    	spriter = new ImageSpriter(resolver, service);
     }
     
     public void update(URI uri){

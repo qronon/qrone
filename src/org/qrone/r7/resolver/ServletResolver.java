@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -18,15 +19,40 @@ public class ServletResolver implements URIResolver{
 	@Override
 	public boolean exist(String uri) {
 		try {
-			return context.getResource(uri) != null;
-		} catch (MalformedURLException e) {
+			URL url = context.getResource(uri);
+			if (url == null) {
+				uri = "/WEB-INF" + uri;
+				url = context.getResource(uri);
+			}
+			if (url == null) {
+				return false;
+			} else {
+				url = new URL("file", "", context.getRealPath(uri));
+			}
+			return true;
+		} catch (IOException e) {
 			return false;
 		}
 	}
 
 	@Override
-	public InputStream getInputStream(URI uri) throws IOException {
-		return context.getResourceAsStream(uri.getPath());
+	public InputStream getInputStream(URI u) throws IOException {
+		try {
+			String uri = u.toString();
+			URL url = context.getResource(uri);
+			if (url == null) {
+				uri = "/WEB-INF" + uri;
+				url = context.getResource(uri);
+			}
+			if (url == null) {
+				return null;
+			} else {
+				url = new URL("file", "", context.getRealPath(uri));
+			}
+			return url.openConnection().getInputStream();
+		} catch (IOException e) {
+			return null;
+		}
 	}
 	
 	@Override

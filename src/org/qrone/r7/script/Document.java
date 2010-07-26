@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.Cookie;
+
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -35,6 +37,10 @@ public class Document extends JSObject{
 				load(npath + ".html");
 			} catch (URISyntaxException e) {}
 		}
+	}
+	
+	public String getCookie(){
+		return ss.request.getHeader("Cookie");
 	}
 	
 

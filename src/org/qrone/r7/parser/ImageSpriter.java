@@ -1,7 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,8 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
+import org.qrone.img.ImageBuffer;
+import org.qrone.img.ImageBufferService;
+import org.qrone.img.ImageRect;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
 
@@ -50,13 +49,15 @@ public class ImageSpriter {
 	private boolean useTransparentDot = false;
 	private boolean outTransparentDot = false;
 	
-	private Map<URI, BufferedImage> map = new Hashtable<URI, BufferedImage>();
+	private Map<URI, ImageBuffer> map = new Hashtable<URI, ImageBuffer>();
 
 	private URI basedir;
 	private URIResolver resolver;
+	private ImageBufferService service;
 	
-	public ImageSpriter(URIResolver resolver) {
+	public ImageSpriter(URIResolver resolver, ImageBufferService service) {
 		this.resolver = resolver;
+		this.service = service;
 		
 		try {
 			setBaseURI(new URI("."));
@@ -68,12 +69,12 @@ public class ImageSpriter {
 		return ins;
 	}
 	*/
-	public BufferedImage getImage(URI file) throws IOException{
+	public ImageBuffer getImage(URI file) throws IOException{
 		if(map.containsKey(file)){
 			return map.get(file);
 		}else{
 			InputStream in = resolver.getInputStream(file);
-			BufferedImage i = ImageIO.read(in);
+			ImageBuffer i = service.createImage(in);
 			in.close();
 			map.put(file, i);
 			return i;
@@ -112,38 +113,32 @@ public class ImageSpriter {
 	}
 
 	public void createi() throws IOException {
-		Graphics g;
 		int currentY = 0;
 		int currentX = 0;
 		if(isprites.size() > 0 && ilastsize != isprites.size()){
 			ilastsize = isprites.size();
 			
-			BufferedImage iimage = new BufferedImage(iWidth, iHeight,
-					BufferedImage.TYPE_4BYTE_ABGR);
-			g = iimage.getGraphics();
+			ImageBuffer iimage = service.createImage(iWidth, iHeight);
 			currentY = 0;
 			for (Iterator<ImagePart> i = isprites.iterator(); i
 					.hasNext();) {
 				ImagePart part = i.next();
-				g.drawImage(getImage(part.file), 
-						currentX, currentY, currentX + part.w, currentY + part.h, 
-						part.x, part.y, part.x+part.w, part.y+part.h, null);
+				iimage.drawImage(getImage(part.file), 
+						new ImageRect(currentX, currentY, part.w, part.h), 
+						new ImageRect(part.x, part.y, part.w, part.h));
 				currentY += part.h;
 			}
-			ImageIO.write(iimage, "png", resolver.getOutputStream(ispriteURI));
+			iimage.writeTo(resolver.getOutputStream(ispriteURI));
 		}
 	}
 	
 	public void createv() throws IOException {
-		Graphics g;
 		int currentY = 0;
 		int currentX = 0;
 		if(vsprites.size() > 0 && vlastsize != vsprites.size()){
 			vlastsize = vsprites.size();
 			
-			BufferedImage vimage = new BufferedImage(vWidth, vHeight,
-					BufferedImage.TYPE_4BYTE_ABGR);
-			g = vimage.getGraphics();
+			ImageBuffer vimage = service.createImage(vWidth, vHeight);
 			currentX = 0;
 			for (Iterator<ImagePart> i = vsprites.iterator(); i
 					.hasNext();) {
@@ -152,42 +147,39 @@ public class ImageSpriter {
 				currentY = 0;
 				while (currentY < vWidth) {
 					if(currentY + part.h > vWidth){
-						g.drawImage(getImage(part.file), 
-								currentX, currentY, 
-								currentX + part.w, 
-								currentY + part.h - (currentY + part.h - vWidth), 
-								part.x, part.y, 
-								part.x+part.w, 
-								part.y+part.h - (currentY + part.h - vWidth), null);
+						vimage.drawImage(getImage(part.file), 
+								new ImageRect(currentX, currentY, 
+								part.w, 
+								part.h - (currentY + part.h - vWidth)), 
+								new ImageRect(part.x, part.y, 
+								part.w, 
+								part.h - (currentY + part.h - vWidth)));
 					}else{
-						g.drawImage(getImage(part.file), 
-								currentX, currentY, 
-								currentX + part.w, 
-								currentY + part.h, 
-								part.x, part.y, 
-								part.x+part.w, 
-								part.y+part.h, null);
+						vimage.drawImage(getImage(part.file), 
+								new ImageRect(currentX, currentY, 
+								part.w, 
+								part.h), 
+								new ImageRect(part.x, part.y, 
+								part.w, 
+								part.h));
 					}
 					currentY += part.h;
 				}
 	
 				currentX += part.w;
 			}
-			ImageIO.write(vimage, "png", resolver.getOutputStream(vspriteURI));
+			vimage.writeTo(resolver.getOutputStream(vspriteURI));
 		}
 	}
 	
 	public void createh() throws IOException {
-		Graphics g;
 		int currentY = 0;
 		int currentX = 0;
 		
 		if(hsprites.size() > 0 && hlastsize != hsprites.size()){
 			hlastsize = hsprites.size();
 			
-			BufferedImage himage = new BufferedImage(hWidth, hHeight,
-					BufferedImage.TYPE_4BYTE_ABGR);
-			g = himage.getGraphics();
+			ImageBuffer himage = service.createImage(hWidth, hHeight);
 			currentY = 0;
 			for (Iterator<ImagePart> i = hsprites.iterator(); i
 					.hasNext();) {
@@ -196,29 +188,29 @@ public class ImageSpriter {
 				currentX = 0;
 				while (currentX < hHeight) {
 					if(currentX + part.w > hHeight){
-						g.drawImage(getImage(part.file), 
-								currentX, currentY, 
-								currentX + part.w - (currentX + part.w - hHeight), 
-								currentY + part.h, 
-								part.x, part.y, 
-								part.x+part.w - (currentX + part.w - hHeight), 
-								part.y+part.h, null);
+						himage.drawImage(getImage(part.file), 
+								new ImageRect(currentX, currentY, 
+								part.w - (currentX + part.w - hHeight), 
+								part.h), 
+								new ImageRect(part.x, part.y, 
+								part.w - (currentX + part.w - hHeight), 
+								part.h));
 					}else{
 	
-						g.drawImage(getImage(part.file), 
-								currentX, currentY, 
-								currentX + part.w, 
-								currentY + part.h, 
-								part.x, part.y, 
-								part.x+part.w, 
-								part.y+part.h, null);
+						himage.drawImage(getImage(part.file), 
+								new ImageRect(currentX, currentY, 
+								part.w, 
+								part.h), 
+								new ImageRect(part.x, part.y, 
+								part.w, 
+								part.h));
 					}
 					currentX += part.w;
 				}
 	
 				currentY += part.h;
 			}
-			ImageIO.write(himage, "png", resolver.getOutputStream(hspriteURI));
+			himage.writeTo(resolver.getOutputStream(hspriteURI));
 		}
 	}
 	
@@ -236,7 +228,7 @@ public class ImageSpriter {
 	}
 	
 	public String addISprite(URI file) throws IOException{
-		BufferedImage b = getImage(file);
+		ImageBuffer b = getImage(file);
 		isprites.add(new ImagePart(file, 0, 0, b.getWidth(), b.getHeight()));
 		
 		if(iWidth < b.getWidth()){
