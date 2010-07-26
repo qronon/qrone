@@ -1,9 +1,14 @@
-package org.qrone.kvs;
+package org.qrone.r7;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.arnx.jsonic.JSON;
+
+import org.bson.BSON;
+import org.bson.BSONDecoder;
+import org.bson.BSONEncoder;
 import org.bson.BSONObject;
 import org.bson.types.BasicBSONList;
 import org.mozilla.javascript.Context;
@@ -14,6 +19,7 @@ import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.UniqueTag;
+import org.mozilla.javascript.json.JsonParser;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -26,17 +32,17 @@ import com.mongodb.DBObject;
  * 
  * @author Tal Liron
  */
-public class BSONConverter
+public class ObjectConverter
 {
-	
 	public static String stringify( Object s){
 		if(s.getClass().getName().equals("org.mozilla.javascript.xmlimpl.XML")){
 			return s.toString();
 		}
 		if(s instanceof Scriptable){
-			return BSONConverter.to((Scriptable)s).toString();
+			BSONObject bson = ObjectConverter.to((Scriptable)s);
+			return com.mongodb.util.JSON.serialize(bson);
 		}
-		return s.toString();
+		return JSON.encode(s);
 	}
 	//
 	// Static operations

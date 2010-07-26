@@ -1,6 +1,7 @@
 package org.qrone.kvs;
 
 import org.mozilla.javascript.Scriptable;
+import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.script.JSObject;
 import org.qrone.r7.script.ServletScope;
 
@@ -26,27 +27,27 @@ public class MongoTable extends JSObject implements KVSTable {
 
 	@Override
 	public KVSCursor find(Scriptable o) {
-		return new MongoCursor(ss, coll.find((DBObject)BSONConverter.to(o)));
+		return new MongoCursor(ss, coll.find((DBObject)ObjectConverter.to(o)));
 	}
 
 	@Override
 	public KVSCursor find(Scriptable o, Scriptable o2) {
-		return new MongoCursor(ss, coll.find((DBObject)BSONConverter.to(o), (DBObject)BSONConverter.to(o2)));
+		return new MongoCursor(ss, coll.find((DBObject)ObjectConverter.to(o), (DBObject)ObjectConverter.to(o2)));
 	}
 
 	@Override
 	public void insert(Scriptable o) {
-		coll.insert((DBObject)BSONConverter.to(o));
+		coll.insert((DBObject)ObjectConverter.to(o));
 	}
 
 	@Override
 	public void remove(Scriptable o) {
-		coll.remove((DBObject)BSONConverter.to(o));
+		coll.remove((DBObject)ObjectConverter.to(o));
 	}
 
 	@Override
 	public void save(Scriptable o) {
-		coll.save((DBObject)BSONConverter.to(o));
+		coll.save((DBObject)ObjectConverter.to(o));
 	}
 
 }

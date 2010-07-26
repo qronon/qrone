@@ -19,7 +19,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.ho.yaml.Yaml;
 import org.mozilla.javascript.Scriptable;
-import org.qrone.kvs.BSONConverter;
+import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.JSOM;
 
@@ -46,7 +46,7 @@ public class Window extends JSObject{
 	}
 
 	public String stringify(Object out){
-		return BSONConverter.stringify(out);
+		return ObjectConverter.stringify(out);
 	}
 	
 	public Object getQuery(){

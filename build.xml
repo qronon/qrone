@@ -63,6 +63,7 @@
     	<unjar src="${lib.dir}/java_memcached-release_2.5.1/java_memcached-release_2.5.1.jar" dest="${bin}"/>
     	<unjar src="${lib.dir}/jyaml-1.3/jyaml-1.3.jar" dest="${bin}"/>
     	<unjar src="${lib.dir}/mongodb-mongo-java-driver-2.0/mongo-2.0.jar" dest="${bin}"/>
+    	<unjar src="${lib.dir}/jsonic-1.2.0/jsonic-1.2.0.jar" dest="${bin}"/>
     	    	
     </target>
     <target name="jar" depends="unjar,compile">

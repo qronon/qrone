@@ -13,7 +13,7 @@ import javax.servlet.http.Cookie;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.qrone.kvs.BSONConverter;
+import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
@@ -73,7 +73,7 @@ public class Document extends JSObject{
 	}
 
 	public void write(Object out) throws IOException{
-		writer.append(BSONConverter.stringify(out));
+		writer.append(ObjectConverter.stringify(out));
 	}
 	
 	public void write(String out) throws IOException{

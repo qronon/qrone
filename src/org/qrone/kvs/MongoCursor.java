@@ -3,6 +3,7 @@ package org.qrone.kvs;
 import org.bson.BSONObject;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.script.JSObject;
 import org.qrone.r7.script.ServletScope;
 
@@ -33,7 +34,7 @@ public class MongoCursor extends JSObject implements KVSCursor {
 	}
 	@Override
 	public Object next() {
-		return BSONConverter.from(c.next());
+		return ObjectConverter.from(c.next());
 	}
 	@Override
 	public KVSCursor skip(Number o) {
@@ -42,7 +43,7 @@ public class MongoCursor extends JSObject implements KVSCursor {
 	
 	@Override
 	public KVSCursor sort(Scriptable o) {
-		return new MongoCursor(ss, c.sort((DBObject)BSONConverter.to(o)));
+		return new MongoCursor(ss, c.sort((DBObject)ObjectConverter.to(o)));
 	}
 
 }
