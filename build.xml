@@ -16,7 +16,7 @@
 	<property name="tmp" value="tmp"/>
 	<property name="lib.dir" value="C:\Users\Qronon\Java Libraries"/>
 	<property name="javadoc" value="doc"/>
-	<property name="outputjar" value="qrone-0.0.4.jar"/>
+	<property name="outputjar" value="qrone-0.0.5.jar"/>
 
 
     <!-- ================================= 
