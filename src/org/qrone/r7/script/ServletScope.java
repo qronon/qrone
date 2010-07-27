@@ -1,5 +1,6 @@
 package org.qrone.r7.script;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -21,4 +22,5 @@ public class ServletScope {
 	public URIResolver resolver;
 	public String path;
 	public Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
+	public URI uri;
 }

@@ -3,7 +3,6 @@ package org.qrone.r7.script;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -69,7 +68,7 @@ public class Window extends JSObject{
 	}
 	
 	public void require_once(String path) throws IOException, URISyntaxException{
-		JSOM om = ss.vm.compile(new URI(path));
+		JSOM om = ss.vm.compile(resolvePath(path));
 		if(!ss.required.contains(om)){
 			ss.required.add(om);
 			om.run(ss.scope);
@@ -77,15 +76,15 @@ public class Window extends JSObject{
 	}
 	
 	public String load_file(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(path)){
-			return QrONEUtils.convertStreamToString(ss.resolver.getInputStream(new URI(path)));
+		if(ss.resolver.exist(resolvePath(path).toString())){
+			return QrONEUtils.convertStreamToString(ss.resolver.getInputStream(resolvePath(path)));
 		}
 		return null;
 	}
 
 	public Object load_properties(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(path)){
-			InputStream in = ss.resolver.getInputStream(new URI(path));
+		if(ss.resolver.exist(resolvePath(path).toString())){
+			InputStream in = ss.resolver.getInputStream(resolvePath(path));
 			Properties p = new Properties();
 			p.load(in);
 			in.close();
@@ -101,8 +100,8 @@ public class Window extends JSObject{
 	}
 	
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(path)){
-			InputStream in = ss.resolver.getInputStream(new URI(path));
+		if(ss.resolver.exist(resolvePath(path).toString())){
+			InputStream in = ss.resolver.getInputStream(resolvePath(path));
 			Object o = Yaml.load(in);
 			in.close();
 			return o;
@@ -111,7 +110,7 @@ public class Window extends JSObject{
 	}
 	
 	public void require(String path) throws IOException, URISyntaxException{
-		JSOM om = ss.vm.compile(new URI(path));
+		JSOM om = ss.vm.compile(resolvePath(path));
 		if(!ss.required.contains(om)){
 			ss.required.add(om);
 		}

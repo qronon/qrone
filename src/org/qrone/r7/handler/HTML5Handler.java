@@ -56,6 +56,7 @@ public class HTML5Handler implements URIHandler{
 					Scriptable scope = om.createScope();
 					ServletScope ss = new ServletScope();
 					ss.path = path;
+					ss.uri = uri;
 					ss.request = request;
 					ss.response = response;
 					ss.scope = scope;
