@@ -16,7 +16,7 @@ import org.qrone.r7.parser.ImagePart;
 import org.w3c.dom.css.CSSValue;
 
 public class Scale9Handler extends HTML5TagHandler {
-	public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
+	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
 	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
 	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
 	
@@ -35,10 +35,8 @@ public class Scale9Handler extends HTML5TagHandler {
 			String url;
 			Matcher mm;
 			
-			mm = urlRegex.matcher(value);
-			if(mm.find()){
-				url = mm.group(1);
-			}else{
+			url = v.getURL();
+			if(v == null){
 				return null;
 			}
 

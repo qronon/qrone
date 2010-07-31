@@ -219,7 +219,7 @@ public class HTML5OM {
 					javascripts.add(JSParser.clean(n.getNodeValue()));
 				}else if(inStyle){
 					try {
-						parseStyleSheet(null, CSS3Parser.clean(n.getNodeValue()));
+						parseStyleSheet(getURI(), CSS3Parser.clean(n.getNodeValue()));
 					} catch (DOMException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -335,7 +335,7 @@ public class HTML5OM {
 				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
 				CSSValue v = style.getPropertyCSSValue(prop);
 				if(v != null){
-					CSS3Values v3 = new CSS3Values(null, style, v, prop);
+					CSS3Values v3 = new CSS3Values(getURI(), style, v, prop);
 					if(v3.isImportant())
 						imporantValue = v3;
 					else
