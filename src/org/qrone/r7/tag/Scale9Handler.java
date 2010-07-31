@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.qrone.img.ImageBuffer;
+import org.qrone.r7.parser.CSS3Values;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.ImagePart;
@@ -27,7 +28,7 @@ public class Scale9Handler extends HTML5TagHandler {
 	
 	@Override
 	public HTML5TagResult process(HTML5Element e) {
-		CSSValue v = e.getPropertyValue("scale9");
+		CSS3Values v = e.getPropertyValue("scale9");
 		
 		if(v != null){
 			String value = v.toString();

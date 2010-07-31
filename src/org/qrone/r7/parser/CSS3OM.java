@@ -23,6 +23,10 @@ public class CSS3OM {
 		parse(path, new InputSource(new StringReader(css)));
 	}
 	
+	public URI getURI(){
+		return path;
+	}
+	
 	public void parse(URI path, InputSource source) throws IOException{
 		this.path = path;
 		stylesheet = CSS3Parser.parse(source);

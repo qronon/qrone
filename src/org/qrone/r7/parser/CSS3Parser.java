@@ -20,20 +20,12 @@ import com.steadystate.css.parser.CSSOMParser;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
 public class CSS3Parser{
-	public static Pattern strRegex = Pattern.compile("[\"'](.*?)[\"']");
-	public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
-	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
-	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
+	//public static Pattern strRegex = Pattern.compile("[\"'](.*?)[\"']");
+	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
+	//public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
+	//public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
 
-	public static String pullurl(String style){
-		Matcher mm = urlRegex.matcher(style);
-		if(mm.find()){
-			return mm.group(1);
-		}else{
-			return null;
-		}
-	}
-	
+	/*
 	public static String pullstring(String style){
 		Matcher mm = strRegex.matcher(style);
 		if(mm.find()){
@@ -41,7 +33,7 @@ public class CSS3Parser{
 		}else{
 			return null;
 		}
-	}
+	}*/
 	
 	public static String clean(String js){
 		return js

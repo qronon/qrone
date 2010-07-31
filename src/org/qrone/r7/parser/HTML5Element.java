@@ -31,7 +31,7 @@ public class HTML5Element {
 		return om.getProperty(e, prop);
 	}
 	
-	public CSSValue getPropertyValue(String prop){
+	public CSS3Values getPropertyValue(String prop){
 		return om.getPropertyValue(e, prop);
 	}
 	

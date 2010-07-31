@@ -3,6 +3,7 @@ package org.qrone.r7.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import org.qrone.coder.QFunc;
 import org.qrone.coder.QState;
 import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.QrONEUtils;
+import org.qrone.r7.parser.HTML5Deck.HTML5Set;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
 import org.qrone.r7.tag.HTML5TagResult;
@@ -43,7 +45,7 @@ public class HTML5OM {
 	
 	private Document document;
 	private Element body;
-	private Map<Node, List<CSSStyleRule>> map = new Hashtable<Node, List<CSSStyleRule>>();
+	private Map<Node, List<CSS3Rule>> map = new Hashtable<Node, List<CSS3Rule>>();
 	
 	private List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
 	private List<String> javascripts = new LinkedList<String>();
@@ -86,7 +88,7 @@ public class HTML5OM {
 	}
 	
 	public void parseStyleSheet(URI path, String css) throws IOException{
-		CSS3OM s = new CSS3OM();
+		final CSS3OM s = new CSS3OM();
 		s.parse(path, css);
 		CSS3Visitor v = new CSS3Visitor(){
 
@@ -105,12 +107,12 @@ public class HTML5OM {
 					for (Iterator<Node> i = set.iterator(); i
 							.hasNext();) {
 						Node node = i.next();
-						List<CSSStyleRule> list = map.get(node);
+						List<CSS3Rule> list = map.get(node);
 						if(list == null){
-							list = new ArrayList<CSSStyleRule>();
+							list = new ArrayList<CSS3Rule>();
 							map.put(node, list);
 						}
-						list.add(style);
+						list.add(new CSS3Rule(s, style));
 					}
 				}
 			}
@@ -119,7 +121,7 @@ public class HTML5OM {
 		stylesheets.add(s);
 	}
 	
-	public void parse(URIResolver resolver) throws SAXException, IOException{
+	public void parse(final URIResolver resolver) throws SAXException, IOException{
 		InputStream in = resolver.getInputStream(uri);
 		document = HTML5Parser.parse(new InputSource(in));
 		in.close();
@@ -185,8 +187,23 @@ public class HTML5OM {
 					accept(e);
 					inStyle = false;
 				}else if(e.getNodeName().equals("link")){
-					if(e.hasAttribute("href"))
-						csslibs.add(e);
+					if(e.hasAttribute("href")){
+						if(e.hasAttribute("include")){
+							try {
+								URI cssuri = uri.resolve(new URI(e.getAttribute("href")));
+								InputStream cssin = resolver.getInputStream(cssuri);
+								if(cssin != null){
+									parseStyleSheet(cssuri, QrONEUtils.convertStreamToString(cssin));
+								}
+							} catch (URISyntaxException e1) {
+								csslibs.add(e);
+							} catch (IOException e1) {
+								csslibs.add(e);
+							}
+						}else{
+							csslibs.add(e);
+						}
+					}
 				}else if(e.getNodeName().equals("meta")){
 					metamap.put(e.getAttribute("name"), e.getAttribute("content"));
 					accept(e);
@@ -270,11 +287,10 @@ public class HTML5OM {
 	}
 	
 	public void removeProperty(Element e, String prop) {
-		List<CSSStyleRule> l = map.get(e);
+		List<CSS3Rule> l = map.get(e);
 		if(l != null){
-			for (Iterator<CSSStyleRule> iter = l.iterator(); iter.hasNext();) {
-				CSSStyleDeclaration style = iter.next().getStyle();
-				style.removeProperty(prop);
+			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
+				iter.next().removeProperty(prop);
 			}
 		}
 		
@@ -293,24 +309,22 @@ public class HTML5OM {
 	}
 	
 	public String getProperty(Element e, String prop) {
-		CSSValue v = getPropertyValue(e, prop);
-		return v != null ? v.getCssText() : null;
+		CSS3Values v = getPropertyValue(e, prop);
+		return v != null ? v.getValue() : null;
 	}
-
-	public CSSValue getPropertyValue(Element e, String prop) {
-		List<CSSStyleRule> l = map.get(e);
-		CSSValue value = null;
-		CSSValue imporantValue = null;
+	
+	public CSS3Values getPropertyValue(Element e, String prop) {
+		List<CSS3Rule> l = map.get(e);
+		CSS3Values value = null;
+		CSS3Values imporantValue = null;
 		if(l != null){
-			for (Iterator<CSSStyleRule> iter = l.iterator(); iter.hasNext();) {
-				CSSStyleDeclaration style = iter.next().getStyle();
-				if(style.getPropertyPriority(prop).equals("important")){
-					CSSValue v = style.getPropertyCSSValue(prop);
-					if(v != null)
+			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
+				CSS3Rule rule = iter.next();
+				CSS3Values v = rule.getProperty(prop);
+				if(v != null){
+					if(v.isImportant())
 						imporantValue = v;
-				}else{
-					CSSValue v = style.getPropertyCSSValue(prop);
-					if(v != null)
+					else
 						value = v;
 				}
 			}
@@ -319,14 +333,13 @@ public class HTML5OM {
 		if(attr != null){
 			try {
 				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
-				if(style.getPropertyPriority(prop).equals("important")){
-					CSSValue v = style.getPropertyCSSValue(prop);
-					if(v != null)
-						imporantValue = v;
-				}else{
-					CSSValue v = style.getPropertyCSSValue(prop);
-					if(v != null)
-						value = v;
+				CSSValue v = style.getPropertyCSSValue(prop);
+				if(v != null){
+					CSS3Values v3 = new CSS3Values(null, style, v, prop);
+					if(v3.isImportant())
+						imporantValue = v3;
+					else
+						value = v3;
 				}
 			} catch (IOException e1) {
 			}
@@ -350,14 +363,14 @@ public class HTML5OM {
 	}
 
 	public void renameProperty(Element e, String prop, String newprop) {
-		List<CSSStyleRule> l = map.get(e);
+		List<CSS3Rule> l = map.get(e);
 		if(l != null){
-			for (Iterator<CSSStyleRule> iter = l.iterator(); iter.hasNext();) {
-				CSSStyleDeclaration style = iter.next().getStyle();
-				CSSValue v = style.getPropertyCSSValue(prop);
+			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
+				CSS3Rule rule = iter.next();
+				CSS3Values v = rule.getProperty(prop);
 				if(v != null){
-					style.setProperty(newprop, v.getCssText(), style.getPropertyPriority(prop));
-					style.removeProperty(prop);
+					rule.setProperty(newprop, v.getValue(), v.isImportant());
+					rule.removeProperty(prop);
 				}
 			}
 		}
@@ -407,7 +420,8 @@ public class HTML5OM {
 		//final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
 		process(bodyt, t, body, null, xomlist);
 		
-		
+
+		final HTML5Set set = deck.getRecurseHeader(getURI(), xomlist);
 		HTML5Selializer s = new HTML5Selializer() {
 			@Override
 			public void visit(Document e) {
@@ -420,14 +434,13 @@ public class HTML5OM {
 				if(e.getNodeName().equals("head")){
 					start(e);
 					accept(e);
-					deck.getRecurseHeader(b, getURI(), xomlist);
+					deck.outputStyles(b, set, uri);
 					end(e);
 				}else if(e.getNodeName().equals("body")){
-
 					start(e);
 					t.append(bodyt);
+					deck.outputScripts(b, set, uri);
 					end(e);
-					
 				}else if(e.getNodeName().equals("script")){
 				}else if(e.getNodeName().equals("style")){
 				}else if(e.getNodeName().equals("link")){
@@ -529,10 +542,10 @@ public class HTML5OM {
 			
 			@Override
 			protected void out(final Element e) {
-				final String include = getProperty(e, "include");
+				final CSS3Values include = getPropertyValue(e, "include");
 				final String uniqueid = QrONEUtils.uniqueid();
 				if(include != null){
-					final String path = CSS3Parser.pullurl(include);
+					final String path = include.getURL();
 					if(path != null && path.trim().length() > 0){
 						super.out(e,new Delegate() {
 							@Override

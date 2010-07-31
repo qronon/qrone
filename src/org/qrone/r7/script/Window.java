@@ -54,19 +54,6 @@ public class Window extends JSObject{
 		query = getQuery();
 		JSON = new JSON(ss);
 	}
-
-	public Document load(String uri) throws IOException, URISyntaxException{
-		URI u = ss.uri.resolve(uri);
-		if(ss.resolver.exist(u.toString())){
-			HTML5OM om = ss.deck.compile(u);
-			if(om != null){
-				Document doc = new Document(ss);
-				doc.load(new HTML5Template(om, u));
-				return doc;
-			}
-		}
-		return null;
-	}
 	
 	public Object getQuery(){
 		Scriptable o = newScriptable();
@@ -102,6 +89,19 @@ public class Window extends JSObject{
 			om.run(ss.scope);
 		}
 	}
+
+	public Document load_html(String uri) throws IOException, URISyntaxException{
+		URI u = ss.uri.resolve(uri);
+		if(ss.resolver.exist(u.toString())){
+			HTML5OM om = ss.deck.compile(u);
+			if(om != null){
+				Document doc = new Document(ss);
+				doc.load(new HTML5Template(om, u));
+				return doc;
+			}
+		}
+		return null;
+	}
 	
 	public String load_file(String path) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(resolvePath(path).toString())){
@@ -130,7 +130,7 @@ public class Window extends JSObject{
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(resolvePath(path).toString())){
 			InputStream in = ss.resolver.getInputStream(resolvePath(path));
-			Object o = Yaml.load(new Tab2WhiteInputStream(new UnicodeInputStream(in)));
+			Object o = Yaml.load(new Tab2WhiteInputStream(in));
 			in.close();
 			return o;
 		}

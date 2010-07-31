@@ -127,7 +127,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 				}
 			});
 		}else{
-			set(selector, o.toString().replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"));
+			set(selector, o.toString().replaceAll("\n", "<br>"));
 		}
 	}
 	

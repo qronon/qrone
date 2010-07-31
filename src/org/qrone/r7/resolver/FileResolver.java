@@ -10,6 +10,8 @@ import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.qrone.util.UnicodeInputStream;
+
 public class FileResolver implements URIResolver {
 	private File root;
 	private Map<String, Long> lastModifiedMap = new Hashtable<String, Long>();
@@ -27,7 +29,7 @@ public class FileResolver implements URIResolver {
 	public InputStream getInputStream(URI uri) throws FileNotFoundException {
 		File f = new File(root, uri.getPath());
 		lastModifiedMap.put(uri.getPath(), f.lastModified());
-		return new FileInputStream(f);
+		return new UnicodeInputStream(new FileInputStream(f));
 	}
 
 	@Override

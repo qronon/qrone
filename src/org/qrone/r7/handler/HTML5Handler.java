@@ -83,6 +83,8 @@ public class HTML5Handler implements URIHandler{
 				URI uri = new URI(path);
 				HTML5OM om = deck.compile(uri);
 				if(om != null){
+					response.setContentType("text/html; charset=utf8");
+					
 					deck.getSpriter().create();
 
 					Writer out = response.getWriter();

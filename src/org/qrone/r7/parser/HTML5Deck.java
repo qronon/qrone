@@ -116,11 +116,9 @@ public class HTML5Deck {
 	}
 	
 	private Map<String, String> inlineJSMap = new Hashtable<String, String>();
-	
-	public String getRecurseHeader(HTML5Writer b, URI file, Set<HTML5OM> xomlist){
-		HTML5Set set = getRecursive(file, xomlist);
-		//StringBuffer b = new StringBuffer();
-		
+
+	public void outputScripts(HTML5Writer b, HTML5Set set, URI file){
+
 		//---------------
 		// script src
 		//---------------
@@ -166,21 +164,24 @@ public class HTML5Deck {
 				}
 			}
 		}
-
-		//---------------
-		// css href
-		//---------------
+		
 		js.append(set.js.toString());
 		if(js.length() > 0){
 			b.append("<script>");
 			b.append(js.toString());
 			b.append("</script>");
 		}
+	}
+	public void outputStyles(HTML5Writer b, HTML5Set set, URI file){
+
+		//---------------
+		// css href
+		//---------------
 		
 		for (Iterator<Element> i = set.csslibs.iterator(); i.hasNext();) {
 			Element el = i.next();
-			b.append("<link href=\"");
-			b.append(QrONEUtils.escape(el.getAttribute("src")));
+			b.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
+			b.append(QrONEUtils.escape(el.getAttribute("href")));
 			b.append("\" />");
 		}
 
@@ -201,8 +202,10 @@ public class HTML5Deck {
 			b.append(css2);
 			b.append("</style>");
 		}
-		
-		return b.toString();
+	}
+	
+	public HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist){
+		return getRecursive(file, xomlist);
 	}
 	
 	public static class HTML5Set{
