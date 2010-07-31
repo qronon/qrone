@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,37 +25,45 @@ public class Document extends JSObject{
 	private HTML5Template t;
 	
 	public Location location;
-	public Object query;
 	
 	public Document(ServletScope ss) throws IOException{
 		super(ss);
-		writer = ss.response.getWriter();
-		
-		if(ss.path.endsWith(".js")){
-			String npath = ss.path.substring(0,ss.path.length()-".js".length());
-
-			try {
-				load(npath + ".html");
-			} catch (URISyntaxException e) {}
-		}
+		writer = ss.writer;
 	}
 	
 	public String getCookie(){
 		return ss.request.getHeader("Cookie");
 	}
 	
+	public HTML5Element getBody(){
+		return t.getBody();
+	}
+	
 
 	public void load(String uri) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(uri)){
-			HTML5OM om = ss.deck.compile(new URI(uri));
+		URI u = ss.uri.resolve(uri);
+		if(ss.resolver.exist(u.toString())){
+			HTML5OM om = ss.deck.compile(u);
 			if(om != null){
-				t = new HTML5Template(om);
+				t = new HTML5Template(om, u);
 			}else{
 				throw new IOException();
 			}
 		}
 	}
 
+	public void load(HTML5Template template){
+		t = template;
+	}
+
+	public void set(Object o){
+		t.set(o);
+	}
+
+	public void set(String selector, final Object o){
+		t.set(selector, o);
+	}
+	
 	public void set(String selector, String value){
 		t.set(selector, value);
 	}
@@ -78,6 +87,16 @@ public class Document extends JSObject{
 	
 	public void write(String out) throws IOException{
 		writer.append(out);
+	}
+
+	public void writeln(Object out) throws IOException{
+		write(out);
+		write("\n");
+	}
+	
+	public void writeln(String out) throws IOException{
+		write(out);
+		write("\n");
 	}
 	
 	public void flush() throws IOException{

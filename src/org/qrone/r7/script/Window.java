@@ -3,6 +3,7 @@ package org.qrone.r7.script;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,10 +18,16 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.ho.yaml.Yaml;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
+import org.qrone.r7.parser.HTML5OM;
+import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSOM;
+import org.qrone.util.Tab2WhiteInputStream;
+import org.qrone.util.UnicodeInputStream;
 
 
 public class Window extends JSObject{
@@ -34,18 +41,31 @@ public class Window extends JSObject{
 	public Window(ServletScope ss) throws IOException{
 		super(ss);
 		document = new Document(ss);
+		if(ss.path.endsWith(".js")){
+			String npath = ss.path.substring(0,ss.path.length()-".js".length());
+			try {
+				document.load(npath + ".html");
+			} catch (URISyntaxException e) {}
+		}
 		
 		location = new Location(ss);
 		document.location = location;
 		
 		query = getQuery();
-		document.query = query;
-		document.location.query = query;
 		JSON = new JSON(ss);
 	}
 
-	public String stringify(Object out){
-		return ObjectConverter.stringify(out);
+	public Document load(String uri) throws IOException, URISyntaxException{
+		URI u = ss.uri.resolve(uri);
+		if(ss.resolver.exist(u.toString())){
+			HTML5OM om = ss.deck.compile(u);
+			if(om != null){
+				Document doc = new Document(ss);
+				doc.load(new HTML5Template(om, u));
+				return doc;
+			}
+		}
+		return null;
 	}
 	
 	public Object getQuery(){
@@ -65,6 +85,14 @@ public class Window extends JSObject{
 			}
 		}
 		return o;
+	}
+	
+	public void require(String path) throws IOException, URISyntaxException{
+		JSOM om = ss.vm.compile(resolvePath(path));
+		if(!ss.required.contains(om)){
+			ss.required.add(om);
+		}
+		om.run(ss.scope);
 	}
 	
 	public void require_once(String path) throws IOException, URISyntaxException{
@@ -102,19 +130,11 @@ public class Window extends JSObject{
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
 		if(ss.resolver.exist(resolvePath(path).toString())){
 			InputStream in = ss.resolver.getInputStream(resolvePath(path));
-			Object o = Yaml.load(in);
+			Object o = Yaml.load(new Tab2WhiteInputStream(new UnicodeInputStream(in)));
 			in.close();
 			return o;
 		}
 		return null;
-	}
-	
-	public void require(String path) throws IOException, URISyntaxException{
-		JSOM om = ss.vm.compile(resolvePath(path));
-		if(!ss.required.contains(om)){
-			ss.required.add(om);
-		}
-		om.run(ss.scope);
 	}
 	
 	public byte[] base64_decode(String base64String){
@@ -187,4 +207,7 @@ public class Window extends JSObject{
 		return b.toString();
 	}
 
+	public String stringify(Object out){
+		return ObjectConverter.stringify(out);
+	}
 }

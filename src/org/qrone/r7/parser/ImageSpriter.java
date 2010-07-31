@@ -163,7 +163,7 @@ public class ImageSpriter {
 								part.w, 
 								part.h));
 					}
-					currentY += part.h-1;
+					currentY += part.h;
 				}
 	
 				currentX += part.w;
@@ -205,7 +205,7 @@ public class ImageSpriter {
 								part.w, 
 								part.h));
 					}
-					currentX += part.w-1;
+					currentX += part.w;
 				}
 	
 				currentY += part.h;
@@ -229,16 +229,23 @@ public class ImageSpriter {
 	
 	public String addISprite(URI file) throws IOException{
 		ImageBuffer b = getImage(file);
-		isprites.add(new ImagePart(file, 0, 0, b.getWidth(), b.getHeight()));
+		ImagePart part = new ImagePart(file, 0, 0, b.getWidth(), b.getHeight());
+		/*
+		if(iresults.containsKey(part)){
+			return iresults.get(part);
+		}
 		
 		if(iWidth < b.getWidth()){
 			iWidth = b.getWidth();
 		}
 		iHeight += b.getHeight();
 		
-		return "width:" + b.getWidth() + "px;" 
+		String res ="width:" + b.getWidth() + "px;" 
 			 + "height:" + b.getHeight() + "px;" 
 			 + "background: no-repeat 0px -" + (iHeight-b.getHeight()) + "px url(" + getPath(file, isprite) + ");";
+		iresults.put(part, res);
+		*/
+		return addISprite(part);
 	}
 
 	public String addISprite(ImagePart file) throws IOException{

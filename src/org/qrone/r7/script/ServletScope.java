@@ -1,9 +1,11 @@
 package org.qrone.r7.script;
 
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,4 +25,5 @@ public class ServletScope {
 	public String path;
 	public Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
 	public URI uri;
+	public PrintWriter writer;
 }

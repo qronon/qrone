@@ -37,7 +37,8 @@ public class HTML5Handler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-
+		long start = System.currentTimeMillis();
+		
 		response.setCharacterEncoding("utf8");
 		try {
 			String path = request.getPathInfo();
@@ -59,11 +60,16 @@ public class HTML5Handler implements URIHandler{
 					ss.uri = uri;
 					ss.request = request;
 					ss.response = response;
+					ss.writer = response.getWriter();
 					ss.scope = scope;
 					ss.vm = vm;
 					ss.deck = deck;
 					ss.resolver = resolver;
 					om.run(scope, new Window(ss), new LocalWindow(ss));
+					
+					ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
+					ss.writer.flush();
+					ss.writer.close();
 					return true;
 				}
 			}
@@ -81,6 +87,11 @@ public class HTML5Handler implements URIHandler{
 
 					Writer out = response.getWriter();
 					out.append(om.serialize());
+
+					out.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
+					out.flush();
+					out.close();
+					
 					out.flush();
 					out.close();
 					return true;

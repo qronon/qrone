@@ -70,6 +70,10 @@ public class HTML5OM {
 		return deck;
 	}
 	
+	public HTML5Element getBody(){
+		return new HTML5Element(this, body);
+	}
+	
 	public Set<Node> select(String selector){
 		try{
 			Set<Node> nodes = selectcache.get(selector);
@@ -399,7 +403,7 @@ public class HTML5OM {
 
 	public void process(final HTML5Template t, final Set<HTML5OM> xomlist){
 		
-		final HTML5Template bodyt = new HTML5Template(this);
+		final HTML5Template bodyt = new HTML5Template(this, t.getURI());
 		//final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
 		process(bodyt, t, body, null, xomlist);
 		
@@ -528,7 +532,7 @@ public class HTML5OM {
 				final String include = getProperty(e, "include");
 				final String uniqueid = QrONEUtils.uniqueid();
 				if(include != null){
-					final String path = CSS3Parser.pullstring(include);
+					final String path = CSS3Parser.pullurl(include);
 					if(path != null && path.trim().length() > 0){
 						super.out(e,new Delegate() {
 							@Override
