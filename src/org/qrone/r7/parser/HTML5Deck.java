@@ -1,7 +1,6 @@
 package org.qrone.r7.parser;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -13,15 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.qrone.deck.XDeck;
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
+import org.qrone.util.XDeck;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
-import org.xml.sax.SAXException;
 
 public class HTML5Deck extends XDeck<HTML5OM> {
 	private CSS3Deck cssdeck;

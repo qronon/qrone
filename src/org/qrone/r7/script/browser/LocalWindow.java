@@ -1,18 +1,13 @@
-package org.qrone.r7.script;
+package org.qrone.r7.script.browser;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.qrone.kvs.KVSService;
-import org.qrone.kvs.MongoService;
-import org.qrone.memcached.ClientMemcachedService;
-import org.qrone.memcached.MemcachedService;
-
-import com.mongodb.MongoException;
+import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.ServletScopeObject;
 
 
 public class LocalWindow extends ServletScopeObject{
@@ -25,7 +20,7 @@ public class LocalWindow extends ServletScopeObject{
 	public String fetch(String url) throws IOException{
 		return null;
 	}
-	
+	/*
 	public MemcachedService memcached_connect(String host, Number port){
 		String[] serverlist = new String[1];
 		serverlist[0] = host + ":" + String.valueOf(port);
@@ -41,7 +36,7 @@ public class LocalWindow extends ServletScopeObject{
 			String user, String password) throws UnknownHostException, MongoException{
         return new MongoService(ss, host, port, schema, user, password);
 	}
-
+*/
 	public Connection jdbc_connect(String cls, String url) throws SQLException{
 		try {
 			Class.forName(cls).newInstance();

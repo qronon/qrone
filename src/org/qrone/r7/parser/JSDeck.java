@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Hashtable;
@@ -8,16 +7,14 @@ import java.util.Map;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.qrone.deck.XDeck;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.SugarWrapFactory;
-import org.qrone.r7.script.Window;
+import org.qrone.util.XDeck;
 
 public class JSDeck extends XDeck<JSOM>{
 	private HTML5Deck deck;
 	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
 	private Scriptable globalScope;
-	private Window window;
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);
@@ -35,6 +32,12 @@ public class JSDeck extends XDeck<JSOM>{
 		JSOM om = new JSOM(this);
 		om.parser(uri);
 		return om;
+	}
+	
+	public Scriptable createScope(){
+		Context cx = getContext();
+		Scriptable global = getGlobalScope();
+		return cx.newObject(global);
 	}
 	
 	public Scriptable getGlobalScope(){

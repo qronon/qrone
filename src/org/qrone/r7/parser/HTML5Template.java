@@ -11,11 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
-import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
-import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
-import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
-import org.qrone.deck.TextileDeck;
 import org.qrone.r7.ObjectConverter;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

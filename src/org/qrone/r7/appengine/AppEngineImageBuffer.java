@@ -5,8 +5,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import org.qrone.img.ImageBuffer;
 import org.qrone.img.ImageRect;
 

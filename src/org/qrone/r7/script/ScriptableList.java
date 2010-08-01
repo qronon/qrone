@@ -18,7 +18,6 @@ package org.qrone.r7.script;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJavaObject;

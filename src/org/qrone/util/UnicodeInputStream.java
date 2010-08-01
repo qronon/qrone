@@ -16,9 +16,9 @@ package org.qrone.util;
  Unicode format = UTF-16LE
  ***/
 
-import java.io.*;
-
-import javax.swing.ProgressMonitorInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 
 /**
  * This inputstream will recognize unicode BOM marks and will skip bytes if

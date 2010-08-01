@@ -16,25 +16,16 @@
  */
 package org.qrone.r7.script;
 
-import java.io.FileReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrapFactory;
-import org.qrone.r7.resolver.URIResolver;
 
 /**
  * Wraps Java objects by adding support for function extensions, which are

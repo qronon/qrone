@@ -6,9 +6,6 @@ import java.util.List;
 
 import net.arnx.jsonic.JSON;
 
-import org.bson.BSON;
-import org.bson.BSONDecoder;
-import org.bson.BSONEncoder;
 import org.bson.BSONObject;
 import org.bson.types.BasicBSONList;
 import org.mozilla.javascript.Context;
@@ -18,12 +15,8 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.UniqueTag;
-import org.mozilla.javascript.json.JsonParser;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 /**
  * Direct conversion between native Rhino objects and BSON.

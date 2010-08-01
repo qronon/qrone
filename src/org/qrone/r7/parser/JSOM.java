@@ -27,12 +27,6 @@ public class JSOM implements Comparable<JSOM>{
 				uri.toString(), 0, null);
 		in.close();
 	}
-	
-	public Scriptable createScope(){
-		Context cx = deck.getContext();
-		Scriptable global = deck.getGlobalScope();
-		return cx.newObject(global);
-	}
 
 	public void run(Scriptable scope) {
 		script.exec(deck.getContext(), scope);

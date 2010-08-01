@@ -1,41 +1,27 @@
-package org.qrone.r7.script;
+package org.qrone.r7.script.browser;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
-import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
-import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
-import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
-import org.ho.yaml.Yaml;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.qrone.deck.PropertiesDeck;
-import org.qrone.deck.TextileDeck;
-import org.qrone.deck.YamlDeck;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSOM;
-import org.qrone.util.Tab2WhiteInputStream;
-import org.qrone.util.UnicodeInputStream;
+import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.ServletScopeObject;
 
 
 public class Window extends ServletScopeObject{
@@ -117,7 +103,7 @@ public class Window extends ServletScopeObject{
 		}
 		return null;
 	}
-
+/*
 	private PropertiesDeck propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{
 		if(propDeck == null)
@@ -138,7 +124,7 @@ public class Window extends ServletScopeObject{
 			textileDeck = new TextileDeck(ss.resolver);
 		return textileDeck.compile(ss.uri.resolve(path));
 	}
-	
+	*/
 	public byte[] base64_decode(String base64String){
 		return Base64.decodeBase64(base64String);
 	}

@@ -7,8 +7,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mozilla.javascript.EvaluatorException;
 import org.w3c.css.sac.InputSource;

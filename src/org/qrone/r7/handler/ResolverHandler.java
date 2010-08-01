@@ -13,7 +13,7 @@ import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
 
 public class ResolverHandler implements URIHandler{
-	private static URIResolver resolver;
+	private URIResolver resolver;
 	
 	public ResolverHandler(URIResolver resolver) {
 		this.resolver = resolver;

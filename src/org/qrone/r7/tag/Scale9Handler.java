@@ -1,6 +1,5 @@
 package org.qrone.r7.tag;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
@@ -13,7 +12,6 @@ import org.qrone.r7.parser.CSS3Value;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.ImagePart;
-import org.w3c.dom.css.CSSValue;
 
 public class Scale9Handler extends HTML5TagHandler {
 	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
@@ -143,7 +141,7 @@ public class Scale9Handler extends HTML5TagHandler {
 
 	public String startScale3(URI file, int left, int right, String color) throws IOException{
 		ImageBuffer image = deck.getSpriter().getImage(file);
-		int width = image.getWidth();
+		//int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
@@ -180,7 +178,7 @@ public class Scale9Handler extends HTML5TagHandler {
 		
 		ImageBuffer image = deck.getSpriter().getImage(file);
 		int width = image.getWidth();
-		int height = image.getHeight();
+		//int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 		b.append("<table" + ( w != null ? " style=\"" + w + "\"" : "" ) + " cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");

@@ -1,13 +1,8 @@
 package org.qrone.r7.script;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.resolver.URIResolver;
 
 public class ScriptableJavaObject<T>{
 	protected Context context;

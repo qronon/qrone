@@ -15,9 +15,9 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.LocalWindow;
 import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.Window;
+import org.qrone.r7.script.browser.LocalWindow;
+import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.tag.ImageHandler;
 import org.qrone.r7.tag.Scale9Handler;
 
@@ -25,7 +25,6 @@ public class HTML5Handler implements URIHandler{
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
-	private Object global;
 	
 	public HTML5Handler(URIResolver resolver, ImageBufferService service) {
 		this.resolver = resolver;
@@ -54,17 +53,9 @@ public class HTML5Handler implements URIHandler{
 				URI uri = new URI(path + ".js");
 				JSOM om = vm.compile(uri);
 				if(om != null){
-					Scriptable scope = om.createScope();
-					ServletScope ss = new ServletScope();
-					ss.path = path + ".js";
-					ss.uri = uri;
-					ss.request = request;
-					ss.response = response;
-					ss.writer = response.getWriter();
-					ss.scope = scope;
-					ss.vm = vm;
-					ss.deck = deck;
-					ss.resolver = resolver;
+					Scriptable scope = vm.createScope();
+					ServletScope ss = new ServletScope(
+							request,response,scope,deck,vm,uri);
 					om.run(scope, new Window(ss), new LocalWindow(ss));
 					
 					ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");

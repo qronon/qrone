@@ -1,7 +1,6 @@
 package org.qrone.r7.app;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 

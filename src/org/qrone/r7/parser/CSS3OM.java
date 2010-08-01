@@ -4,20 +4,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.qrone.r7.QrONEUtils;
 import org.w3c.css.sac.InputSource;
-import org.w3c.dom.Node;
-import org.w3c.dom.css.CSSMediaRule;
 import org.w3c.dom.css.CSSRuleList;
-import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
-import org.w3c.dom.stylesheets.MediaList;
 
 public class CSS3OM{
 

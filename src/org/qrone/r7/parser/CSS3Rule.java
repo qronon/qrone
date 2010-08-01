@@ -12,7 +12,7 @@ public class CSS3Rule {
 	public CSS3Rule(CSS3OM om, CSSStyleRule rule) {
 		this.om = om;
 		this.rule = rule;
-		this.style = rule.getStyle();
+		this.style = this.rule.getStyle();
 	}
 	
 	public void setProperty( String newprop, String v, boolean important ) {
