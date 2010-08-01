@@ -46,17 +46,17 @@ public class HTML5Handler implements URIHandler{
 			
 
 			
-			if(resolver.exist(path + ".js")){
-				path += ".js"; 
-			}
+			//if(resolver.exist(path + ".js")){
+			//	path += ".js"; 
+			//}
 			
-			if(path.endsWith(".js") && resolver.exist(path)){
-				URI uri = new URI(path);
+			if(resolver.exist(path + ".js")){
+				URI uri = new URI(path + ".js");
 				JSOM om = vm.compile(uri);
 				if(om != null){
 					Scriptable scope = om.createScope();
 					ServletScope ss = new ServletScope();
-					ss.path = path;
+					ss.path = path + ".js";
 					ss.uri = uri;
 					ss.request = request;
 					ss.response = response;

@@ -2,7 +2,9 @@ package org.qrone.r7.script;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -17,10 +19,14 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
+import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
+import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
+import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 import org.ho.yaml.Yaml;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.qrone.parser.TextileParser;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5OM;
@@ -133,6 +139,14 @@ public class Window extends JSObject{
 			Object o = Yaml.load(new Tab2WhiteInputStream(in));
 			in.close();
 			return o;
+		}
+		return null;
+	}
+	
+	public String load_textile(String path) throws IOException, URISyntaxException{
+		if(ss.resolver.exist(resolvePath(path).toString())){
+			InputStream in = ss.resolver.getInputStream(resolvePath(path));
+			return new TextileParser().parse(ss.uri, in, "utf8");
 		}
 		return null;
 	}

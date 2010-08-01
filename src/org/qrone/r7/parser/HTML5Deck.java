@@ -3,6 +3,7 @@ package org.qrone.r7.parser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.qrone.img.ImageBufferService;
+import org.qrone.parser.XDeck;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
@@ -21,11 +23,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
 import org.xml.sax.SAXException;
 
-public class HTML5Deck {
-	private URIResolver resolver;
+public class HTML5Deck extends XDeck<HTML5OM> {
+	private CSS3Deck cssdeck;
 	private ImageSpriter spriter;
-	
-	private Map<URI, HTML5OM> map = new Hashtable<URI, HTML5OM>();
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	
 	public HTML5Deck(File file, ImageBufferService service){
@@ -33,8 +33,20 @@ public class HTML5Deck {
 	}
     
     public HTML5Deck(URIResolver resolver, ImageBufferService service){
-    	this.resolver = resolver;
+    	super(resolver);
     	spriter = new ImageSpriter(resolver, service);
+    	cssdeck = new CSS3Deck(resolver);
+    
+    }
+
+    protected boolean updated(HTML5OM t, URI uri){
+    	for (Iterator<CSS3OM> i = t.getStyleSheets().iterator(); i
+				.hasNext();) {
+			CSS3OM cssom = i.next();
+			if(resolver.updated(cssom.getURI()))
+				return true;
+		}
+    	return super.updated(t, uri);
     }
     
     public void update(URI uri){
@@ -43,10 +55,6 @@ public class HTML5Deck {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-    
-    public URIResolver getResolver(){
-    	return resolver;
     }
     
     public ImageSpriter getSpriter(){
@@ -60,59 +68,14 @@ public class HTML5Deck {
 	public List<HTML5TagHandler> getTagHandlers() {
 		return handlers;
 	}
-    
-	public HTML5OM compile(URI f){
-		HTML5OM o = map.get(f);
-		try {
-			if(o == null || resolver.updated(f)){
-				HTML5OM xom = new HTML5OM(this, f);
-				map.put(f, xom);
-				xom.parse(resolver);
-				return xom;
-			}
-		} catch (FileNotFoundException e) {
-		} catch (SAXException e) {
-		} catch (IOException e) {
-		}
-		return o;
-	}
-	
-	public HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist){
-		HTML5Set set = new HTML5Set();
-		Set<URI> s = new HashSet<URI>();
-		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
-		if(xomlist != null){
-			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
-				HTML5OM xom = i.next();
-				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true);
-			}
-		}
-		return set;
-	}
 
-	public void getRecursive(URI file, 
-			StringBuffer js, List<CSS3OM> css, 
-			List<Element> jslibs, List<Element> csslibs, 
-			Set<URI> clses, boolean first){
-		if(file == null || clses.contains(file)) return;
-		clses.add(file);
-		
-		HTML5OM c = compile(file);
-		if(c != null){
-			String extend = c.getMETAMap().get("extends");
-			if(extend != null)
-				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false);
-			
-			js.append(c.getScripts(!first));
-			css.addAll(c.getStyles());
-			
-			jslibs.addAll(c.getJSLibraries());
-			csslibs.addAll(c.getCSSLibraries());
-	
-			for (Iterator<String> iter = c.getRequires().iterator(); iter.hasNext();) {
-				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false);
-			}
-		}
+
+	@Override
+	public HTML5OM compile(URI uri, InputStream in, String encoding)
+			throws Exception {
+		HTML5OM xom = new HTML5OM(this, cssdeck, uri);
+		xom.parse(resolver);
+		return xom;
 	}
 	
 	private Map<String, String> inlineJSMap = new Hashtable<String, String>();
@@ -202,10 +165,6 @@ public class HTML5Deck {
 			b.append(css2);
 			b.append("</style>");
 		}
-	}
-	
-	public HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist){
-		return getRecursive(file, xomlist);
 	}
 	
 	public static class HTML5Set{

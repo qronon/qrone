@@ -19,5 +19,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AppEngine SDK"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSONIC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressorDependencies"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -37,48 +37,6 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		visit(e);
 	}
 	
-	/*
-	public void visit(HTML5OM om, Element e, final HTML5Writer... w){
-		visit(om, e, new HTML5Writer() {
-			@Override
-			public void append(String key, String value) {
-				for (int i = 0; i < w.length; i++) {
-					w[i].append(key, value);
-				}
-			}
-			
-			@Override
-			public void append(String str) {
-				for (int i = 0; i < w.length; i++) {
-					w[i].append(str);
-				}
-			}
-			
-			@Override
-			public void append(char c) {
-				for (int i = 0; i < w.length; i++) {
-					w[i].append(c);
-				}
-			}
-		});
-	}
-	*/
-
-	protected String jsmin(String js){
-		return jsmin(js, null);
-	}
-	
-	protected String jsmin(String js, String replace){
-		if(replace == null)
-			return JSParser.compress(js, false);
-		else
-			return JSParser.compress(js, true).replace("__QRONE_PREFIX_NAME__", replace);
-	}
-	
-	protected String cssmin(String css){
-		return CSS3Parser.compress(css);
-	}
-	
 	protected void out(String str){
 		if(str == null) return;
 		b.append(str);
@@ -87,6 +45,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	protected void out(Element e){
 		out(e,null);
 	}
+	
 	protected void out(Element e, Delegate d){
 		List<HTML5TagResult> r = om.getTagResult(e);
 		if(r != null){
@@ -145,7 +104,10 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	
 	protected void start(Element e){
 		b.append('<');
-		b.append(e.getNodeName());
+		if(e.hasAttribute("tag"))
+			b.append(e.getAttribute("tag"));
+		else
+			b.append(e.getNodeName());
 
 		NamedNodeMap map = e.getAttributes();
 		for (int i = 0; i < map.getLength(); i++) {
@@ -159,21 +121,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				b.append("id",id);
 				write(n.getNodeValue());
 				b.append('"');
-				
-			}
-			/*
-			else if(n.getNodeName().startsWith("on")){
-				writejs(n.getNodeName(), jsmin(n.getNodeValue(),
-						"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
-			}else if(n.getNodeName().equals("href") && n.getNodeValue().startsWith("javascript:")){
-				String js = n.getNodeValue();
-				if(js.startsWith("javascript:")){
-					js = js.substring("javascript:".length());
-					writejs(n.getNodeName(), "javascript:" + jsmin(js,
-							"qrone('" + om.getURI().toString() + "','__QRONE_ID__')"));
-				}
-			}*/
-			else{
+			}else{
 				write((Attr)map.item(i));
 			}
 		}
@@ -186,7 +134,10 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				&& !nnendtaglist.contains(e.getNodeName())){
 			b.append('<');
 			b.append('/');
-			b.append(e.getNodeName());
+			if(e.hasAttribute("tag"))
+				b.append(e.getAttribute("tag"));
+			else
+				b.append(e.getNodeName());
 			b.append('>');
 		}
 	}

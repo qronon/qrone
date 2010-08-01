@@ -187,7 +187,7 @@ public class QrONECompressor {
 		        }
 				
 				HTML5OM xom = deck.compile(new URI(path));
-				out.write(xom.serialize(lang));
+				out.write(xom.serialize());
 				//xom.serialize(lang);
 				if (verbose) {
 		            System.err.println("[INFO] Writing " + outfile.getName() + " done.");

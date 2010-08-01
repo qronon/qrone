@@ -1,6 +1,7 @@
 package org.qrone.r7.parser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
@@ -8,36 +9,31 @@ import java.util.Map;
 import org.apache.commons.js2j.SugarWrapFactory;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.parser.XDeck;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Window;
 
-public class JSDeck {
-	private URIResolver resolver;
+public class JSDeck extends XDeck<JSOM>{
 	private HTML5Deck deck;
-	private Map<URI, JSOM> ommap = new Hashtable<URI, JSOM>();
 	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
 	private Scriptable globalScope;
 	private Window window;
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
-    	this.resolver = resolver;
+    	super(resolver);
     	this.deck = deck;
-    }
-    
-    public URIResolver getResolver(){
-    	return resolver;
     }
     
     public HTML5Deck getHTML5Deck(){
     	return deck;
     }
-    
-	public JSOM compile(URI uri) throws IOException{
-		JSOM om = ommap.get(uri);
-		if(om == null){
-			om = new JSOM(this);
-			om.parser(uri);
-		}
+
+
+	@Override
+	public JSOM compile(URI uri, InputStream in, String encoding)
+			throws Exception {
+		JSOM om = new JSOM(this);
+		om.parser(uri);
 		return om;
 	}
 	

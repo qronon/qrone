@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.qrone.img.ImageBuffer;
 import org.qrone.img.ImageBufferService;
@@ -28,19 +29,19 @@ public class ImageSpriter {
 	private URI hspriteURI;
 	private URI tspriteURI;
 	
-	private List<ImagePart> isprites = new LinkedList<ImagePart>();
+	private List<ImagePart> isprites = new CopyOnWriteArrayList<ImagePart>();
 	private Map<ImagePart, String> iresults = new Hashtable<ImagePart, String>();
 	private int iWidth;
 	private int iHeight;
 	private int ilastsize = -1;
 	
-	private List<ImagePart> vsprites = new LinkedList<ImagePart>();
+	private List<ImagePart> vsprites = new CopyOnWriteArrayList<ImagePart>();
 	private Map<ImagePart, String> vresults = new Hashtable<ImagePart, String>();
 	private int vWidth;
 	private int vHeight;
 	private int vlastsize = -1;
 	
-	private List<ImagePart> hsprites = new LinkedList<ImagePart>();
+	private List<ImagePart> hsprites = new CopyOnWriteArrayList<ImagePart>();
 	private Map<ImagePart, String> hresults = new Hashtable<ImagePart, String>();
 	private int hWidth;
 	private int hHeight;

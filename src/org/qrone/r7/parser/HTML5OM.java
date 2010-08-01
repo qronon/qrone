@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,6 +43,7 @@ import se.fishtank.css.selectors.dom.DOMNodeSelector;
 
 public class HTML5OM {
 	private HTML5Deck deck;
+	private CSS3Deck cssdeck;
 	
 	private Document document;
 	private Element body;
@@ -63,13 +65,26 @@ public class HTML5OM {
 	
 	private URI uri;
 	
-	public HTML5OM(HTML5Deck deck, URI uri){
+	public HTML5OM(HTML5Deck deck, CSS3Deck cssdeck, URI uri){
 		this.uri = uri;
 		this.deck = deck;
+		this.cssdeck = cssdeck;
 	}
 	
 	public HTML5Deck getDeck(){
 		return deck;
+	}
+
+	public URI getURI(){
+		return uri;
+	}
+	
+	public List<CSS3OM> getStyleSheets(){
+		return stylesheets;
+	}
+	
+	public Map<Node, List<CSS3Rule>> getCSSRuleMap(){
+		return map;
 	}
 	
 	public HTML5Element getBody(){
@@ -85,40 +100,6 @@ public class HTML5OM {
 			return nodes;
 		}catch(NodeSelectorException e){}
 		return null;
-	}
-	
-	public void parseStyleSheet(URI path, String css) throws IOException{
-		final CSS3OM s = new CSS3OM();
-		s.parse(path, css);
-		CSS3Visitor v = new CSS3Visitor(){
-
-			@Override
-			public void visit(CSSMediaRule rule){
-				MediaList list = rule.getMedia();
-				if(list.getMediaText().indexOf("all") >= 0 || list.getMediaText().indexOf("screen") >= 0){
-					accept(rule);
-				}
-			}
-			
-			@Override
-			public void visit(CSSStyleRule style) {
-				Set<Node> set = select(style.getSelectorText());
-				if(set != null){
-					for (Iterator<Node> i = set.iterator(); i
-							.hasNext();) {
-						Node node = i.next();
-						List<CSS3Rule> list = map.get(node);
-						if(list == null){
-							list = new ArrayList<CSS3Rule>();
-							map.put(node, list);
-						}
-						list.add(new CSS3Rule(s, style));
-					}
-				}
-			}
-		};
-		v.visit(s.getStyleSheet());
-		stylesheets.add(s);
 	}
 	
 	public void parse(final URIResolver resolver) throws SAXException, IOException{
@@ -191,9 +172,9 @@ public class HTML5OM {
 						if(e.hasAttribute("include")){
 							try {
 								URI cssuri = uri.resolve(new URI(e.getAttribute("href")));
-								InputStream cssin = resolver.getInputStream(cssuri);
-								if(cssin != null){
-									parseStyleSheet(cssuri, QrONEUtils.convertStreamToString(cssin));
+								CSS3OM cssom = cssdeck.compile(cssuri);
+								if(cssom != null){
+									parseStyleSheet(cssom);
 								}
 							} catch (URISyntaxException e1) {
 								csslibs.add(e);
@@ -218,13 +199,11 @@ public class HTML5OM {
 					findRequires(n.getNodeValue());
 					javascripts.add(JSParser.clean(n.getNodeValue()));
 				}else if(inStyle){
+					CSS3OM cssom;
 					try {
-						parseStyleSheet(getURI(), CSS3Parser.clean(n.getNodeValue()));
-					} catch (DOMException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+						cssom = cssdeck.compile(getURI(), CSS3Parser.clean(n.getNodeValue()));
+						parseStyleSheet(cssom);
+					} catch (Exception e) {}
 				}
 			}
 			
@@ -243,10 +222,7 @@ public class HTML5OM {
 		};
 		v.visit(document);
 	}
-	
-	public URI getURI(){
-		return uri;
-	}
+
 
 	private void findRequires(String js){
 		Pattern pattern = Pattern.compile("require\\s*\\(\\s*[\"'](.*?)[\"']\\s*\\)\\s*;?");
@@ -255,165 +231,12 @@ public class HTML5OM {
 			requires.add(matcher.group(1));
 		}
 	}
-
-	/*
-	public String getScripts() {
-		StringBuffer b = new StringBuffer();
-		for (Iterator<String> j = javascripts.iterator(); j.hasNext();) {
-			b.append(j.next());
-		}
-		return b.toString();
-	}
-	*/
 	
-	public List<CSS3OM> getStyles() {
-		return stylesheets;
-	}
-	
-	public List<String> getRequires() {
-		return requires;
-	}
-
-	public List<Element> getJSLibraries() {
-		return jslibs;
-	}
-
-	public List<Element> getCSSLibraries() {
-		return csslibs;
-	}
-	
-	public Map<String,String> getMETAMap() {
-		return metamap;
-	}
-	
-	public void removeProperty(Element e, String prop) {
-		List<CSS3Rule> l = map.get(e);
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				iter.next().removeProperty(prop);
-			}
-		}
-		
-		String attr = e.getAttribute("style");
-		if(attr != null){
-			try {
-				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
-				CSSValue v = style.getPropertyCSSValue(prop);
-				if(v != null){
-					style.removeProperty(prop);
-					e.setAttribute("style", style.getCssText());
-				}
-			} catch (IOException e1) {
-			}
-		}
-	}
-	
-	public String getProperty(Element e, String prop) {
-		CSS3Values v = getPropertyValue(e, prop);
-		return v != null ? v.getValue() : null;
-	}
-	
-	public CSS3Values getPropertyValue(Element e, String prop) {
-		List<CSS3Rule> l = map.get(e);
-		CSS3Values value = null;
-		CSS3Values imporantValue = null;
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				CSS3Rule rule = iter.next();
-				CSS3Values v = rule.getProperty(prop);
-				if(v != null){
-					if(v.isImportant())
-						imporantValue = v;
-					else
-						value = v;
-				}
-			}
-		}
-		String attr = e.getAttribute("style");
-		if(attr != null){
-			try {
-				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
-				CSSValue v = style.getPropertyCSSValue(prop);
-				if(v != null){
-					CSS3Values v3 = new CSS3Values(getURI(), style, v, prop);
-					if(v3.isImportant())
-						imporantValue = v3;
-					else
-						value = v3;
-				}
-			} catch (IOException e1) {
-			}
-		}
-		return imporantValue != null ? imporantValue : value;
-	}
-
-	public void setProperty(Element e, String prop, String value) {
-		String attr = e.getAttribute("style");
-		if(attr != null){
-			try {
-				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
-				style.setProperty(prop, value, null);
-				e.setAttribute("style", style.getCssText());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}else{
-			e.setAttribute("style", prop + ":" + value + ";");
-		}
-	}
-
-	public void renameProperty(Element e, String prop, String newprop) {
-		List<CSS3Rule> l = map.get(e);
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				CSS3Rule rule = iter.next();
-				CSS3Values v = rule.getProperty(prop);
-				if(v != null){
-					rule.setProperty(newprop, v.getValue(), v.isImportant());
-					rule.removeProperty(prop);
-				}
-			}
-		}
-		
-		String attr = e.getAttribute("style");
-		if(attr != null){
-			try {
-				CSSStyleDeclaration style = CSS3Parser.parsestyle(attr);
-				CSSValue v = style.getPropertyCSSValue(prop);
-				if(v != null){
-					style.setProperty(newprop, v.getCssText(), style.getPropertyPriority(prop));
-					style.removeProperty(prop);
-					e.setAttribute("style", style.getCssText());
-				}
-			} catch (IOException e1) {
-			}
-		}
-	}
 	
 	public List<HTML5TagResult> getTagResult(Element e){
 		return extmap.get(e);
 	}
 	
-	//---
-	/*
-	private void process(HTML5Writer t){
-		process(t, false, null);
-	}
-
-	private void process(HTML5Writer t, boolean bodyOnly, String id){
-		process(t, bodyOnly, null, null, null);
-	}
-
-	private void process(final HTML5Writer t, final boolean bodyOnly, 
-			final Stack<HTML5OM> xomlist, final String target, String id){
-		process(t, bodyOnly ? body : document.getDocumentElement(),
-				xomlist, target, id);
-	}
-	*/
-	//private void process(final HTML5Writer t, final Element element, 
-	//		final Stack<HTML5OM> xomlist, final String target, String id){
-	
-
 	public void process(final HTML5Template t, final Set<HTML5OM> xomlist){
 		
 		final HTML5Template bodyt = new HTML5Template(this, t.getURI());
@@ -421,7 +244,7 @@ public class HTML5OM {
 		process(bodyt, t, body, null, xomlist);
 		
 
-		final HTML5Set set = deck.getRecurseHeader(getURI(), xomlist);
+		final HTML5Set set = getRecurseHeader(getURI(), xomlist);
 		HTML5Selializer s = new HTML5Selializer() {
 			@Override
 			public void visit(Document e) {
@@ -472,7 +295,7 @@ public class HTML5OM {
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
 
-			String path = getMETAMap().get("include-in");
+			String path = metamap.get("include-in");
 			if(path != null){
 				final String[] paths = path.split("#", 2);
 				if(paths.length == 2){
@@ -532,7 +355,9 @@ public class HTML5OM {
 			@Override
 			public void visit(Text n) {
 				if(inScript){
-					out(jsmin(n.getNodeValue(), "qrone[\"" + getURI().toString() + "\"]"));
+					out(JSParser.compress(n.getNodeValue(), true)
+							.replace("__QRONE_PREFIX_NAME__", 
+									"qrone[\"" + getURI().toString() + "\"]"));
 				}else if(formatting>0){
 					writeraw(n.getNodeValue());
 				}else{
@@ -542,7 +367,8 @@ public class HTML5OM {
 			
 			@Override
 			protected void out(final Element e) {
-				final CSS3Values include = getPropertyValue(e, "include");
+				HTML5Element e5 = new HTML5Element(om, e);
+				final CSS3Value include = e5.getPropertyValue("include");
 				final String uniqueid = QrONEUtils.uniqueid();
 				if(include != null){
 					final String path = include.getURL();
@@ -576,7 +402,7 @@ public class HTML5OM {
 		s.visit(this, node, id, t);
 	}
 
-	public String getHTML(){
+	public String serialize(){
 		HTML5Template t = new HTML5Template(this);
 		String o = t.out();
 		try {
@@ -584,10 +410,41 @@ public class HTML5OM {
 		} catch (IOException e) {}
 		return o;
 	}
+	
+	private void parseStyleSheet(final CSS3OM cssom) throws IOException{
+		CSS3Visitor v = new CSS3Visitor(){
+			@Override
+			public void visit(CSSMediaRule rule){
+				MediaList list = rule.getMedia();
+				if(list.getMediaText().indexOf("all") >= 0 || list.getMediaText().indexOf("screen") >= 0){
+					accept(rule);
+				}
+			}
+			
+			@Override
+			public void visit(CSSStyleRule style) {
+				Set<Node> set = select(style.getSelectorText());
+				if(set != null){
+					for (Iterator<Node> i = set.iterator(); i
+							.hasNext();) {
+						Node node = i.next();
+						List<CSS3Rule> list = map.get(node);
+						if(list == null){
+							list = new ArrayList<CSS3Rule>();
+							map.put(node, list);
+						}
+						list.add(new CSS3Rule(cssom, style));
+					}
+				}
+			}
+		};
+		v.visit(cssom.getStyleSheet());
+		stylesheets.add(cssom);
+	}
 
 	private String scriptCache = null;
 	private String scriptCacheNoHTML = null;
-	public String getScripts(boolean html){
+	private String getScripts(boolean html){
 		if(html){
 			if(scriptCache != null){
 				return scriptCache;
@@ -649,20 +506,47 @@ public class HTML5OM {
 		return b.toString();
 	}
 	
-	public String getScripts() {
-		return getScripts(true);
+	private HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist){
+		return getRecursive(file, xomlist);
 	}
 	
-	public String serialize(){
-		return serialize(null);
+	private HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist){
+		HTML5Set set = new HTML5Set();
+		Set<URI> s = new HashSet<URI>();
+		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
+		if(xomlist != null){
+			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
+				HTML5OM xom = i.next();
+				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true);
+			}
+		}
+		return set;
 	}
+
+	private void getRecursive(URI file, 
+			StringBuffer js, List<CSS3OM> css, 
+			List<Element> jslibs, List<Element> csslibs, 
+			Set<URI> clses, boolean first){
+		if(file == null || clses.contains(file)) return;
+		clses.add(file);
+		
+		HTML5OM c = deck.compile(file);
+		if(c != null){
+			String extend = metamap.get("extends");
+			if(extend != null)
+				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false);
+			
+			if(first)
+				js.append("if(!window.qrone)window.qrone=function(){};");
+			js.append(c.getScripts(!first));
+			css.addAll(stylesheets);
+			
+			jslibs.addAll(jslibs);
+			csslibs.addAll(csslibs);
 	
-	public String serialize(String lang){
-		if(lang != null && lang.equals("js")){
-			return getScripts(true);
-		}else{
-			return getHTML();
+			for (Iterator<String> iter = requires.iterator(); iter.hasNext();) {
+				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false);
+			}
 		}
 	}
-	
 }
