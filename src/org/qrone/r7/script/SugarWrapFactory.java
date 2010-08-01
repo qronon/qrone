@@ -39,6 +39,10 @@ public class SugarWrapFactory extends WrapFactory {
         super();
     }
     
+    public void setWrapClass(Class target, Class<? extends ScriptableJavaObject> wrapper){
+    	map.put(target, wrapper);
+    }
+    
     public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
         Object javaObject, Class staticType) {
         if (javaObject instanceof Map) {

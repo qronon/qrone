@@ -13,8 +13,9 @@ import org.qrone.util.XDeck;
 
 public class JSDeck extends XDeck<JSOM>{
 	private HTML5Deck deck;
-	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
-	private Scriptable globalScope;
+	private static Map<Thread, Context> map = new Hashtable<Thread, Context>();
+	private static Scriptable globalScope;
+	private static SugarWrapFactory wrapFactory = new SugarWrapFactory();
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);
@@ -23,6 +24,10 @@ public class JSDeck extends XDeck<JSOM>{
     
     public HTML5Deck getHTML5Deck(){
     	return deck;
+    }
+    
+    public static SugarWrapFactory getSugarWrapFactory(){
+    	return wrapFactory;
     }
 
 
@@ -40,20 +45,20 @@ public class JSDeck extends XDeck<JSOM>{
 		return cx.newObject(global);
 	}
 	
-	public Scriptable getGlobalScope(){
+	public static Scriptable getGlobalScope(){
 		if(globalScope == null){
 			globalScope = getContext().initStandardObjects();
 		}
 		return globalScope;
 	}
 	
-	public Context getContext(){
+	public static Context getContext(){
 		Thread t = Thread.currentThread();
 		Context cx = map.get(t);
 		if(cx == null){
 			cx = Context.enter();
 			cx.setOptimizationLevel(9);
-			cx.setWrapFactory(new SugarWrapFactory());
+			cx.setWrapFactory(wrapFactory);
 			map.put(t, cx);
 		}
 		return cx;

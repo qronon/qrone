@@ -22,14 +22,14 @@ public class JSOM implements Comparable<JSOM>{
 	public void parser(URI uri) throws IOException{
 		InputStream in = deck.getResolver().getInputStream(uri);
 		this.uri = uri;
-		script = deck.getContext().compileReader(new InputStreamReader(
+		script = JSDeck.getContext().compileReader(new InputStreamReader(
 				in, "utf8"), 
 				uri.toString(), 0, null);
 		in.close();
 	}
 
 	public void run(Scriptable scope) {
-		script.exec(deck.getContext(), scope);
+		script.exec(JSDeck.getContext(), scope);
 	}
 
 	public void run(Scriptable scope, Object... prototypes) {
@@ -43,7 +43,7 @@ public class JSOM implements Comparable<JSOM>{
 		scope.put("window", scope, scope);
 		
 		try{
-			script.exec(deck.getContext(), scope);
+			script.exec(JSDeck.getContext(), scope);
 		}catch(WrappedException e){
 			e.getWrappedException().printStackTrace();
 		}

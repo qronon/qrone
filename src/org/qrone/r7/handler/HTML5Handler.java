@@ -31,6 +31,7 @@ public class HTML5Handler implements URIHandler{
 		deck = new HTML5Deck(resolver, service);
 		deck.addTagHandler(new Scale9Handler(deck));
     	deck.addTagHandler(new ImageHandler(deck));
+    	
 		vm = new JSDeck(resolver, deck);
 	}
 
