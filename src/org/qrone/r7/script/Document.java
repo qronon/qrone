@@ -20,7 +20,7 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.NodeLister;
 
-public class Document extends JSObject{
+public class Document extends ServletScopeObject{
 	private Writer writer;
 	private HTML5Template t;
 	

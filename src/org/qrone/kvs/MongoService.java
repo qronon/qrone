@@ -5,14 +5,14 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.script.JSScriptable;
+import org.qrone.r7.script.AbstractScriptable;
 import org.qrone.r7.script.ServletScope;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-public class MongoService extends JSScriptable implements KVSService{
+public class MongoService extends AbstractScriptable implements KVSService{
 	private Mongo mongo;
 	private String schema;
 	private DB db;

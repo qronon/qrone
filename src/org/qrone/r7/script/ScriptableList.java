@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.js2j;
+package org.qrone.r7.script;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Wrapper;
 
 /**  Wrap a java.util.List for JavaScript.  */
-public class ScriptableList extends JavaObjectWrapper implements Scriptable, Wrapper, Serializable {
+public class ScriptableList extends NativeJavaObject implements Scriptable, Wrapper, Serializable {
 
     /** Auto-generated serialization id */
     private static final long serialVersionUID = -2221655313388687110L;
@@ -40,8 +42,8 @@ public class ScriptableList extends JavaObjectWrapper implements Scriptable, Wra
     }
 
 
-    public ScriptableList(Scriptable scope, Object javaObject, Class staticType, Map funcs) {
-        super(scope, javaObject, staticType, funcs);
+    public ScriptableList(Context cx, Scriptable scope, Object javaObject, Class staticType) {
+        super(scope, javaObject, staticType);
         if (javaObject instanceof List) {
             this.list = (List) javaObject;
         } else {

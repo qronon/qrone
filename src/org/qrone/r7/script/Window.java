@@ -38,7 +38,7 @@ import org.qrone.util.Tab2WhiteInputStream;
 import org.qrone.util.UnicodeInputStream;
 
 
-public class Window extends JSObject{
+public class Window extends ServletScopeObject{
 	public PrintStream in = System.out;
 	public PrintStream out = System.out;
 	public Document document;

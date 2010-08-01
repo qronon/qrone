@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.js2j;
+package org.qrone.r7.script;
 
 import java.io.Serializable;
 import java.util.Map;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Wrapper;
@@ -26,7 +27,7 @@ import org.mozilla.javascript.Wrapper;
 /**
  * Wrap a java.util.Map for JavaScript.
  */
-public class ScriptableMap extends JavaObjectWrapper implements Scriptable, Wrapper, Serializable {
+public class ScriptableMap extends NativeJavaObject implements Scriptable, Wrapper, Serializable {
 
     /** Auto-generated serialization id */
     private static final long serialVersionUID = 7192070806139403748L;
@@ -40,8 +41,8 @@ public class ScriptableMap extends JavaObjectWrapper implements Scriptable, Wrap
         this.map = map;
     }
     
-    public ScriptableMap(Scriptable scope, Object javaObject, Class staticType, Map functions) {
-        super(scope, javaObject, staticType, functions);
+    public ScriptableMap(Context cx, Scriptable scope, Object javaObject, Class staticType) {
+        super(scope, javaObject, staticType);
         if (javaObject instanceof Map) {
             this.map = (Map)javaObject;
         } else {

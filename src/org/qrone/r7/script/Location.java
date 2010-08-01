@@ -17,7 +17,7 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.NodeLister;
 
-public class Location extends JSObject{
+public class Location extends ServletScopeObject{
 	
 	public Location(ServletScope ss) throws IOException{
 		super(ss);

@@ -2,13 +2,13 @@ package org.qrone.kvs;
 
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.ObjectConverter;
-import org.qrone.r7.script.JSObject;
+import org.qrone.r7.script.ServletScopeObject;
 import org.qrone.r7.script.ServletScope;
 
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class MongoTable extends JSObject implements KVSTable {
+public class MongoTable extends ServletScopeObject implements KVSTable {
 	private DBCollection coll;
 	public MongoTable(ServletScope ss, DBCollection coll) {
 		super(ss);

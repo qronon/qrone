@@ -7,7 +7,6 @@ import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.commons.js2j.SugarWrapFactory;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.deck.XDeck;

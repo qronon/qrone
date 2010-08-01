@@ -7,10 +7,10 @@ import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-public class JSObject {
+public class ServletScopeObject {
 	protected ServletScope ss;
 	
-	public JSObject(ServletScope ss) {
+	public ServletScopeObject(ServletScope ss) {
 		this.ss = ss;
 	}
 	

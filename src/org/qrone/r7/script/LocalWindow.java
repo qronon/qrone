@@ -15,7 +15,7 @@ import org.qrone.memcached.MemcachedService;
 import com.mongodb.MongoException;
 
 
-public class LocalWindow extends JSObject{
+public class LocalWindow extends ServletScopeObject{
 	
 	public LocalWindow(ServletScope ss) throws IOException{
 		super(ss);

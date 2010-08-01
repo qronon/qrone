@@ -20,7 +20,7 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.NodeLister;
 
-public class JSON extends JSObject{
+public class JSON extends ServletScopeObject{
 	
 	public JSON(ServletScope ss) throws IOException{
 		super(ss);

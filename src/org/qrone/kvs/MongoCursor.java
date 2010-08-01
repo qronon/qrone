@@ -4,13 +4,13 @@ import org.bson.BSONObject;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.ObjectConverter;
-import org.qrone.r7.script.JSObject;
+import org.qrone.r7.script.ServletScopeObject;
 import org.qrone.r7.script.ServletScope;
 
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class MongoCursor extends JSObject implements KVSCursor {
+public class MongoCursor extends ServletScopeObject implements KVSCursor {
 	private DBCursor c;
 	public MongoCursor(ServletScope ss, DBCursor c) {
 		super(ss);
