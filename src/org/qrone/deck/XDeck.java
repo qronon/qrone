@@ -34,6 +34,7 @@ public abstract class XDeck<T> {
 				t = compile(uri, in, "utf8");
 				map.put(uri, t);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return t;

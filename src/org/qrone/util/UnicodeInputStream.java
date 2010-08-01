@@ -18,6 +18,8 @@ package org.qrone.util;
 
 import java.io.*;
 
+import javax.swing.ProgressMonitorInputStream;
+
 /**
  * This inputstream will recognize unicode BOM marks and will skip bytes if
  * getEncoding() method is called before any of the read(...) methods.
@@ -28,8 +30,7 @@ import java.io.*;
  * and skip bytes InputStreamReader in; if (enc == null) in = new
  * InputStreamReader(uin); else in = new InputStreamReader(uin, enc);
  */
-public class UnicodeInputStream extends InputStream {
-	PushbackInputStream internalIn;
+public class UnicodeInputStream extends PushbackInputStream {
 	boolean isInited = false;
 	String defaultEnc;
 	String encoding;
@@ -40,26 +41,15 @@ public class UnicodeInputStream extends InputStream {
 		this(in, "utf8");
 	}
 	
-	public UnicodeInputStream(InputStream in, String defaultEnc) {
-		internalIn = new PushbackInputStream(new BufferedInputStream(in), BOM_SIZE);
-		this.defaultEnc = defaultEnc;
-	}
-
-	public String getDefaultEncoding() {
-		return defaultEnc;
+	public UnicodeInputStream(InputStream in, String encoding) {
+		super(in,BOM_SIZE);
+		this.defaultEnc = encoding;
+		this.encoding = encoding;
 	}
 
 	public String getEncoding() {
-     if (!isInited) {
-        try {
-           init();
-        } catch (IOException ex) {
-           throw new IllegalStateException("Init method failed.");
-//              (Throwable)ex);
-        }
-     }
-     return encoding;
-  }
+		return encoding;
+	}
 
 	/**
 	 * Read-ahead four bytes and check for BOM marks. Extra bytes are unread
@@ -71,7 +61,7 @@ public class UnicodeInputStream extends InputStream {
 
 		byte bom[] = new byte[BOM_SIZE];
 		int n, unread;
-		n = internalIn.read(bom, 0, bom.length);
+		n = super.read(bom, 0, bom.length);
 
 		if ((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB)
 				&& (bom[2] == (byte) 0xBF)) {
@@ -96,23 +86,34 @@ public class UnicodeInputStream extends InputStream {
 			encoding = defaultEnc;
 			unread = n;
 		}
-		//System.out.println("read=" + n + ", unread=" + unread);
 
 		if (unread > 0)
-			internalIn.unread(bom, (n - unread), unread);
+			super.unread(bom, (n - unread), unread);
 
 		isInited = true;
 	}
 
+	@Override
 	public void close() throws IOException {
-		// init();
 		isInited = true;
-		internalIn.close();
+		super.close();
 	}
 
+	@Override
 	public int read() throws IOException {
-		init();
-		isInited = true;
-		return internalIn.read();
+		if(!isInited) init();
+		return super.read();
+	}
+	
+	@Override
+	public int read(byte[] b) throws IOException {
+		if(!isInited) init();
+		return super.read(b);
+	}
+	
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		if(!isInited) init();
+		return super.read(b, off, len);
 	}
 }

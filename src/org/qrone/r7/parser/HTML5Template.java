@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
 	private List<Object> list = new ArrayList<Object>();
-	private StringBuilder b = new StringBuilder();
+	private StringBuilder b = new StringBuilder(10240);
 	
 	private HTML5OM om;
 	private Set<HTML5OM> xomlist;
@@ -227,6 +227,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 					}
 				}
 			}
+			initialized = true;
 		}
 	}
 

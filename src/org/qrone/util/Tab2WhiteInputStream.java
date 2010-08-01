@@ -28,15 +28,28 @@ import java.io.*;
  * and skip bytes InputStreamReader in; if (enc == null) in = new
  * InputStreamReader(uin); else in = new InputStreamReader(uin, enc);
  */
-public class Tab2WhiteInputStream extends InputStream {
-	InputStream in;
-
+public class Tab2WhiteInputStream extends FilterInputStream {
 	public Tab2WhiteInputStream(InputStream in) {
-		this.in = in;
+		super(in);
 	}
-	
+
+	@Override
 	public int read() throws IOException {
 		int c = in.read();
 		return c == '\t' ? ' ' : c;
+	}
+	
+	@Override
+	public int read(byte[] b) throws IOException {
+		return read(b, 0, b.length);
+	}
+	
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		int c = super.read(b, off, len);
+		for (int i = off; i < off + len; i++) {
+			if(b[i] == '\t') b[i] = ' ';
+		}
+		return c;
 	}
 }

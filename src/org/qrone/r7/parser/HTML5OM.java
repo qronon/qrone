@@ -369,8 +369,8 @@ public class HTML5OM {
 			protected void out(final Element e) {
 				HTML5Element e5 = new HTML5Element(om, e);
 				final CSS3Value include = e5.getPropertyValue("include");
-				final String uniqueid = QrONEUtils.uniqueid();
 				if(include != null){
+					final String uniqueid = QrONEUtils.uniqueid();
 					final String path = include.getURL();
 					if(path != null && path.trim().length() > 0){
 						super.out(e,new Delegate() {

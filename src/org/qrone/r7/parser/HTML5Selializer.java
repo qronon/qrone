@@ -3,8 +3,10 @@ package org.qrone.r7.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Attr;
@@ -14,11 +16,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public abstract class HTML5Selializer extends HTML5Visitor{
-	public final String[] noendtags = {"br", "img", "hr", "meta", "input", "embed", "area", "base", "col", "keygen", "link", "param", "source"};
-	public final String[] nnendtags = {"li", "dt", "dd", "p", "tr", "td", "th", "rt", "rp", "optgroup", "option", "thread", "tfoot"};
-	public final List<String> noendtaglist = Arrays.asList(noendtags);
-	public final List<String> nnendtaglist = Arrays.asList(nnendtags);
-	
+	public static final String[] noendtags = {"br", "img", "hr", "meta", "input", "embed", "area", "base", "col", "keygen", "link", "param", "source"};
+	public static final String[] nnendtags = {"li", "dt", "dd", "p", "tr", "td", "th", "rt", "rp", "optgroup", "option", "thread", "tfoot"};
+	public static final Set<String> noendtaglist = new HashSet<String>();
+	static{
+		noendtaglist.addAll(Arrays.asList(noendtags));
+		noendtaglist.addAll(Arrays.asList(nnendtags));
+	}
 	protected HTML5OM om;
 	protected HTML5Writer b;
 	protected String id;
@@ -130,8 +134,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 	}
 	
 	protected void end(Element e){
-		if(!noendtaglist.contains(e.getNodeName())
-				&& !nnendtaglist.contains(e.getNodeName())){
+		if(!noendtaglist.contains(e.getNodeName())){
 			b.append('<');
 			b.append('/');
 			if(e.hasAttribute("tag"))
