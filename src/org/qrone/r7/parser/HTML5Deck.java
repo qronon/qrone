@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.qrone.deck.XDeck;
 import org.qrone.img.ImageBufferService;
-import org.qrone.parser.XDeck;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;

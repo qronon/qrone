@@ -10,7 +10,7 @@ import java.util.Map;
 import org.apache.commons.js2j.SugarWrapFactory;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.qrone.parser.XDeck;
+import org.qrone.deck.XDeck;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Window;
 import org.w3c.css.sac.InputSource;

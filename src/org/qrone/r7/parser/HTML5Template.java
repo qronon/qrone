@@ -15,13 +15,12 @@ import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
-import org.qrone.parser.TextileParser;
+import org.qrone.deck.TextileDeck;
 import org.qrone.r7.ObjectConverter;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class HTML5Template implements HTML5Writer, NodeProcessor{
-	
 	
 	private List<Object> list = new ArrayList<Object>();
 	private StringBuilder b = new StringBuilder();
@@ -134,7 +133,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 				}
 			});
 		}else{
-			set(selector, new TextileParser().parse(uri,o.toString()));
+			set(selector, o.toString().replaceAll("\n", "<br>"));
 		}
 	}
 	

@@ -26,7 +26,9 @@ import org.ho.yaml.Yaml;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.qrone.parser.TextileParser;
+import org.qrone.deck.PropertiesDeck;
+import org.qrone.deck.TextileDeck;
+import org.qrone.deck.YamlDeck;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5OM;
@@ -116,39 +118,25 @@ public class Window extends JSObject{
 		return null;
 	}
 
+	private PropertiesDeck propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(resolvePath(path).toString())){
-			InputStream in = ss.resolver.getInputStream(resolvePath(path));
-			Properties p = new Properties();
-			p.load(in);
-			in.close();
-			Map<Object, Object> map = new Hashtable<Object, Object>();
-			for (Iterator<Entry<Object, Object>> i = p.entrySet().iterator(); i
-					.hasNext();) {
-				Entry<Object, Object> t = i.next();
-				map.put(t.getKey(), t.getValue());
-			}
-			return map;
-		}
-		return null;
+		if(propDeck == null)
+			propDeck = new PropertiesDeck(ss.resolver);
+		return propDeck.compile(ss.uri.resolve(path));
 	}
-	
+
+	private YamlDeck yamlDeck;
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(resolvePath(path).toString())){
-			InputStream in = ss.resolver.getInputStream(resolvePath(path));
-			Object o = Yaml.load(new Tab2WhiteInputStream(in));
-			in.close();
-			return o;
-		}
-		return null;
+		if(yamlDeck == null)
+			yamlDeck = new YamlDeck(ss.resolver);
+		return yamlDeck.compile(ss.uri.resolve(path));
 	}
 	
+	private TextileDeck textileDeck;
 	public String load_textile(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(resolvePath(path).toString())){
-			InputStream in = ss.resolver.getInputStream(resolvePath(path));
-			return new TextileParser().parse(ss.uri, in, "utf8");
-		}
-		return null;
+		if(textileDeck == null)
+			textileDeck = new TextileDeck(ss.resolver);
+		return textileDeck.compile(ss.uri.resolve(path));
 	}
 	
 	public byte[] base64_decode(String base64String){
