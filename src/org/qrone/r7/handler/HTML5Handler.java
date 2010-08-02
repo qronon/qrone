@@ -15,9 +15,12 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ScriptableJavaObject;
 import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.browser.LocalWindow;
 import org.qrone.r7.script.browser.Window;
+import org.qrone.r7.script.ext.FileExtension;
+import org.qrone.r7.script.ext.LocalWindow;
+import org.qrone.r7.tag.HTML5TagHandler;
 import org.qrone.r7.tag.ImageHandler;
 import org.qrone.r7.tag.Scale9Handler;
 
@@ -29,10 +32,20 @@ public class HTML5Handler implements URIHandler{
 	public HTML5Handler(URIResolver resolver, ImageBufferService service) {
 		this.resolver = resolver;
 		deck = new HTML5Deck(resolver, service);
-		deck.addTagHandler(new Scale9Handler(deck));
-    	deck.addTagHandler(new ImageHandler(deck));
-    	
 		vm = new JSDeck(resolver, deck);
+    	
+		addExtension(Scale9Handler.class);
+		addExtension(ImageHandler.class);
+		addExtension(FileExtension.class);
+		addExtension(LocalWindow.class);
+	}
+	
+	public void addExtension(Class c){
+		if(ScriptableJavaObject.class.isAssignableFrom(c)){
+			vm.addExtension(c);
+		}else if(HTML5TagHandler.class.isAssignableFrom(c)){
+			deck.addExtension(c);
+		}
 	}
 
 	@Override
@@ -57,9 +70,9 @@ public class HTML5Handler implements URIHandler{
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
 							request,response,scope,deck,vm,uri);
-					om.run(scope, new Window(ss), new LocalWindow(ss));
-					
-					ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
+					om.run(scope, new Window(ss));
+					//ss.response.setHeader("", arg1)
+					//ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
 					ss.writer.flush();
 					ss.writer.close();
 					return true;

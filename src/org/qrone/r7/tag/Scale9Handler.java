@@ -13,7 +13,7 @@ import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.ImagePart;
 
-public class Scale9Handler extends HTML5TagHandler {
+public class Scale9Handler implements HTML5TagHandler {
 	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
 	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");
 	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");

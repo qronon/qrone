@@ -17,6 +17,7 @@
 package org.qrone.r7.script;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +33,20 @@ import org.mozilla.javascript.WrapFactory;
  * functions that extend existing Java objects at the Rhino level.
  */
 public class SugarWrapFactory extends WrapFactory {
-    private Map<Class, Class<? extends ScriptableJavaObject>> map
-    	= new Hashtable<Class, Class<? extends ScriptableJavaObject>>();
+    private Map<Class, List<Class<? extends ScriptableJavaObject>>> map
+    	= new Hashtable<Class, List<Class<? extends ScriptableJavaObject>>>();
     
     public SugarWrapFactory() {
         super();
     }
     
-    public void setWrapClass(Class target, Class<? extends ScriptableJavaObject> wrapper){
-    	map.put(target, wrapper);
+    public void addWrapperClass(Class target, Class<? extends ScriptableJavaObject> wrapper){
+    	List<Class<? extends ScriptableJavaObject>> l = map.get(target);
+    	if(l == null){
+    		l = new ArrayList<Class<? extends ScriptableJavaObject>>();
+    		map.put(target, l);
+    	}
+    	l.add(wrapper);
     }
     
     public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
@@ -54,16 +60,34 @@ public class SugarWrapFactory extends WrapFactory {
 				for (Iterator<Class> i = map.keySet().iterator(); i.hasNext();) {
 					Class type = i.next();
 					if (type.isInstance(javaObject)) {
-						Constructor<? extends ScriptableJavaObject> cr = map.get(type)
-								.getConstructor(Context.class, Scriptable.class, type, Class.class, Scriptable.class);
+						List<Class<? extends ScriptableJavaObject>> l = map.get(type);
+						
 						NativeJavaObject wrapper = new NativeJavaObject(scope, javaObject, staticType);
-						ScriptableJavaObject sjo = cr.newInstance(cx, scope, javaObject, staticType, wrapper);
-						wrapper.setPrototype(new NativeJavaObject(scope, sjo, null));
+						NativeJavaObject last = wrapper;
+						for (Iterator<Class<? extends ScriptableJavaObject>> iter = l.iterator(); iter.hasNext();) {
+							Class<? extends ScriptableJavaObject> cls = iter.next();
+							
+							ScriptableJavaObject sjo = null;
+							try{
+								Constructor<? extends ScriptableJavaObject> cr = 
+									cls.getConstructor(ContextPack.class);
+								sjo = cr.newInstance(new ContextPack(cx, scope, javaObject, staticType, wrapper));
+							}catch(Exception e){
+								Constructor<? extends ScriptableJavaObject> cr = 
+									cls.getConstructor();
+								sjo = cr.newInstance();
+								
+							}
+							NativeJavaObject wsjo = new NativeJavaObject(scope, sjo, null);
+							last.setPrototype(wsjo);
+							last = wsjo;
+						}
 						return wrapper;
 					}
 				}
 				return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return super.wrapAsJavaObject(cx, scope, javaObject, staticType);

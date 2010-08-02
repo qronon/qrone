@@ -1,6 +1,8 @@
 package org.qrone.r7.parser;
 
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Map;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ScriptableJavaObject;
 import org.qrone.r7.script.SugarWrapFactory;
 import org.qrone.util.XDeck;
 
@@ -29,7 +32,6 @@ public class JSDeck extends XDeck<JSOM>{
     public static SugarWrapFactory getSugarWrapFactory(){
     	return wrapFactory;
     }
-
 
 	@Override
 	public JSOM compile(URI uri, InputStream in, String encoding)
@@ -96,4 +98,25 @@ public class JSDeck extends XDeck<JSOM>{
 		}
 	}
 	*/
+
+	private static Class getGenericType(Class cls) {
+		Type[] types = cls.getGenericInterfaces();
+		for (int i = 0; i < types.length; i++) {
+			if(types[i] instanceof ParameterizedType){
+				ParameterizedType ty = (ParameterizedType) types[i];
+				if(ty.getRawType().equals(ScriptableJavaObject.class)){
+					Type[] actualType = ty.getActualTypeArguments();
+					if (actualType.length > 0 && actualType[0] instanceof Class) {
+						return (Class) actualType[0];
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public void addExtension(Class<? extends ScriptableJavaObject> wrapper) {
+		Class cls = getGenericType(wrapper);
+		getSugarWrapFactory().addWrapperClass(cls, wrapper);
+	}
 }

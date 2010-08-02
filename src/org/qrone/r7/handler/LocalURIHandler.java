@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.app.AwtImageBufferService;
 import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.FileResolver;
-import org.qrone.r7.resolver.FilteredResolver;
-import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.MemoryResolver;
 
 public class LocalURIHandler implements URIHandler {
@@ -18,7 +16,6 @@ public class LocalURIHandler implements URIHandler {
 	
 	public LocalURIHandler() {
 		resolver = new CascadeResolver();
-		resolver.add(new FilteredResolver("/qrone-server/", new InternalResourceResolver()));
 		resolver.add(new MemoryResolver());
 		resolver.add(new FileResolver(new File(".")));
 		

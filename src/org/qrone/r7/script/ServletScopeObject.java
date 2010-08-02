@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.r7.parser.JSDeck;
 
 public class ServletScopeObject {
 	protected ServletScope ss;
@@ -15,11 +16,11 @@ public class ServletScopeObject {
 	}
 	
 	protected Scriptable newScriptable(){
-		return ss.vm.getContext().newObject(ss.scope);
+		return JSDeck.getContext().newObject(ss.scope);
 	}
 	
 	protected void callJSFunction(Callable func, Object thisObj, Object ... args){
-		func.call(ss.vm.getContext(), ss.scope, 
+		func.call(JSDeck.getContext(), ss.scope, 
 				(Scriptable)Context.javaToJS(thisObj,ss.scope), args);
 	}
 

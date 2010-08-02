@@ -1,42 +1,53 @@
-package org.qrone.r7.script.browser;
+package org.qrone.r7.script.ext;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.ServletScopeObject;
+import org.qrone.memcached.ClientMemcachedService;
+import org.qrone.memcached.MemcachedService;
+import org.qrone.r7.script.ContextPack;
+import org.qrone.r7.script.ScriptableJavaObject;
+import org.qrone.r7.script.browser.Window;
+
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 
 
-public class LocalWindow extends ServletScopeObject{
-	
-	public LocalWindow(ServletScope ss) throws IOException{
-		super(ss);
+public class LocalWindow implements ScriptableJavaObject<Window>{
+	protected ContextPack<Window> pack;
+	public LocalWindow(ContextPack<Window> pack) {
+		this.pack = pack;
 	}
-	
 	
 	public String fetch(String url) throws IOException{
 		return null;
 	}
-	/*
+	
 	public MemcachedService memcached_connect(String host, Number port){
 		String[] serverlist = new String[1];
 		serverlist[0] = host + ":" + String.valueOf(port);
 		return new ClientMemcachedService(serverlist);
 	}
 
-	public KVSService mongo_connect(String host, Number port, String schema)
+	public DB mongo_connect(String host, Number port, String schema)
 			throws UnknownHostException, MongoException{
-        return new MongoService(ss, host, port, schema);
+		Mongo m = new Mongo(host, port.intValue());
+        return m.getDB(schema);
 	}
 	
-	public KVSService mongo_connect(String host, Number port, String schema, 
+	public DB mongo_connect(String host, Number port, String schema, 
 			String user, String password) throws UnknownHostException, MongoException{
-        return new MongoService(ss, host, port, schema, user, password);
+		Mongo m = new Mongo(host, port.intValue());
+		DB db = m.getDB(schema);
+		db.authenticate(user, password.toCharArray());
+        return db;
 	}
-*/
+
 	public Connection jdbc_connect(String cls, String url) throws SQLException{
 		try {
 			Class.forName(cls).newInstance();

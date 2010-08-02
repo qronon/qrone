@@ -9,7 +9,7 @@ import org.qrone.r7.parser.HTML5Element;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
-public class ImageHandler extends HTML5TagHandler {
+public class ImageHandler implements HTML5TagHandler {
 	private HTML5Deck deck;
 	public ImageHandler(HTML5Deck deck) {
 		this.deck = deck;

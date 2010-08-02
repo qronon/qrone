@@ -29,7 +29,13 @@ public class JSOM implements Comparable<JSOM>{
 	}
 
 	public void run(Scriptable scope) {
-		script.exec(JSDeck.getContext(), scope);
+		scope.put("window", scope, scope);
+		
+		try{
+			script.exec(JSDeck.getContext(), scope);
+		}catch(WrappedException e){
+			e.getWrappedException().printStackTrace();
+		}
 	}
 
 	public void run(Scriptable scope, Object... prototypes) {
@@ -39,14 +45,7 @@ public class JSOM implements Comparable<JSOM>{
 			parent.setPrototype(window);
 			parent = window;
 		}
-		
-		scope.put("window", scope, scope);
-		
-		try{
-			script.exec(JSDeck.getContext(), scope);
-		}catch(WrappedException e){
-			e.getWrappedException().printStackTrace();
-		}
+		run(scope);
 	}
 
 	@Override

@@ -58,7 +58,19 @@ public class HTML5Deck extends XDeck<HTML5OM> {
     public ImageSpriter getSpriter(){
     	return spriter;
     }
-    
+
+	public void addExtension(Class<? extends HTML5TagHandler> c){
+		try{
+			HTML5TagHandler h = c.getConstructor(HTML5Deck.class).newInstance(this);
+			handlers.add(h);
+		}catch(Exception e){
+			try{
+				HTML5TagHandler h = c.getConstructor().newInstance();
+				handlers.add(h);
+			}catch(Exception e1){}
+		}
+	}
+	
 	public void addTagHandler(HTML5TagHandler h){
 		handlers.add(h);
 	}
