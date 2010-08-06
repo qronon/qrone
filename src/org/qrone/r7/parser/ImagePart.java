@@ -1,9 +1,12 @@
 package org.qrone.r7.parser;
 
+import java.io.Serializable;
 import java.net.URI;
 
 
-public class ImagePart{
+public class ImagePart implements Serializable{
+	private static final long serialVersionUID = -2816750802010010337L;
+	
 	public URI file;
 	public int x;
 	public int y;

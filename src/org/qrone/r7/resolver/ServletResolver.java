@@ -8,6 +8,8 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 
+import org.qrone.util.UnicodeInputStream;
+
 public class ServletResolver implements URIResolver{
 
 	private ServletContext context;
@@ -48,7 +50,7 @@ public class ServletResolver implements URIResolver{
 			} else {
 				url = new URL("file", "", context.getRealPath(uri));
 			}
-			return url.openConnection().getInputStream();
+			return new UnicodeInputStream(url.openConnection().getInputStream());
 		} catch (IOException e) {
 			return null;
 		}

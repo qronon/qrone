@@ -156,15 +156,29 @@ public class QrONECompressor {
     
 	public static void compile(HTML5Deck deck, File file, String path, String lang, boolean recurse){
 		if(file.isDirectory()){
+			if (verbose) {
+	            System.err.println("[INFO] Directory " + path);
+	        }
 			File[] files = file.listFiles();
 			for (int i = 0; i < files.length; i++) {
-				if( files[i].isDirectory() && recurse)
-					compile(deck, files[i], files[i].getName(), lang, recurse);
+				if( files[i].isDirectory() && recurse && !files[i].getName().startsWith("."))
+					compile(deck, files[i], path + "/" + files[i].getName(), lang, recurse);
 				else if( files[i].getName().indexOf("-min.") < 0 &&
 						(files[i].getName().endsWith(".html") || files[i].getName().endsWith(".htm")) )
-					compile(deck, files[i], files[i].getName(), lang, recurse);
+					compile(deck, files[i], path + "/" + files[i].getName(), lang, recurse);
 			}
 		}else{
+			if (verbose) {
+	            System.err.println("[INFO] Parsing " + path);
+	        }
+			try {
+				HTML5OM xom = deck.compile(new URI(path));
+				xom.serialize();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			/*
 	        if(lang == null) lang = "html";
 	        else lang = lang.toLowerCase();
 	        
@@ -182,9 +196,6 @@ public class QrONECompressor {
 			}
 			
 		    try {
-				if (verbose) {
-		            System.err.println("[INFO] Parsing " + file.getName());
-		        }
 				
 				HTML5OM xom = deck.compile(new URI(path));
 				out.write(xom.serialize());
@@ -207,6 +218,7 @@ public class QrONECompressor {
 				} catch (IOException e) {
 				}
 			}
+			*/
 		}
 	}
 	

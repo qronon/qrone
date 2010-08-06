@@ -15,6 +15,9 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.deck.PropertiesDeck;
+import org.qrone.deck.TextileDeck;
+import org.qrone.deck.YamlDeck;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5OM;
@@ -103,7 +106,7 @@ public class Window extends ServletScopeObject{
 		}
 		return null;
 	}
-/*
+	
 	private PropertiesDeck propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{
 		if(propDeck == null)
@@ -124,7 +127,7 @@ public class Window extends ServletScopeObject{
 			textileDeck = new TextileDeck(ss.resolver);
 		return textileDeck.compile(ss.uri.resolve(path));
 	}
-	*/
+	
 	public byte[] base64_decode(String base64String){
 		return Base64.decodeBase64(base64String);
 	}

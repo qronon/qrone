@@ -2,6 +2,10 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidClassException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,29 +26,15 @@ public class ImageSpriter {
 	private String vsprite = "/sprite-v.png";
 	private String hsprite = "/sprite-h.png";
 	private String tsprite = "/sprite-t.png";
+	private String psprite = "/sprite-pack.ser";
 
 	private URI ispriteURI;
 	private URI vspriteURI;
 	private URI hspriteURI;
 	private URI tspriteURI;
+	private URI pspriteURI;
 	
-	private List<ImagePart> isprites = new CopyOnWriteArrayList<ImagePart>();
-	private Map<ImagePart, String> iresults = new Hashtable<ImagePart, String>();
-	private int iWidth;
-	private int iHeight;
-	private int ilastsize = -1;
-	
-	private List<ImagePart> vsprites = new CopyOnWriteArrayList<ImagePart>();
-	private Map<ImagePart, String> vresults = new Hashtable<ImagePart, String>();
-	private int vWidth;
-	private int vHeight;
-	private int vlastsize = -1;
-	
-	private List<ImagePart> hsprites = new CopyOnWriteArrayList<ImagePart>();
-	private Map<ImagePart, String> hresults = new Hashtable<ImagePart, String>();
-	private int hWidth;
-	private int hHeight;
-	private int hlastsize = -1;
+	private ImagePack pack;
 	
 	private boolean useTransparentDot = false;
 	private boolean outTransparentDot = false;
@@ -62,6 +52,52 @@ public class ImageSpriter {
 		try {
 			setBaseURI(new URI("."));
 		} catch (URISyntaxException e) {}
+	}
+
+	public boolean pack() {
+		ObjectOutputStream out = null;
+		try {
+			out = new ObjectOutputStream(resolver.getOutputStream(pspriteURI));
+			out.writeObject(pack);
+			out.flush();
+			return true;
+		} catch (InvalidClassException e) {
+		} catch (NotSerializableException e) {
+		} catch (IOException e) {
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return false;
+	}
+	
+	private ImagePack unpack() {
+		if (pack == null && pspriteURI != null) {
+			ObjectInputStream oin = null;
+			try {
+				InputStream in = resolver.getInputStream(pspriteURI);
+				if (in != null) {
+					oin = new ObjectInputStream(in);
+					pack = (ImagePack) oin.readObject();
+				}
+			} catch (IOException e) {
+			} catch (ClassNotFoundException e) {
+			} finally {
+				if (oin != null) {
+					try {
+						oin.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
+		if(pack == null)
+			pack = new ImagePack();
+		return pack;
 	}
 	/*
 	public static ImageSpriter instance(){
@@ -87,9 +123,11 @@ public class ImageSpriter {
 		tspriteURI = basedir.resolve(tsprite);
 		vspriteURI = basedir.resolve(vsprite);
 		hspriteURI = basedir.resolve(hsprite);
+		pspriteURI = basedir.resolve(psprite);
 	}
 	
 	public void update(URI uri) throws IOException{
+		unpack();
 		if(uri.equals(ispriteURI)){
 			createi();
 		}else if(uri.equals(hspriteURI)){
@@ -106,21 +144,23 @@ public class ImageSpriter {
 	}
 	
 	public void create() throws IOException {
+		unpack();
 		createi();
 		createh();
 		createv();
 		createt();
+		pack();
 	}
 
 	public void createi() throws IOException {
 		int currentY = 0;
 		int currentX = 0;
-		if(isprites.size() > 0 && ilastsize != isprites.size()){
-			ilastsize = isprites.size();
+		if(pack.isprites.size() > 0 && pack.ilastsize != pack.isprites.size()){
+			pack.ilastsize = pack.isprites.size();
 			
-			ImageBuffer iimage = service.createImage(iWidth, iHeight);
+			ImageBuffer iimage = service.createImage(pack.iWidth, pack.iHeight);
 			currentY = 0;
-			for (Iterator<ImagePart> i = isprites.iterator(); i
+			for (Iterator<ImagePart> i = pack.isprites.iterator(); i
 					.hasNext();) {
 				ImagePart part = i.next();
 				iimage.drawImage(getImage(part.file), 
@@ -135,25 +175,25 @@ public class ImageSpriter {
 	public void createv() throws IOException {
 		int currentY = 0;
 		int currentX = 0;
-		if(vsprites.size() > 0 && vlastsize != vsprites.size()){
-			vlastsize = vsprites.size();
+		if(pack.vsprites.size() > 0 && pack.vlastsize != pack.vsprites.size()){
+			pack.vlastsize = pack.vsprites.size();
 			
-			ImageBuffer vimage = service.createImage(vWidth, vHeight);
+			ImageBuffer vimage = service.createImage(pack.vWidth, pack.vHeight);
 			currentX = 0;
-			for (Iterator<ImagePart> i = vsprites.iterator(); i
+			for (Iterator<ImagePart> i = pack.vsprites.iterator(); i
 					.hasNext();) {
 				ImagePart part = i.next();
 	
 				currentY = 0;
-				while (currentY < vWidth) {
-					if(currentY + part.h > vWidth){
+				while (currentY < pack.vWidth) {
+					if(currentY + part.h > pack.vWidth){
 						vimage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
 								part.w, 
-								part.h - (currentY + part.h - vWidth)), 
+								part.h - (currentY + part.h - pack.vWidth)), 
 								new ImageRect(part.x, part.y, 
 								part.w, 
-								part.h - (currentY + part.h - vWidth)));
+								part.h - (currentY + part.h - pack.vWidth)));
 					}else{
 						vimage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
@@ -176,24 +216,24 @@ public class ImageSpriter {
 		int currentY = 0;
 		int currentX = 0;
 		
-		if(hsprites.size() > 0 && hlastsize != hsprites.size()){
-			hlastsize = hsprites.size();
+		if(pack.hsprites.size() > 0 && pack.hlastsize != pack.hsprites.size()){
+			pack.hlastsize = pack.hsprites.size();
 			
-			ImageBuffer himage = service.createImage(hWidth, hHeight);
+			ImageBuffer himage = service.createImage(pack.hWidth, pack.hHeight);
 			currentY = 0;
-			for (Iterator<ImagePart> i = hsprites.iterator(); i
+			for (Iterator<ImagePart> i = pack.hsprites.iterator(); i
 					.hasNext();) {
 				ImagePart part = i.next();
 	
 				currentX = 0;
-				while (currentX < hHeight) {
-					if(currentX + part.w > hHeight){
+				while (currentX < pack.hHeight) {
+					if(currentX + part.w > pack.hHeight){
 						himage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
-								part.w - (currentX + part.w - hHeight), 
+								part.w - (currentX + part.w - pack.hHeight), 
 								part.h), 
 								new ImageRect(part.x, part.y, 
-								part.w - (currentX + part.w - hHeight), 
+								part.w - (currentX + part.w - pack.hHeight), 
 								part.h));
 					}else{
 	
@@ -249,54 +289,54 @@ public class ImageSpriter {
 	}
 
 	public String addISprite(ImagePart file) throws IOException{
-		if(iresults.containsKey(file)){
-			return iresults.get(file);
+		if(pack.iresults.containsKey(file)){
+			return pack.iresults.get(file);
 		}
 		
-		isprites.add(file);
-		if(iWidth < file.w){
-			iWidth = file.w;
+		pack.isprites.add(file);
+		if(pack.iWidth < file.w){
+			pack.iWidth = file.w;
 		}
-		iHeight += file.h;
+		pack.iHeight += file.h;
 		
 		String res = "width:" + file.w + "px;" 
 			 + "height:" + file.h + "px;" 
 			 + "background: no-repeat 0px -" 
-			 	+ (iHeight-file.h) + "px url(" + getPath(file.file, isprite) + ");";
-		iresults.put(file, res);
+			 	+ (pack.iHeight-file.h) + "px url(" + getPath(file.file, isprite) + ");";
+		pack.iresults.put(file, res);
 		return res;
 	}
 	public String addVSprite(ImagePart file) throws IOException{
-		if(vresults.containsKey(file)){
-			return vresults.get(file);
+		if(pack.vresults.containsKey(file)){
+			return pack.vresults.get(file);
 		}
 		
-		vsprites.add(file);
-		if(vHeight < file.h){
-			vHeight = file.h;
+		pack.vsprites.add(file);
+		if(pack.vHeight < file.h){
+			pack.vHeight = file.h;
 		}
-		vWidth += file.w;
+		pack.vWidth += file.w;
 		
 		String res = "width:" + file.w + "px;" 
-			 + "background: repeat-y -" + (vWidth-file.w) + "px 0px url(" + getPath(file.file, vsprite) + ");";
-		vresults.put(file, res);
+			 + "background: repeat-y -" + (pack.vWidth-file.w) + "px 0px url(" + getPath(file.file, vsprite) + ");";
+		pack.vresults.put(file, res);
 		return res;
 	}
 
 	public String addHSprite(ImagePart file) throws IOException{
-		if(hresults.containsKey(file)){
-			return hresults.get(file);
+		if(pack.hresults.containsKey(file)){
+			return pack.hresults.get(file);
 		}
 		
-		hsprites.add(file);
-		if(hWidth < file.w){
-			hWidth = file.w;
+		pack.hsprites.add(file);
+		if(pack.hWidth < file.w){
+			pack.hWidth = file.w;
 		}
-		hHeight += file.h;
+		pack.hHeight += file.h;
 		
 		String res = "height:" + file.h + "px;" 
-			 + "background: repeat-x 0px -" + (hHeight-file.h) + "px url(" + getPath(file.file, hsprite) + ");";
-		hresults.put(file, res);
+			 + "background: repeat-x 0px -" + (pack.hHeight-file.h) + "px url(" + getPath(file.file, hsprite) + ");";
+		pack.hresults.put(file, res);
 		return res;
 	}
 	

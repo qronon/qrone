@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import org.qrone.r7.QrONEUtils;
+import org.qrone.util.UnicodeInputStream;
 
 public class InternalResourceResolver implements URIResolver{
 	
@@ -20,7 +21,7 @@ public class InternalResourceResolver implements URIResolver{
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
-		return QrONEUtils.getResourceAsStream(uri.toString());
+		return new UnicodeInputStream(QrONEUtils.getResourceAsStream(uri.toString()));
 	}
 	@Override
 	public boolean updated(URI uri) {

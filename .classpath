@@ -20,5 +20,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSONIC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressorDependencies"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openid4java-0.9.5.593"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
