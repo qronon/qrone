@@ -1,15 +1,10 @@
 package org.qrone.r7.parser;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.qrone.img.ImageBuffer;
-import org.qrone.img.ImageBufferService;
-import org.qrone.r7.resolver.URIResolver;
 
 
 public class ImagePack implements Serializable{

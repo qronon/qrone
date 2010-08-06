@@ -1,16 +1,12 @@
 package org.qrone.r7.script.ext;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.qrone.deck.PropertiesDeck;
-import org.qrone.deck.TextileDeck;
-import org.qrone.deck.YamlDeck;
 import org.qrone.memcached.ClientMemcachedService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.script.ContextPack;
