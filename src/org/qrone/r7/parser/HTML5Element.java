@@ -19,7 +19,7 @@ public class HTML5Element {
 		this.e = e;
 		this.map = om.getCSSRuleMap();
 	}
-	
+	 
 	public HTML5OM getOM(){
 		return om;
 	}
