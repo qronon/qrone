@@ -16,7 +16,7 @@ public class MongoCursor extends ServletScopeObject implements KVSCursor {
 		super(ss);
 		this.c = c;
 	}
-	
+	 
 	@Override
 	public void forEach(Callable func) {
 		while(hasNext()){
