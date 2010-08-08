@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,19 +31,27 @@ import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
 import org.qrone.r7.QrONEUtils;
-import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.browser.LoginService;
 import org.qrone.r7.script.browser.User;
 import org.qrone.r7.store.KeyValueStore;
 
-public class OpenIDHandler implements URIHandler{
+import com.google.appengine.api.users.UserService;
+
+public class OpenIDHandler implements URIHandler, LoginService{
 	private static ConsumerManager manager;
-	//private URIResolver resolver;
 	private KeyValueStore store;
 	private User user;
+	private UserService service;
+	private static OpenIDHandler instance;
 	
-	public OpenIDHandler(URIResolver resolver, KeyValueStore store) {
-		//this.resolver = resolver;
+	public OpenIDHandler(KeyValueStore store, UserService service) {
 		this.store = store;
+		this.service = service;
+		instance = this;
+	}
+	
+	public static OpenIDHandler instance(){
+		return instance;
 	}
 	
 	@Override
@@ -76,32 +86,50 @@ public class OpenIDHandler implements URIHandler{
 	}
 
 	public User getUser() {
+		if(service != null){
+			com.google.appengine.api.users.User u = service.getCurrentUser();
+			return new User(u.getNickname(), u.getEmail());
+		}
 		return user;
 	}
 
-	public String loginURL(HttpServletRequest req, HttpServletResponse res,
-			String url, Scriptable attributes, String doneURL){
+	public String loginURL(String doneURL) {
+		if(service != null){
+			return service.createLoginURL(doneURL);
+		}else{
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("login", "http://axschema.org/contact/email");
+			return loginURL("https://www.google.com/accounts/o8/id",
+					map, doneURL);
+		}
+	}
+
+	public String loginURL(String url, Map<String, String> attrMap, String doneURL){
 		LoginPack pack = new LoginPack();
 		pack.url = url;
+		pack.attributes = attrMap;
+		return "/openid/login?pack=" 
+			+ QrONEUtils.packEQ64(pack) + "&.done=" + QrONEUtils.escape(doneURL);
+	}
+	
+	public String loginURL(String url, Scriptable attributes, String doneURL){
+		Map<String, String> attrMap = new HashMap<String, String>();
 		if(attributes != null){
-			pack.attributes = new HashMap<String, String>();
 			Object[] ids = attributes.getIds();
 			for (int i = 0; i < ids.length; i++) {
 				if(ids[i] instanceof String){
 					Object v = attributes.get((String)ids[i], attributes);
 					if(v instanceof String){
-						pack.attributes.put((String)ids[i], (String)v);
+						attrMap.put((String)ids[i], (String)v);
 					}
 				}
 			}
 		}
-		return getBaseURL(req) + "/login?pack=" 
-			+ QrONEUtils.packEQ64(pack) + "&.done=" + QrONEUtils.escape(doneURL);
+		return loginURL(url, attrMap, doneURL);
 	}
 
-	public String logoutURL(HttpServletRequest req, HttpServletResponse res,
-			String doneURL){
-		return getBaseURL(req) + "/logout?.done=" + QrONEUtils.escape(doneURL);
+	public String logoutURL(String doneURL){
+		return "/openid/logout?.done=" + QrONEUtils.escape(doneURL);
 	}
 	
 	private String getBaseURL(HttpServletRequest req){
@@ -120,10 +148,12 @@ public class OpenIDHandler implements URIHandler{
 				manager = new ConsumerManager();
 			}
 			
+			URI reqURL = new URI(req.getRequestURL().toString()).resolve("/openid");
+			
 			List discoveries = manager.discover(url);
 			DiscoveryInformation discovered = manager.associate(discoveries);
 			AuthRequest authReq = manager.authenticate(discovered, 
-					getBaseURL(req) + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
+					reqURL.toString() + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
 			FetchRequest fetch = FetchRequest.createFetchRequest();
 			
 			store.set("openid-discover:" + uuid, QrONEUtils.serialize(discovered));
@@ -140,6 +170,8 @@ public class OpenIDHandler implements URIHandler{
 		}catch (OpenIDException e){
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return false;

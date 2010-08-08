@@ -1,5 +1,6 @@
 package org.qrone.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Hashtable;
@@ -28,12 +29,19 @@ public abstract class XDeck<T> {
 	public T compile(URI uri){
 		T t = map.get(uri);
 		if(t == null || updated(t, uri)){
+			InputStream in = null;
 			try {
-				InputStream in = resolver.getInputStream(uri);
+				in = resolver.getInputStream(uri);
 				t = compile(uri, in, "utf8");
 				map.put(uri, t);
 			} catch (Exception e) {
 				e.printStackTrace();
+			}finally{
+				if(in != null){
+					try{
+						in.close();
+					}catch(IOException e){}
+				}
 			}
 		}
 		return t;

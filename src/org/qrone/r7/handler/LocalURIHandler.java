@@ -16,8 +16,10 @@ public class LocalURIHandler extends ExtendableURIHandler{
 		resolver.add(new MemoryResolver());
 		resolver.add(new FileResolver(new File(".")));
 		
+		OpenIDHandler openidHandler = new OpenIDHandler(
+				new MemoryStore(), null);
 		HTML5Handler html5handler = new HTML5Handler(
-				resolver, new MemoryStore(), new AwtImageBufferService());
+				resolver, new AwtImageBufferService(), openidHandler);
 		ExtensionIndex ei = new ExtensionIndex();
 		if(ei.unpack(resolver) == null){
 			ei.find();
@@ -27,6 +29,7 @@ public class LocalURIHandler extends ExtendableURIHandler{
 		ei.extend(this);
 		
 		handler.add(html5handler);
+		handler.add(openidHandler);
 		handler.add(new ResolverHandler(resolver));
 	}
 }

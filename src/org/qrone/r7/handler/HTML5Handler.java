@@ -18,19 +18,19 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ScriptableJavaObject;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.browser.LoginService;
 import org.qrone.r7.script.browser.Window;
-import org.qrone.r7.store.KeyValueStore;
 import org.qrone.r7.tag.HTML5TagHandler;
 
 public class HTML5Handler implements URIHandler, Extendable{
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
-	private OpenIDHandler handler;
+	private LoginService loginService;
 	
-	public HTML5Handler(URIResolver resolver, KeyValueStore store, ImageBufferService service) {
+	public HTML5Handler(URIResolver resolver, ImageBufferService service, LoginService loginService) {
 		this.resolver = resolver;
-		handler = new OpenIDHandler(resolver, store);
+		this.loginService = loginService;
 		deck = new HTML5Deck(resolver, service);
 		vm = new JSDeck(resolver, deck);
 	}
@@ -45,10 +45,6 @@ public class HTML5Handler implements URIHandler, Extendable{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-		if(handler.handle(request, response)){
-			return true;
-		}
-		
 		long start = System.currentTimeMillis();
 		
 		response.setCharacterEncoding("utf8");
@@ -71,7 +67,7 @@ public class HTML5Handler implements URIHandler, Extendable{
 				if(om != null){
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
-							request,response,scope,deck,vm,uri,handler);
+							request,response,scope,deck,vm,uri,loginService);
 					om.run(scope, new Window(ss));
 					//ss.response.setHeader("", arg1)
 					//ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");

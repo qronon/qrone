@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -210,20 +211,32 @@ public class Window extends ServletScopeObject{
 	public String stringify(Object out){
 		return ObjectConverter.stringify(out);
 	}
-
-	public String loginURL(String url, String doneURL){
-		return ss.handler.loginURL(ss.request, ss.response, url, null, doneURL);
-	}
 	
 	public String loginURL(String url, Scriptable attributes, String doneURL){
-		return ss.handler.loginURL(ss.request, ss.response, url, attributes, doneURL);
+		Map<String, String> attrMap = new HashMap<String, String>();
+		if(attributes != null){
+			Object[] ids = attributes.getIds();
+			for (int i = 0; i < ids.length; i++) {
+				if(ids[i] instanceof String){
+					Object v = attributes.get((String)ids[i], attributes);
+					if(v instanceof String){
+						attrMap.put((String)ids[i], (String)v);
+					}
+				}
+			}
+		}
+		return ss.service.loginURL(url, attrMap, doneURL);
+	}
+
+	public String loginURL(String doneURL) {
+		return ss.service.loginURL(doneURL);
 	}
 	
 	public String logoutURL(String doneURL){
-		return ss.handler.logoutURL(ss.request, ss.response, doneURL);
+		return ss.service.logoutURL(doneURL);
 	}
 	
 	public User getUser(){
-		return ss.handler.getUser();
+		return ss.service.getUser();
 	}
 }
