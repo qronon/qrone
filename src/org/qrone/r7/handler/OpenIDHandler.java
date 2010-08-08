@@ -55,7 +55,8 @@ public class OpenIDHandler implements URIHandler, LoginService{
 	}
 	
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
+			String path, String pathArg) {
 		Cookie ucookie = QrONEUtils.getCookie(request.getCookies(), "U");
 		String uuid = null;
 		if(ucookie == null){

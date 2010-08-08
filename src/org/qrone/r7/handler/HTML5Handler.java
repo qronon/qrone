@@ -44,7 +44,8 @@ public class HTML5Handler implements URIHandler, Extendable{
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
+			String path, String pathArg) {
 		try {
 			deck.update(new URI(path));
 			response.setCharacterEncoding("utf8");
@@ -54,7 +55,8 @@ public class HTML5Handler implements URIHandler, Extendable{
 				if(om != null){
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
-							request,response,scope,deck,vm,uri,loginService);
+							request,response,path,pathArg,
+							scope,deck,vm,uri,loginService);
 					om.run(scope, new Window(ss));
 					ss.writer.flush();
 					ss.writer.close();

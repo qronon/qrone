@@ -20,7 +20,8 @@ public class ResolverHandler implements URIHandler{
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path){
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
+			String path, String pathArg){
 		InputStream in = null;
 		try{
 			URI uri = new URI(request.getPathInfo());

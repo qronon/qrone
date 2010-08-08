@@ -37,15 +37,10 @@ public class Window extends ServletScopeObject{
 	public Object query;
 	public JSON JSON;
 	
-	public Window(ServletScope ss) throws IOException{
+	public Window(ServletScope ss) throws IOException, URISyntaxException{
 		super(ss);
 		document = new Document(ss);
-		if(ss.path.endsWith(".js")){
-			String npath = ss.path.substring(0,ss.path.length()-".js".length());
-			try {
-				document.load(npath + ".html");
-			} catch (URISyntaxException e) {}
-		}
+		document.load(ss.path + ".html");
 		
 		location = new Location(ss);
 		navigator = new Navigator(ss);
@@ -71,6 +66,8 @@ public class Window extends ServletScopeObject{
 				o.put(e.getKey(), o, l);
 			}
 		}
+		if(!o.has("path", o))
+			o.put("path", o, ss.pathArg);
 		return o;
 	}
 	

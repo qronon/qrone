@@ -5,5 +5,5 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface URIHandler {
 	public boolean handle(HttpServletRequest request, HttpServletResponse response,
-			String path);
+			String path, String pathArg);
 }

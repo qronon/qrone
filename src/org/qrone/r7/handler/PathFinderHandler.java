@@ -11,17 +11,21 @@ public class PathFinderHandler implements URIHandler {
 	}
 	
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String path) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
+			String path, String pathArg) {
 		int index = path.lastIndexOf('/');
 		if(index > 0){
-			handle(request, response, path.substring(0, index));
+			if(handle(request, response, path.substring(0, index), 
+					path.substring(index) + pathArg))
+				return true;
 		}
 		
 		if(path.endsWith("/")){
-			if(handler.handle(request, response, path + "index")) return true;
+			if(handler.handle(request, response, path + "index", pathArg)) 
+				return true;
 		}else{
-			if(handler.handle(request, response, path)) return true;
+			if(handler.handle(request, response, path, pathArg)) 
+				return true;
 		}
 		
 		return false;

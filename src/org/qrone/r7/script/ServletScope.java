@@ -26,12 +26,14 @@ public class ServletScope {
 
 	public URIResolver resolver;
 	public String path;
+	public String pathArg;
 	public PrintWriter writer;
 	public Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
 	
 	public LoginService service;
 	
 	public ServletScope(HttpServletRequest request, HttpServletResponse response, 
+			String path, String pathArg,
 			Scriptable scope, HTML5Deck deck, JSDeck vm, URI uri, LoginService service) {
 		this.request = request;
 		this.response = response;
@@ -42,7 +44,8 @@ public class ServletScope {
 		this.service = service;
 		
 		resolver = deck.getResolver();
-		path = uri.toString();
+		this.path = path;
+		this.pathArg = pathArg;
 		try {
 			writer = response.getWriter();
 		} catch (IOException e) {
