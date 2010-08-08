@@ -13,7 +13,7 @@ import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.MemoryResolver;
 import org.qrone.r7.resolver.ServletResolver;
-
+ 
 public class AppEngineURIHandler implements URIHandler {
 	protected CascadeResolver resolver;
 	protected CascadeHandler handler;

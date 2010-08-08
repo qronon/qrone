@@ -15,7 +15,7 @@ public class CascadeHandler implements URIHandler{
 	}
 	
 	public void add(int index, URIHandler r){
-		list.add(index, r);
+		list.add(index, r); 
 	}
 
 	@Override
