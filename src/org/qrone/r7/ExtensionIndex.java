@@ -1,11 +1,6 @@
 package org.qrone.r7;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -56,59 +51,35 @@ public class ExtensionIndex {
 		Set<String> classes = extClasses;
 		if(classes == null)
 			classes = db.getAnnotationIndex().get(Extension.class.getName());
-		for (Iterator<String> i = classes.iterator(); i
-				.hasNext();) {
-			try {
-				e.addExtension(Class.forName(i.next()));
-			} catch (ClassNotFoundException e1) {}
+		if(classes != null){
+			for (Iterator<String> i = classes.iterator(); i
+					.hasNext();) {
+				try {
+					e.addExtension(Class.forName(i.next()));
+				} catch (ClassNotFoundException e1) {}
+			}
 		}
 	}
 
 	public boolean pack(URIResolver resolver) {
 		Set<String> classes = db.getAnnotationIndex().get(Extension.class.getName());
-		HashSet<String> set = new HashSet<String>();
-		set.addAll(classes);
-		
-		ObjectOutputStream out = null;
-		try {
+		if(classes != null){
+			HashSet<String> set = new HashSet<String>();
+			set.addAll(classes);
 			
-			out = new ObjectOutputStream(resolver.getOutputStream(pspriteURI));
-			out.writeObject(set);
-			out.flush();
-			return true;
-		} catch (InvalidClassException e) {
-		} catch (NotSerializableException e) {
-		} catch (IOException e) {
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-				}
+			try {
+				QrONEUtils.serialize(set, resolver.getOutputStream(pspriteURI));
+				return true;
+			} catch (IOException e) {
 			}
 		}
 		return false;
 	}
 	
 	public Set<String> unpack(URIResolver resolver) {
-		if (extClasses == null && pspriteURI != null) {
-			ObjectInputStream oin = null;
-			try {
-				InputStream in = resolver.getInputStream(pspriteURI);
-				if (in != null) {
-					oin = new ObjectInputStream(in);
-					extClasses = (HashSet<String>) oin.readObject();
-				}
-			} catch (IOException e) {
-			} catch (ClassNotFoundException e) {
-			} finally {
-				if (oin != null) {
-					try {
-						oin.close();
-					} catch (IOException e) {
-					}
-				}
-			}
+		try {
+			extClasses = (Set<String>)QrONEUtils.unserialize(resolver.getInputStream(pspriteURI));
+		} catch (IOException e) {
 		}
 		return extClasses;
 	}

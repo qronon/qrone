@@ -76,10 +76,13 @@ public class Document extends ServletScopeObject{
 	}
 
 	public void write(Object out) throws IOException{
-		writer.append(ObjectConverter.stringify(out));
+		if(out instanceof String)
+			write((String)out);
+		else
+			writer.append(ObjectConverter.stringify(out));
 	}
 	
-	public void write(String out) throws IOException{
+	private void write(String out) throws IOException{
 		writer.append(out);
 	}
 

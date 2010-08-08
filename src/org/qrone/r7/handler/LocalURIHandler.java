@@ -1,21 +1,14 @@
 package org.qrone.r7.handler;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.r7.Extendable;
 import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.app.AwtImageBufferService;
-import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.MemoryResolver;
-import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ScriptableJavaObject;
-import org.qrone.r7.tag.HTML5TagHandler;
+import org.qrone.r7.store.MemoryStore;
 
 public class LocalURIHandler extends ExtendableURIHandler{
 	
@@ -24,7 +17,7 @@ public class LocalURIHandler extends ExtendableURIHandler{
 		resolver.add(new FileResolver(new File(".")));
 		
 		HTML5Handler html5handler = new HTML5Handler(
-				resolver, new AwtImageBufferService());
+				resolver, new MemoryStore(), new AwtImageBufferService());
 		ExtensionIndex ei = new ExtensionIndex();
 		if(ei.unpack(resolver) == null){
 			ei.find();

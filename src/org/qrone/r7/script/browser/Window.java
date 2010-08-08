@@ -198,6 +198,15 @@ public class Window extends ServletScopeObject{
 		return b.toString();
 	}
 
+	public void header(String header, String value){
+		ss.response.addHeader(header, value);
+	}
+	
+	public void header(String header){
+		String[] hs = header.split(":", 2);
+		ss.response.addHeader(hs[0], hs[1]);
+	}
+
 	public String stringify(Object out){
 		return ObjectConverter.stringify(out);
 	}

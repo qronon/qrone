@@ -21,22 +21,29 @@ public class ResolverHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response){
+		InputStream in = null;
 		try{
 			String path = request.getPathInfo();
 			URI uri = new URI(request.getPathInfo());
 			if(resolver.exist(path)){
-				InputStream in = resolver.getInputStream(uri);
+				in = resolver.getInputStream(uri);
 				OutputStream out = response.getOutputStream();
 				QrONEUtils.copy(in, out);
 				out.flush();
 				out.close();
-				in.close();
 				return true;
 			}
 		}catch (IOException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+		}finally{
+			if(in != null){
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 		return false;
 	}

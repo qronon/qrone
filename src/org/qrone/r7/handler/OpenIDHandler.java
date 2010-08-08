@@ -1,11 +1,15 @@
 package org.qrone.r7.handler;
 
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
@@ -27,32 +31,47 @@ import org.openid4java.message.ax.FetchResponse;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.browser.User;
+import org.qrone.r7.store.KeyValueStore;
 
 public class OpenIDHandler implements URIHandler{
 	private static ConsumerManager manager;
 	//private URIResolver resolver;
+	private KeyValueStore store;
 	private User user;
 	
-	public OpenIDHandler(URIResolver resolver) {
+	public OpenIDHandler(URIResolver resolver, KeyValueStore store) {
 		//this.resolver = resolver;
+		this.store = store;
 	}
 	
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-		String path = request.getPathInfo();
-		if(path.equals("/openid/login")){
-			LoginPack pack = (LoginPack)QrONEUtils.unpackQ64(request.getParameter("pack"));
-			handleLogin(request, response, pack.url, pack.attributes);
-		}else if(path.equals("/openid/verify")){
-			handleVerify(request, response);
-		}else if(path.equals("/openid/logout")){
-			handleLogout(request, response);
+		Cookie ucookie = QrONEUtils.getCookie(request.getCookies(), "U");
+		String uuid = null;
+		if(ucookie == null){
+			uuid = UUID.randomUUID().toString();
+			ucookie = new Cookie("U", uuid);
+			ucookie.setPath("/");
+			response.addCookie(ucookie);
+		}else{
+			uuid = ucookie.getValue();
 		}
 		
-		Cookie cookie = QrONEUtils.getCookie(request.getCookies(), "Q");
-		if(cookie != null){
-			user = User.createUser(cookie.getValue());
+		String path = request.getPathInfo();
+		if(path.equals("/openid/login")){
+			LoginPack pack = (LoginPack)QrONEUtils.unpackEQ64(LoginPack.class, request.getParameter("pack"));
+			handleLogin(uuid, request, response, pack.url, pack.attributes);
+		}else if(path.equals("/openid/verify")){
+			handleVerify(uuid, request, response);
+		}else if(path.equals("/openid/logout")){
+			handleLogout(uuid, request, response);
 		}
+		
+		Cookie qcookie = QrONEUtils.getCookie(request.getCookies(), "Q");
+		if(qcookie != null){
+			user = User.createUser(qcookie.getValue());
+		}
+		
 		return false;
 	}
 
@@ -77,7 +96,7 @@ public class OpenIDHandler implements URIHandler{
 			}
 		}
 		return getBaseURL(req) + "/login?pack=" 
-			+ QrONEUtils.packQ64(pack) + "&.done=" + QrONEUtils.escape(doneURL);
+			+ QrONEUtils.packEQ64(pack) + "&.done=" + QrONEUtils.escape(doneURL);
 	}
 
 	public String logoutURL(HttpServletRequest req, HttpServletResponse res,
@@ -86,10 +105,14 @@ public class OpenIDHandler implements URIHandler{
 	}
 	
 	private String getBaseURL(HttpServletRequest req){
-		return "http://" + req.getLocalName() + "/openid";
+		int port = req.getServerPort();
+		if(port == 80)
+			return "http://" + req.getServerName() + "/openid";
+		else
+			return "http://" + req.getServerName() + ":" + port + "/openid";
 	}
 	
-	public boolean handleLogin(HttpServletRequest req, HttpServletResponse res,
+	public boolean handleLogin(String uuid, HttpServletRequest req, HttpServletResponse res,
 			String url, Map<String, String> attributes){
 		try
 		{
@@ -100,9 +123,10 @@ public class OpenIDHandler implements URIHandler{
 			List discoveries = manager.discover(url);
 			DiscoveryInformation discovered = manager.associate(discoveries);
 			AuthRequest authReq = manager.authenticate(discovered, 
-					getBaseURL(req) + "/verify?d=" + QrONEUtils.packQ64(discovered) 
-					+ "&.done=" + QrONEUtils.escape(req.getParameter(".done")));
+					getBaseURL(req) + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
 			FetchRequest fetch = FetchRequest.createFetchRequest();
+			
+			store.set("openid-discover:" + uuid, QrONEUtils.serialize(discovered));
 			
 			for (Iterator<Entry<String, String>> i = attributes.entrySet().iterator(); i
 					.hasNext();) {
@@ -114,14 +138,17 @@ public class OpenIDHandler implements URIHandler{
 			res.sendRedirect(authReq.getDestinationUrl(true));
 			return true;
 		}catch (OpenIDException e){
+			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
 
-	public boolean handleLogout(HttpServletRequest req, HttpServletResponse res){
+	public boolean handleLogout(String uuid, HttpServletRequest req, HttpServletResponse res){
 		Cookie c = new Cookie("Q", "");
 		c.setMaxAge(0);
+		c.setPath("/");
 		res.addCookie(c);
 		try {
 			res.sendRedirect(req.getParameter(".done"));
@@ -131,13 +158,13 @@ public class OpenIDHandler implements URIHandler{
 	}
 	
     // --- processing the authentication response ---
-    public boolean handleVerify(HttpServletRequest req, HttpServletResponse res)
+    public boolean handleVerify(String uuid, HttpServletRequest req, HttpServletResponse res)
     {
         try{
             ParameterList response =
                     new ParameterList(req.getParameterMap());
             DiscoveryInformation discovered = 
-            	(DiscoveryInformation)QrONEUtils.unpackQ64(req.getParameter("d"));
+            	(DiscoveryInformation)QrONEUtils.unserialize(store.get("openid-discover:" + uuid));
 
             StringBuffer receivingURL = req.getRequestURL();
             String queryString = req.getQueryString();
@@ -164,21 +191,47 @@ public class OpenIDHandler implements URIHandler{
                 
                 User user = new User(name, verified.getIdentifier());
                 Cookie qcookie = new Cookie("Q", user.getQCookie());
+                qcookie.setPath("/");
                 res.addCookie(qcookie);
                 res.sendRedirect(req.getParameter(".done"));
                 return true;
             }
         }catch (OpenIDException e){
+			e.printStackTrace();
         } catch (IOException e) {
+			e.printStackTrace();
 		}
         return false;
     }
     
-    public static class LoginPack implements Serializable{
+    public static class LoginPack implements Serializable, Externalizable{
 		private static final long serialVersionUID = 7001446077656573040L;
 		public String url;
-    	public String done;
     	public Map<String, String> attributes;
+    	
+		@Override
+		public void readExternal(ObjectInput in) throws IOException,
+				ClassNotFoundException {
+			url = in.readUTF();
+			attributes = new HashMap<String, String>();
+			int c = in.readInt();
+			for (int i = 0; i < c; i++) {
+				String k = in.readUTF();
+				String v = in.readUTF();
+				attributes.put(k, v);
+			}
+		}
+		@Override
+		public void writeExternal(ObjectOutput out) throws IOException {
+			out.writeUTF(url);
+			out.writeInt(attributes.size());
+			for (Iterator<Entry<String, String>> i = attributes.entrySet().iterator(); i
+					.hasNext();) {
+				Entry<String, String> e = i.next();
+				out.writeUTF(e.getKey());
+				out.writeUTF(e.getValue());
+			}
+		}
     }
 
 }

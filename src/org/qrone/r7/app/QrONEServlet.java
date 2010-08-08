@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.handler.URIHandler;
 
 /**
@@ -15,7 +14,7 @@ import org.qrone.r7.handler.URIHandler;
  */
 public class QrONEServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private URIHandler handler = new QrONEURIHandler(getServletContext());
+	private URIHandler handler;
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -28,6 +27,8 @@ public class QrONEServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if(handler == null)
+			handler = new QrONEURIHandler(getServletContext());
 		handler.handle(request, response);
 		/*
 		try {

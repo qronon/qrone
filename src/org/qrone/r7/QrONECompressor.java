@@ -115,10 +115,8 @@ public class QrONECompressor {
 
         long extime = System.currentTimeMillis();
 		ExtensionIndex ei = new ExtensionIndex();
-		if(ei.unpack(resolver) == null){
-			ei.find();
-			ei.pack(resolver);
-		}
+		ei.find();
+		ei.pack(resolver);
 		ei.extend(deck);
 		extime = System.currentTimeMillis() - extime;
 		if (verbose) {

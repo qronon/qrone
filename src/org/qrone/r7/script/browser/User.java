@@ -3,11 +3,13 @@ package org.qrone.r7.script.browser;
 import org.qrone.r7.QrONEUtils;
 
 public class User{
-	private String name;
-	private String key;
+	private String name = null;
+	private String key = null;
 	
 	public User(String name, String key) {
 		this.name = name;
+		if(this.name == null)
+			this.name = "guest";
 		this.key = key;
 	}
 	
@@ -29,7 +31,7 @@ public class User{
 		return key;
 	}
 
-	public String getNickname() {
+	public String getLogin() {
 		return name;
 	}
 	

@@ -101,8 +101,11 @@ public class HTML5OM {
 	
 	public void parse(final URIResolver resolver) throws SAXException, IOException{
 		InputStream in = resolver.getInputStream(uri);
-		document = HTML5Parser.parse(new InputSource(in));
-		in.close();
+		try{
+			document = HTML5Parser.parse(new InputSource(in));
+		}finally{
+			in.close();
+		}
 		
 		nodeselector = new DOMNodeSelector(document);
 		HTML5Visitor visitor = new HTML5Visitor() {

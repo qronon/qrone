@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
-import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
@@ -20,6 +19,7 @@ import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ScriptableJavaObject;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.Window;
+import org.qrone.r7.store.KeyValueStore;
 import org.qrone.r7.tag.HTML5TagHandler;
 
 public class HTML5Handler implements URIHandler, Extendable{
@@ -28,9 +28,9 @@ public class HTML5Handler implements URIHandler, Extendable{
 	private JSDeck vm;
 	private OpenIDHandler handler;
 	
-	public HTML5Handler(URIResolver resolver, ImageBufferService service) {
+	public HTML5Handler(URIResolver resolver, KeyValueStore store, ImageBufferService service) {
 		this.resolver = resolver;
-		handler = new OpenIDHandler(resolver);
+		handler = new OpenIDHandler(resolver, store);
 		deck = new HTML5Deck(resolver, service);
 		vm = new JSDeck(resolver, deck);
 	}

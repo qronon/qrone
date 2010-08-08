@@ -3,6 +3,7 @@ package org.qrone.r7;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,9 +14,9 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.zip.DeflaterOutputStream;
 
 import javax.servlet.http.Cookie;
 
@@ -181,7 +182,12 @@ public class QrONEUtils{
 		String base64String = Base64.encodeBase64String(bytes);
 		base64String = base64String.replace('+', '.');
 		base64String = base64String.replace('/', '_');
-		return base64String.substring(0, base64String.indexOf('='));
+		base64String = base64String.replaceAll("\n", "");
+		
+		int i = base64String.indexOf('=');
+		if(i >= 0)
+			return base64String.substring(0, base64String.indexOf('='));
+		return base64String;
 	}
 	
 	public static byte[] decodeQ64(String base64String){
@@ -201,16 +207,34 @@ public class QrONEUtils{
 		}
 		return Base64.decodeBase64(base64String);
 	}
+
+	public static String packEQ64(Externalizable object){
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		extenalize(object,out);
+		return encodeQ64(out.toByteArray());
+	}
+
+	public static Object unpackEQ64(Class c, String packed){
+		ByteArrayInputStream in = new ByteArrayInputStream(decodeQ64(packed));
+		return unextenalize(c, in);
+	}
 	
 	public static String packQ64(Object object){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		serialize(object, new DeflaterOutputStream(out));
+		serialize(object,out);
 		return encodeQ64(out.toByteArray());
 	}
 	
 	public static Object unpackQ64(String packed){
 		ByteArrayInputStream in = new ByteArrayInputStream(decodeQ64(packed));
 		return unserialize(in);
+	}
+	
+
+	public static byte[] serialize(Object o){
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serialize(o,out);
+		return out.toByteArray();
 	}
 	
 	public static boolean serialize(Object o, OutputStream out){
@@ -233,13 +257,17 @@ public class QrONEUtils{
 		}
 		return false;
 	}
+
+	public static Object unserialize(byte[] bytes){
+		return unserialize(new ByteArrayInputStream(bytes));
+	}
 	
 	public static Object unserialize(InputStream in){
 		ObjectInputStream oin = null;
 		try {
 			if (in != null) {
 				oin = new ObjectInputStream(in);
-				oin.readObject();
+				return oin.readObject();
 			}
 		} catch (IOException e) {
 		} catch (ClassNotFoundException e) {
@@ -251,13 +279,64 @@ public class QrONEUtils{
 				}
 			}
 		}
-		return oin;
+		return null;
+	}
+
+	public static boolean extenalize(Externalizable o, OutputStream out){
+		ObjectOutputStream oout = null;
+		try {
+			oout = new ObjectOutputStream(out);
+			o.writeExternal(oout);
+			oout.flush();
+			return true;
+		} catch (InvalidClassException e) {
+		} catch (NotSerializableException e) {
+		} catch (IOException e) {
+		} finally {
+			if (oout != null) {
+				try {
+					oout.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static Object unextenalize(Class c, InputStream in){
+		ObjectInputStream oin = null;
+		try {
+			if (in != null) {
+				oin = new ObjectInputStream(in);
+				Externalizable r = (Externalizable)c.getConstructor().newInstance();
+				r.readExternal(oin);
+				return r;
+			}
+		} catch (IOException e) {
+		} catch (ClassNotFoundException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (SecurityException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException e) {
+		} finally {
+			if (oin != null) {
+				try {
+					oin.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return null;
 	}
 	
 	public static Cookie getCookie(Cookie[] cookies, String name){
-		for (int i = 0; i < cookies.length; i++) {
-			if(cookies[i].getName().equals(name)){
-				return cookies[i];
+		if(cookies != null){
+			for (int i = 0; i < cookies.length; i++) {
+				if(cookies[i].getName().equals(name)){
+					return cookies[i];
+				}
 			}
 		}
 		return null;

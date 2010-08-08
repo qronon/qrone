@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache HTTPClient"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Log4J"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Validator.nu"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
@@ -20,6 +19,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Scannotation"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
-	<classpathentry kind="lib" path="C:/Users/Qronon/Java Libraries/openid4java-0.9.5.593/openid4java-min.jar" sourcepath="C:/Users/Qronon/Java Libraries/openid4java-0.9.5.593/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenIDLibs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

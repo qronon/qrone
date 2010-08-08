@@ -72,10 +72,13 @@ public class ImageSpriter {
 			return map.get(file);
 		}else{
 			InputStream in = resolver.getInputStream(file);
-			ImageBuffer i = service.createImage(in);
-			in.close();
-			map.put(file, i);
-			return i;
+			try{
+				ImageBuffer i = service.createImage(in);
+				map.put(file, i);
+				return i;
+			}finally{
+				in.close();
+			}
 		}
 	}
 	
@@ -221,11 +224,14 @@ public class ImageSpriter {
 			outTransparentDot = true;
 			InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
 			OutputStream out = resolver.getOutputStream(tspriteURI);
-			int buf;
-		    while ((buf = in.read()) >= 0)
-		        out.write(buf);
-		    in.close();
-		    out.close();
+			try{
+				int buf;
+			    while ((buf = in.read()) >= 0)
+			        out.write(buf);
+			}finally{
+				in.close();
+				out.close();
+			}
 		}
 	}
 	
