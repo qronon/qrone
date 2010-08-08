@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.handler.URIHandler;
 
 /**

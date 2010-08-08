@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
+import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
