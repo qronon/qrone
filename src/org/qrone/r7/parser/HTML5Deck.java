@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.qrone.img.ImageBufferService;
+import org.qrone.r7.Extendable;
 import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
@@ -21,7 +22,7 @@ import org.qrone.util.XDeck;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
 
-public class HTML5Deck extends XDeck<HTML5OM> {
+public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 	private CSS3Deck cssdeck;
 	private ImageSpriter spriter;
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
@@ -58,22 +59,26 @@ public class HTML5Deck extends XDeck<HTML5OM> {
     public ImageSpriter getSpriter(){
     	return spriter;
     }
-
-	public void addExtension(Class<? extends HTML5TagHandler> c){
-		try{
-			HTML5TagHandler h = c.getConstructor(HTML5Deck.class).newInstance(this);
-			handlers.add(h);
-		}catch(Exception e){
+	
+	public void addExtension(Class c){
+		if(HTML5TagHandler.class.isAssignableFrom(c)){
 			try{
-				HTML5TagHandler h = c.getConstructor().newInstance();
+				HTML5TagHandler h = (HTML5TagHandler)c.getConstructor(HTML5Deck.class).newInstance(this);
 				handlers.add(h);
-			}catch(Exception e1){}
+			}catch(Exception e){
+				try{
+					HTML5TagHandler h = (HTML5TagHandler)c.getConstructor().newInstance();
+					handlers.add(h);
+				}catch(Exception e1){}
+			}
 		}
 	}
 	
+	/*
 	public void addTagHandler(HTML5TagHandler h){
 		handlers.add(h);
 	}
+	*/
 	
 	public List<HTML5TagHandler> getTagHandlers() {
 		return handlers;

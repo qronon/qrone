@@ -1,14 +1,25 @@
 package org.qrone.r7;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InvalidClassException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.zip.DeflaterOutputStream;
+
+import javax.servlet.http.Cookie;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class QrONEUtils{
 
@@ -164,5 +175,91 @@ public class QrONEUtils{
 		while ((buf = in.read()) != -1) {
 			out.write(buf);
 		}
+	}
+
+	public static String encodeQ64(byte[] bytes){
+		String base64String = Base64.encodeBase64String(bytes);
+		base64String = base64String.replace('+', '.');
+		base64String = base64String.replace('/', '_');
+		return base64String.substring(0, base64String.indexOf('='));
+	}
+	
+	public static byte[] decodeQ64(String base64String){
+		base64String = base64String.replace('+', '.');
+		base64String = base64String.replace('/', '_');
+		
+		int eq = 4 - base64String.length() % 4;
+		switch(eq){
+		case 1:
+			return Base64.decodeBase64(base64String + "===");
+		case 2:
+			return Base64.decodeBase64(base64String + "==");
+		case 3:
+			return Base64.decodeBase64(base64String + "=");
+		case 4:
+			return Base64.decodeBase64(base64String);
+		}
+		return Base64.decodeBase64(base64String);
+	}
+	
+	public static String packQ64(Object object){
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serialize(object, new DeflaterOutputStream(out));
+		return encodeQ64(out.toByteArray());
+	}
+	
+	public static Object unpackQ64(String packed){
+		ByteArrayInputStream in = new ByteArrayInputStream(decodeQ64(packed));
+		return unserialize(in);
+	}
+	
+	public static boolean serialize(Object o, OutputStream out){
+		ObjectOutputStream oout = null;
+		try {
+			oout = new ObjectOutputStream(out);
+			oout.writeObject(o);
+			oout.flush();
+			return true;
+		} catch (InvalidClassException e) {
+		} catch (NotSerializableException e) {
+		} catch (IOException e) {
+		} finally {
+			if (oout != null) {
+				try {
+					oout.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static Object unserialize(InputStream in){
+		ObjectInputStream oin = null;
+		try {
+			if (in != null) {
+				oin = new ObjectInputStream(in);
+				oin.readObject();
+			}
+		} catch (IOException e) {
+		} catch (ClassNotFoundException e) {
+		} finally {
+			if (oin != null) {
+				try {
+					oin.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return oin;
+	}
+	
+	public static Cookie getCookie(Cookie[] cookies, String name){
+		for (int i = 0; i < cookies.length; i++) {
+			if(cookies[i].getName().equals(name)){
+				return cookies[i];
+			}
+		}
+		return null;
 	}
 }

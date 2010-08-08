@@ -201,4 +201,20 @@ public class Window extends ServletScopeObject{
 	public String stringify(Object out){
 		return ObjectConverter.stringify(out);
 	}
+
+	public String loginURL(String url, String doneURL){
+		return ss.handler.loginURL(ss.request, ss.response, url, null, doneURL);
+	}
+	
+	public String loginURL(String url, Scriptable attributes, String doneURL){
+		return ss.handler.loginURL(ss.request, ss.response, url, attributes, doneURL);
+	}
+	
+	public String logoutURL(String doneURL){
+		return ss.handler.logoutURL(ss.request, ss.response, doneURL);
+	}
+	
+	public User getUser(){
+		return ss.handler.getUser();
+	}
 }

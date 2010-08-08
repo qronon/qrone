@@ -11,15 +11,15 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jetty"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JDBM"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MySQL"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Commons Codec"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Memcached"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MongoDB"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AppEngine SDK"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSONIC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressorDependencies"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MongoDB"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Javassist"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Scannotation"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/openid4java-0.9.5.593"/>
+	<classpathentry kind="lib" path="C:/Users/Qronon/Java Libraries/openid4java-0.9.5.593/openid4java-min.jar" sourcepath="C:/Users/Qronon/Java Libraries/openid4java-0.9.5.593/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

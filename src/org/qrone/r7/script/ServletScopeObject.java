@@ -9,7 +9,7 @@ import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.parser.JSDeck;
 
 public class ServletScopeObject {
-	protected ServletScope ss;
+	public ServletScope ss;
 	
 	public ServletScopeObject(ServletScope ss) {
 		this.ss = ss;

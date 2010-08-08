@@ -2,10 +2,6 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,56 +49,24 @@ public class ImageSpriter {
 	}
 
 	public boolean pack() {
-		ObjectOutputStream out = null;
 		try {
-			out = new ObjectOutputStream(resolver.getOutputStream(pspriteURI));
-			out.writeObject(pack);
-			out.flush();
-			return true;
-		} catch (InvalidClassException e) {
-		} catch (NotSerializableException e) {
-		} catch (IOException e) {
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-				}
-			}
-		}
+			return QrONEUtils.serialize(pack, resolver.getOutputStream(pspriteURI));
+		} catch (IOException e) {}
 		return false;
 	}
 	
 	private ImagePack unpack() {
 		if (pack == null && pspriteURI != null) {
-			ObjectInputStream oin = null;
 			try {
-				InputStream in = resolver.getInputStream(pspriteURI);
-				if (in != null) {
-					oin = new ObjectInputStream(in);
-					pack = (ImagePack) oin.readObject();
-				}
-			} catch (IOException e) {
-			} catch (ClassNotFoundException e) {
-			} finally {
-				if (oin != null) {
-					try {
-						oin.close();
-					} catch (IOException e) {
-					}
-				}
-			}
+				pack = (ImagePack) QrONEUtils.unserialize(
+						resolver.getInputStream(pspriteURI));
+			} catch (IOException e) {}
 		}
 		if(pack == null)
 			pack = new ImagePack();
 		return pack;
 	}
-	/*
-	public static ImageSpriter instance(){
-		if(ins == null) ins = new ImageSpriter();
-		return ins;
-	}
-	*/
+	
 	public ImageBuffer getImage(URI file) throws IOException{
 		if(map.containsKey(file)){
 			return map.get(file);

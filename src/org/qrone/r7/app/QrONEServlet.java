@@ -14,7 +14,7 @@ import org.qrone.r7.handler.URIHandler;
  */
 public class QrONEServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private URIHandler handler = new QrONEURIHandler();
+	private URIHandler handler = new QrONEURIHandler(getServletContext());
 	
     /**
      * @see HttpServlet#HttpServlet()

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Scriptable;
 import org.qrone.img.ImageBufferService;
+import org.qrone.r7.Extendable;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
@@ -18,26 +19,19 @@ import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ScriptableJavaObject;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.Window;
-import org.qrone.r7.script.ext.FileExtension;
-import org.qrone.r7.script.ext.LocalWindow;
 import org.qrone.r7.tag.HTML5TagHandler;
-import org.qrone.r7.tag.ImageHandler;
-import org.qrone.r7.tag.Scale9Handler;
 
-public class HTML5Handler implements URIHandler{
+public class HTML5Handler implements URIHandler, Extendable{
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
+	private OpenIDHandler handler;
 	
 	public HTML5Handler(URIResolver resolver, ImageBufferService service) {
 		this.resolver = resolver;
+		handler = new OpenIDHandler(resolver);
 		deck = new HTML5Deck(resolver, service);
 		vm = new JSDeck(resolver, deck);
-    	
-		addExtension(Scale9Handler.class);
-		addExtension(ImageHandler.class);
-		addExtension(FileExtension.class);
-		addExtension(LocalWindow.class);
 	}
 	
 	public void addExtension(Class c){
@@ -50,6 +44,10 @@ public class HTML5Handler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
+		if(handler.handle(request, response)){
+			return true;
+		}
+		
 		long start = System.currentTimeMillis();
 		
 		response.setCharacterEncoding("utf8");
@@ -57,6 +55,9 @@ public class HTML5Handler implements URIHandler{
 			String path = request.getPathInfo();
 			deck.update(new URI(path));
 			
+			if(path.endsWith("/")){
+				path += "index";
+			}
 
 			
 			//if(resolver.exist(path + ".js")){
@@ -69,7 +70,7 @@ public class HTML5Handler implements URIHandler{
 				if(om != null){
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
-							request,response,scope,deck,vm,uri);
+							request,response,scope,deck,vm,uri,handler);
 					om.run(scope, new Window(ss));
 					//ss.response.setHeader("", arg1)
 					//ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");

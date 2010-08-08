@@ -20,10 +20,7 @@ import org.qrone.r7.app.AwtImageBufferService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.resolver.FileResolver;
-import org.qrone.r7.tag.ImageHandler;
-import org.qrone.r7.tag.Scale9Handler;
-
-
+import org.qrone.r7.resolver.URIResolver;
 
 public class QrONECompressor {
 	
@@ -112,9 +109,25 @@ public class QrONECompressor {
         	path = target.getName();
         }
         
+        URIResolver resolver = new FileResolver(basedir);
         if(deck == null)
-        	deck = new HTML5Deck(new FileResolver(basedir), new AwtImageBufferService());
-        
+        	deck = new HTML5Deck(resolver, new AwtImageBufferService());
+
+        long extime = System.currentTimeMillis();
+		ExtensionIndex ei = new ExtensionIndex();
+		if(ei.unpack(resolver) == null){
+			ei.find();
+			ei.pack(resolver);
+		}
+		ei.extend(deck);
+		extime = System.currentTimeMillis() - extime;
+		if (verbose) {
+            System.err.println("[INFO] Class finding time " + extime + "ms");
+        }
+		if (verbose) {
+            System.err.println("[INFO] Pack extension classes.");
+        }
+		
         try {
 	    	if(imgdir != null){
 	    		deck.getSpriter().setBaseURI(QrONEUtils.relativize(new URI(fileArgs[0]),new URI(imgdir)));
@@ -123,10 +136,6 @@ public class QrONECompressor {
 			e.printStackTrace();
             System.exit(0);
 		}
-		
-    	deck.addTagHandler(new Scale9Handler(deck));
-    	deck.addTagHandler(new ImageHandler(deck));
-        
         
         compile(deck, target, path, lang, recurse);
         

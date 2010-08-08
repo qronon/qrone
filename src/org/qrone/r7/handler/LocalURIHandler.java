@@ -2,6 +2,7 @@ package org.qrone.r7.handler;
 
 import java.io.File;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,7 +15,7 @@ public class LocalURIHandler implements URIHandler {
 	protected CascadeResolver resolver;
 	protected CascadeHandler handler;
 	
-	public LocalURIHandler() {
+	public LocalURIHandler(ServletContext cx) {
 		resolver = new CascadeResolver();
 		resolver.add(new MemoryResolver());
 		resolver.add(new FileResolver(new File(".")));
