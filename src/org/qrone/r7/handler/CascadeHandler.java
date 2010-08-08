@@ -19,10 +19,10 @@ public class CascadeHandler implements URIHandler{
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path) {
 		for (Iterator<URIHandler> i = list.iterator(); i.hasNext();) {
 			URIHandler r = i.next();
-			if(r.handle(request,response)){
+			if(r.handle(request,response,path)){
 				return true;
 			}
 		}

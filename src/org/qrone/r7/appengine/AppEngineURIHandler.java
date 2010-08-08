@@ -6,6 +6,7 @@ import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.handler.ExtendableURIHandler;
 import org.qrone.r7.handler.HTML5Handler;
 import org.qrone.r7.handler.OpenIDHandler;
+import org.qrone.r7.handler.PathFinderHandler;
 import org.qrone.r7.handler.ResolverHandler;
 import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
@@ -33,7 +34,7 @@ public class AppEngineURIHandler extends ExtendableURIHandler{
 		ei.extend(html5handler);
 		ei.extend(this);
 
-		handler.add(html5handler);
+		handler.add(new PathFinderHandler(html5handler));
 		handler.add(openidHandler);
 		handler.add(new ResolverHandler(resolver));
 	}

@@ -33,6 +33,7 @@ public class Window extends ServletScopeObject{
 	public PrintStream out = System.out;
 	public Document document;
 	public Location location;
+	public Navigator navigator;
 	public Object query;
 	public JSON JSON;
 	
@@ -47,6 +48,7 @@ public class Window extends ServletScopeObject{
 		}
 		
 		location = new Location(ss);
+		navigator = new Navigator(ss);
 		document.location = location;
 		
 		query = getQuery();

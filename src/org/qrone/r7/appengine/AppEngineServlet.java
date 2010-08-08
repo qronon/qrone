@@ -13,6 +13,6 @@ public class AppEngineServlet extends HttpServlet {
 			throws IOException {
 		if(h == null)
 			h = new AppEngineURIHandler(getServletContext());
-		h.handle(req, resp);
+		h.handle(req, resp, req.getPathInfo());
 	}
 }

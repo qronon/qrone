@@ -20,8 +20,8 @@ public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) {
-		return handler.handle(request, response);
+			HttpServletResponse response, String path) {
+		return handler.handle(request, response, path);
 	}
 	
 	public void addExtension(Class c){

@@ -28,7 +28,7 @@ public class LocalURIHandler extends ExtendableURIHandler{
 		ei.extend(html5handler);
 		ei.extend(this);
 		
-		handler.add(html5handler);
+		handler.add(new PathFinderHandler(html5handler));
 		handler.add(openidHandler);
 		handler.add(new ResolverHandler(resolver));
 	}

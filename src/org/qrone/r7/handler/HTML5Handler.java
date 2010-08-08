@@ -44,23 +44,10 @@ public class HTML5Handler implements URIHandler, Extendable{
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-		long start = System.currentTimeMillis();
-		
-		response.setCharacterEncoding("utf8");
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path) {
 		try {
-			String path = request.getPathInfo();
 			deck.update(new URI(path));
-			
-			if(path.endsWith("/")){
-				path += "index";
-			}
-
-			
-			//if(resolver.exist(path + ".js")){
-			//	path += ".js"; 
-			//}
-			
+			response.setCharacterEncoding("utf8");
 			if(resolver.exist(path + ".js")){
 				URI uri = new URI(path + ".js");
 				JSOM om = vm.compile(uri);
@@ -69,8 +56,6 @@ public class HTML5Handler implements URIHandler, Extendable{
 					ServletScope ss = new ServletScope(
 							request,response,scope,deck,vm,uri,loginService);
 					om.run(scope, new Window(ss));
-					//ss.response.setHeader("", arg1)
-					//ss.writer.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
 					ss.writer.flush();
 					ss.writer.close();
 					return true;
@@ -78,25 +63,14 @@ public class HTML5Handler implements URIHandler, Extendable{
 			}
 			
 			if(resolver.exist(path + ".html")){
-				path += ".html"; 
-			}
-			
-			if((path.endsWith(".html") || path.endsWith(".htm")) 
-					&& resolver.exist(path)){
-				URI uri = new URI(path);
+				URI uri = new URI(path + ".html");
 				HTML5OM om = deck.compile(uri);
 				if(om != null){
 					response.setContentType("text/html; charset=utf8");
-					
 					deck.getSpriter().create();
 
 					Writer out = response.getWriter();
 					out.append(om.serialize());
-
-					out.append("<!-- execution time " + (System.currentTimeMillis()-start) + "ms -->");
-					out.flush();
-					out.close();
-					
 					out.flush();
 					out.close();
 					return true;

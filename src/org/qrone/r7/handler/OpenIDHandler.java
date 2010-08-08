@@ -55,7 +55,7 @@ public class OpenIDHandler implements URIHandler, LoginService{
 	}
 	
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, String path) {
 		Cookie ucookie = QrONEUtils.getCookie(request.getCookies(), "U");
 		String uuid = null;
 		if(ucookie == null){
@@ -67,7 +67,6 @@ public class OpenIDHandler implements URIHandler, LoginService{
 			uuid = ucookie.getValue();
 		}
 		
-		String path = request.getPathInfo();
 		if(path.equals("/openid/login")){
 			LoginPack pack = (LoginPack)QrONEUtils.unpackEQ64(LoginPack.class, request.getParameter("pack"));
 			handleLogin(uuid, request, response, pack.url, pack.attributes);
@@ -131,7 +130,7 @@ public class OpenIDHandler implements URIHandler, LoginService{
 	public String logoutURL(String doneURL){
 		return "/openid/logout?.done=" + QrONEUtils.escape(doneURL);
 	}
-	
+	/*
 	private String getBaseURL(HttpServletRequest req){
 		int port = req.getServerPort();
 		if(port == 80)
@@ -139,7 +138,7 @@ public class OpenIDHandler implements URIHandler, LoginService{
 		else
 			return "http://" + req.getServerName() + ":" + port + "/openid";
 	}
-	
+	*/
 	public boolean handleLogin(String uuid, HttpServletRequest req, HttpServletResponse res,
 			String url, Map<String, String> attributes){
 		try

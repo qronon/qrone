@@ -4,5 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface URIHandler {
-	public boolean handle(HttpServletRequest request, HttpServletResponse response);
+	public boolean handle(HttpServletRequest request, HttpServletResponse response,
+			String path);
 }
