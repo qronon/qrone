@@ -9,7 +9,7 @@
      ====================================================================== -->
 <project name="project" default="jar">
     <description>
-            description
+            description 
     </description>
 	<property name="src" value="src"/>
 	<property name="bin" value="bin"/>
