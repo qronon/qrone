@@ -5,7 +5,6 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.mozilla.javascript.Callable;
 import org.qrone.r7.ObjectConverter;
 import org.qrone.r7.parser.HTML5Element;
 import org.qrone.r7.parser.HTML5OM;

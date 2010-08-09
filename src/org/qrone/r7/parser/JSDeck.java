@@ -1,8 +1,6 @@
 package org.qrone.r7.parser;
 
 import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
@@ -11,7 +9,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ScriptablePrototype;
 import org.qrone.r7.script.SugarWrapFactory;
 import org.qrone.util.XDeck;
 
