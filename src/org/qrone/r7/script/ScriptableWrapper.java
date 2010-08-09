@@ -18,57 +18,60 @@ public abstract class ScriptableWrapper<T> extends NativeJavaObject implements S
         super(scope, javaObject, staticType);
 	}
 
-	public abstract boolean exist(String key);
-	public abstract boolean exist(int index);
-	public abstract void put(String key, Object value);
-	public abstract void put(int index, Object value);
-	public abstract Object get(String key);
-	public abstract Object get(int index);
-
     public String getClassName() {
         return this.getClass().getName();
     }
 
     public boolean has(String name, Scriptable start) {
-        return (super.has(name, start) || exist(name));
+        return (super.has(name, start) || 
+        		(this instanceof Mapper && ((Mapper)this).exist(name)));
     }
     
     public boolean has(int index, Scriptable start) {
-        return (super.has(index, start) || exist(index));
+        return (super.has(index, start) || 
+        		(this instanceof Indexer && ((Indexer)this).exist(index)));
     }
     
     public Object get(String name, Scriptable start) {
-    	if (exist(name)) {
-            return get(name);
-        } else if (super.has(name, start)) {
+    	if (super.has(name, start)) {
             return super.get(name, start);
-        } else {
+        } else if (this instanceof Mapper && ((Mapper)this).exist(name)) {
+            return ((Mapper)this).get(name);
+        }  else {
             return Scriptable.NOT_FOUND;
         }
     }
 
     public Object get(int index, Scriptable start) {
-    	 if (exist(index)) {
-             return get(index);
-         }else if (super.has(index, start)) {
+    	 if (super.has(index, start)) {
             return super.get(index, start);
+        } else if(this instanceof Indexer && ((Indexer)this).exist(index)) {
+            return ((Indexer)this).get(index);
         } else {
             return Scriptable.NOT_FOUND;
         }
     }
 
     public void put(String name, Scriptable start, Object value) {
-        if (value instanceof NativeJavaObject) {
-            value = ((NativeJavaObject)value).unwrap();
-        }
-        put(name, value);
+    	if(this instanceof Mapper){
+	        if (value instanceof NativeJavaObject) {
+	            value = ((NativeJavaObject)value).unwrap();
+	        }
+	        ((Mapper)this).put(name, value);
+    	}else{
+    		super.put(name, start, value);
+    	}
     }
 
     public void put(int index, Scriptable start, Object value) {
-    	if (value instanceof NativeJavaObject) {
-            value = ((NativeJavaObject)value).unwrap();
-        }
-    	put(index, value);
+    	if(this instanceof Mapper){
+	    	if (value instanceof NativeJavaObject) {
+	            value = ((NativeJavaObject)value).unwrap();
+	        }
+	    	((Indexer)this).put(index, value);
+    	}else{
+    		super.put(index, start, value);
+    	}
     }
     
     public Object getDefaultValue(Class typeHint) {
