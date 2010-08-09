@@ -1,15 +1,21 @@
 package org.qrone.r7.script.browser;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serializable;
+
 import org.qrone.r7.QrONEUtils;
 
-public class User{
-	private String name = null;
+public class User implements Serializable, Externalizable{
+	private String login = null;
 	private String key = null;
 	
-	public User(String name, String key) {
-		this.name = name;
-		if(this.name == null)
-			this.name = "guest";
+	public User(String login, String key) {
+		this.login = login;
+		if(this.login == null)
+			this.login = "guest";
 		this.key = key;
 	}
 	
@@ -23,7 +29,7 @@ public class User{
 	}
 	
 	public String getQCookie(){
-		return QrONEUtils.encodeQ64(name.getBytes()) 
+		return QrONEUtils.encodeQ64(login.getBytes()) 
 			+ ":" + QrONEUtils.encodeQ64(key.getBytes());
 	}
 	
@@ -32,11 +38,29 @@ public class User{
 	}
 
 	public String getLogin() {
-		return name;
+		return login;
 	}
 	
 	public boolean isAdmin() {
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return getQCookie();
+	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		login = in.readUTF();
+		key = in.readUTF();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeUTF(login);
+		out.writeUTF(key);
 	}
 
 }

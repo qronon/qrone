@@ -16,7 +16,7 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ScriptableJavaObject;
+import org.qrone.r7.script.ScriptablePrototype;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.LoginService;
 import org.qrone.r7.script.browser.Window;
@@ -36,7 +36,7 @@ public class HTML5Handler implements URIHandler, Extendable{
 	}
 	
 	public void addExtension(Class c){
-		if(ScriptableJavaObject.class.isAssignableFrom(c)){
+		if(ScriptablePrototype.class.isAssignableFrom(c)){
 			vm.addExtension(c);
 		}else if(HTML5TagHandler.class.isAssignableFrom(c)){
 			deck.addExtension(c);

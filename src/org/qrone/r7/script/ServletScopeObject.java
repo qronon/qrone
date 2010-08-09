@@ -19,10 +19,12 @@ public class ServletScopeObject {
 		return JSDeck.getContext().newObject(ss.scope);
 	}
 	
+	/*
 	protected void callJSFunction(Callable func, Object thisObj, Object ... args){
 		func.call(JSDeck.getContext(), ss.scope, 
 				(Scriptable)Context.javaToJS(thisObj,ss.scope), args);
 	}
+	*/
 
 	protected URI resolvePath(String path) throws URISyntaxException {
 		return ss.uri.resolve(new URI(path));

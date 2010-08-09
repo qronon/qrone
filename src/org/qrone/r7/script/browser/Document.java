@@ -62,13 +62,8 @@ public class Document extends ServletScopeObject{
 		t.set(selector, value);
 	}
 	
-	public void set(String selector, final Callable func){
-		t.set(selector, new NodeLister() {
-			@Override
-			public void accept(HTML5Template t, HTML5Element e) {
-				callJSFunction(func, t, t, e);
-			}
-		});
+	public void set(String selector, NodeLister lister){
+		t.set(selector, lister);
 	}
 	
 	public void out() throws IOException{

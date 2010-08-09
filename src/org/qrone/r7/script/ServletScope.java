@@ -22,15 +22,16 @@ public class ServletScope {
 	public Scriptable scope;
 	public HTML5Deck deck;
 	public JSDeck vm;
-	public URI uri;
-
+	public LoginService service;
 	public URIResolver resolver;
+
+	public URI uri;
 	public String path;
 	public String pathArg;
+
 	public PrintWriter writer;
 	public Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
 	
-	public LoginService service;
 	
 	public ServletScope(HttpServletRequest request, HttpServletResponse response, 
 			String path, String pathArg,

@@ -17,79 +17,153 @@
 package org.qrone.r7.script;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrapFactory;
+import org.qrone.r7.Extendable;
 
 /**
  * Wraps Java objects by adding support for function extensions, which are
  * functions that extend existing Java objects at the Rhino level.
  */
-public class SugarWrapFactory extends WrapFactory {
-    private Map<Class, List<Class<? extends ScriptableJavaObject>>> map
-    	= new Hashtable<Class, List<Class<? extends ScriptableJavaObject>>>();
+public class SugarWrapFactory extends WrapFactory implements Extendable {
+    private Map<Class, Class> wmap = new Hashtable<Class, Class>();
+    private Map<Class, List<Class<? extends ScriptablePrototype>>> map
+    	= new Hashtable<Class, List<Class<? extends ScriptablePrototype>>>();
     
     public SugarWrapFactory() {
         super();
     }
-    
-    public void addWrapperClass(Class target, Class<? extends ScriptableJavaObject> wrapper){
-    	List<Class<? extends ScriptableJavaObject>> l = map.get(target);
+
+	private static Class getSuperGenericType(Class cls) {
+		Type type = cls.getGenericSuperclass();
+		if(type instanceof ParameterizedType){
+			ParameterizedType ty = (ParameterizedType) type;
+			if(ty.getRawType().equals(ScriptableWrapper.class)){
+				Type[] actualType = ty.getActualTypeArguments();
+				if (actualType.length > 0 && actualType[0] instanceof Class) {
+					return (Class) actualType[0];
+				}
+			}
+		}
+		return null;
+	}
+	
+	private static Class getInterfaceGenericType(Class cls) {
+		Type[] types = cls.getGenericInterfaces();
+		for (int i = 0; i < types.length; i++) {
+			if(types[i] instanceof ParameterizedType){
+				ParameterizedType ty = (ParameterizedType) types[i];
+				if(ty.getRawType().equals(ScriptablePrototype.class)){
+					Type[] actualType = ty.getActualTypeArguments();
+					if (actualType.length > 0 && actualType[0] instanceof Class) {
+						return (Class) actualType[0];
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public void addExtension(Class wrapper) {
+		if(ScriptablePrototype.class.isAssignableFrom(wrapper.getClass())){
+			Class cls = getInterfaceGenericType(wrapper);
+			addPrototypeClass(cls, wrapper);
+		}else if(ScriptableWrapper.class.isAssignableFrom(wrapper.getClass())){
+			Class cls = getSuperGenericType(wrapper);
+			setWrapperClass(cls, wrapper);
+		}
+	}
+	
+	public void setWrapperClass(Class target, Class wrapper){
+		wmap.put(target, wrapper);
+	}
+	
+    public void addPrototypeClass(Class target, Class<? extends ScriptablePrototype> wrapper){
+    	List<Class<? extends ScriptablePrototype>> l = map.get(target);
     	if(l == null){
-    		l = new ArrayList<Class<? extends ScriptableJavaObject>>();
+    		l = new ArrayList<Class<? extends ScriptablePrototype>>();
     		map.put(target, l);
     	}
     	l.add(wrapper);
     }
     
-    public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
-        Object javaObject, Class staticType) {
-        if (javaObject instanceof Map) {
-            return new ScriptableMap(cx, scope, javaObject, staticType);
-        } else if (javaObject instanceof List) {
-            return new ScriptableList(cx, scope, javaObject, staticType);
-		} else {
-			try {
-				for (Iterator<Class> i = map.keySet().iterator(); i.hasNext();) {
-					Class type = i.next();
-					if (type.isInstance(javaObject)) {
-						List<Class<? extends ScriptableJavaObject>> l = map.get(type);
-						
-						NativeJavaObject wrapper = new NativeJavaObject(scope, javaObject, staticType);
-						NativeJavaObject last = wrapper;
-						for (Iterator<Class<? extends ScriptableJavaObject>> iter = l.iterator(); iter.hasNext();) {
-							Class<? extends ScriptableJavaObject> cls = iter.next();
-							
-							ScriptableJavaObject sjo = null;
-							try{
-								Constructor<? extends ScriptableJavaObject> cr = 
-									cls.getConstructor(ContextPack.class);
-								sjo = cr.newInstance(new ContextPack(cx, scope, javaObject, staticType, wrapper));
-							}catch(Exception e){
-								Constructor<? extends ScriptableJavaObject> cr = 
-									cls.getConstructor();
-								sjo = cr.newInstance();
-								
-							}
-							NativeJavaObject wsjo = new NativeJavaObject(scope, sjo, null);
-							last.setPrototype(wsjo);
-							last = wsjo;
-						}
-						return wrapper;
-					}
-				}
-				return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
-			} catch (Exception e) {
-				e.printStackTrace();
+    private Entry<Class,Class> findWrapperClass(Object javaObject){
+    	 for (Iterator<Entry<Class,Class>> i = wmap.entrySet().iterator(); i
+				.hasNext();) {
+			Entry<Class,Class> e = i.next();
+			if(e.getKey().isInstance(javaObject)){
+				return e;
 			}
 		}
+    	return null;
+    }
+    
+    public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
+    		Object javaObject, Class staticType) {
+    	
+		try {
+			NativeJavaObject wrapper = null;
+			Entry<Class,Class> types = findWrapperClass(javaObject);
+			if(types != null){
+				ScriptableWrapper sjo = null;
+				try{
+					Constructor<? extends ScriptableWrapper> cr = 
+						types.getValue().getConstructor(Scriptable.class, types.getKey(), Class.class);
+					sjo = cr.newInstance(scope, javaObject, staticType);
+				}catch(Exception e1){
+					Constructor<? extends ScriptableWrapper> cr = 
+						types.getValue().getConstructor();
+					sjo = cr.newInstance();
+				}
+				
+				wrapper = sjo;
+			}else{
+				wrapper = new NativeJavaObject(scope, javaObject, staticType);
+			}
+			
+			for (Iterator<Class> i = map.keySet().iterator(); i.hasNext();) {
+				Class type = i.next();
+				if (type.isInstance(javaObject)) {
+					List<Class<? extends ScriptablePrototype>> l = map.get(type);
+					
+					NativeJavaObject last = wrapper;
+					for (Iterator<Class<? extends ScriptablePrototype>> iter = l.iterator(); iter.hasNext();) {
+						Class<? extends ScriptablePrototype> cls = iter.next();
+						
+						ScriptablePrototype sjo = null;
+						try{
+							Constructor<? extends ScriptablePrototype> cr = 
+								cls.getConstructor(type);
+							sjo = cr.newInstance(javaObject);
+						}catch(Exception e1){
+							Constructor<? extends ScriptablePrototype> cr = 
+								cls.getConstructor();
+							sjo = cr.newInstance();
+						}
+						
+						NativeJavaObject wsjo = new NativeJavaObject(scope, sjo, null);
+						last.setPrototype(wsjo);
+						last = wsjo;
+					}
+					return wrapper;
+				}
+			}
+			return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
     }
 

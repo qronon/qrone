@@ -2,13 +2,11 @@ package org.qrone.r7.script;
 
 import org.mozilla.javascript.Scriptable;
 
-public abstract class AbstractScriptable extends ServletScopeObject implements Scriptable{
+public abstract class AbstractScriptable implements Scriptable{
 	private Scriptable scope;
 	private Scriptable prototype;
 	
-	public AbstractScriptable(ServletScope ss){
-		super(ss);
-		scope = ss.scope;
+	public AbstractScriptable(){
 	}
 
 	@Override
