@@ -1,7 +1,6 @@
 package org.qrone.r7.script;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
