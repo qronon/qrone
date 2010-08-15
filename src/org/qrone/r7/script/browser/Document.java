@@ -2,7 +2,8 @@ package org.qrone.r7.script.browser;
 
 import java.io.IOException;
 
-import org.qrone.r7.ObjectConverter;
+import net.arnx.jsonic.JSON;
+
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.script.ServletScope;
 
@@ -27,7 +28,7 @@ public class Document extends HTML5Template{
 		if(out instanceof String)
 			ss.writer.append((String)out);
 		else
-			ss.writer.append(ObjectConverter.stringify(out));
+			ss.writer.append(JSON.encode(out));
 	}
 	
 	public void flush() throws IOException{

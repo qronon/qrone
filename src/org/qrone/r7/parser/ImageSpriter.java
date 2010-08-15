@@ -12,8 +12,8 @@ import java.util.Map;
 import org.qrone.img.ImageBuffer;
 import org.qrone.img.ImageBufferService;
 import org.qrone.img.ImageRect;
-import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.QrONEUtils;
 
 public class ImageSpriter {
 	private String isprite = "/sprite-i.png";

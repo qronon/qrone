@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.QrONEUtils;
 import org.scannotation.AnnotationDB;
 import org.scannotation.ClasspathUrlFinder;
 import org.scannotation.WarUrlFinder;

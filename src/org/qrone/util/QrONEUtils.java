@@ -1,4 +1,4 @@
-package org.qrone.r7;
+package org.qrone.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,24 +25,6 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.codec.binary.Base64;
 
 public class QrONEUtils{
-
-    public static void main(String[] args) {
-    	String[] a = {"-v", "-n", "site/test"};
-    	/*
-    	try{
-    		URI from = new URI("file.html/");
-    		URI to = new URI("to/../path/to/../path/to/file.png");
-    		System.out.println(from.resolve(to));
-    		//System.out.println(relativize(from.toString(), to.toString()));
-    		//from.relativize(from)
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}*/
-    	
-    	QrONECompressor.main(a);
-    	QrONECompressor.main(a);
-	}
-    
     
     public static URI relativize(URI basePath, URI targetPathString) {
     	String uri = relativize(basePath.toString(), targetPathString.toString());
@@ -91,7 +73,7 @@ public class QrONEUtils{
 	}
 
 	public static InputStream getResourceAsStream(String name) throws IOException {
-		InputStream in = QrONEUtils.class.getResourceAsStream("resource/" + name);
+		InputStream in = QrONEUtils.class.getResourceAsStream("../r7/resource/" + name);
 		if(in != null){
 			return in;
 		}

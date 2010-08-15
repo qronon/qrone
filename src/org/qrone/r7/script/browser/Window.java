@@ -19,13 +19,12 @@ import org.mozilla.javascript.Scriptable;
 import org.qrone.deck.PropertiesDeck;
 import org.qrone.deck.TextileDeck;
 import org.qrone.deck.YamlDeck;
-import org.qrone.r7.ObjectConverter;
-import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.ServletScopeObject;
+import org.qrone.util.QrONEUtils;
 
 
 public class Window extends ServletScopeObject{
@@ -204,7 +203,7 @@ public class Window extends ServletScopeObject{
 	}
 
 	public String stringify(Object out){
-		return ObjectConverter.stringify(out);
+		return net.arnx.jsonic.JSON.encode(out);
 	}
 	
 	public String loginURL(String url, Scriptable attributes, String doneURL){

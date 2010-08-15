@@ -6,17 +6,23 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 
-import org.qrone.r7.QrONEUtils;
+import org.qrone.util.QrONEUtils;
 
 public class User implements Serializable, Externalizable{
 	private String login = null;
 	private String key = null;
+	private boolean isAdmin = false;
 	
 	public User(String login, String key) {
 		this.login = login;
 		if(this.login == null)
 			this.login = "guest";
 		this.key = key;
+	}
+	
+	public User(String login, String key, boolean isAdmin){
+		this(login,key);
+		this.isAdmin = isAdmin;
 	}
 	
 	public static User createUser(String qcookie){
@@ -42,7 +48,7 @@ public class User implements Serializable, Externalizable{
 	}
 	
 	public boolean isAdmin() {
-		return false;
+		return isAdmin;
 	}
 	
 	@Override

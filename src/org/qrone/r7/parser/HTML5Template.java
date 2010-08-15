@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.qrone.r7.ObjectConverter;
+import net.arnx.jsonic.JSON;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -199,7 +200,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			select(selector).html(o.toString().replaceAll("\n", "<br>"));
 		}
 	}
-	
+
+	public void set(String selector, NodeLister lister){
+		select(selector).listup(lister);
+	}
 	/*
 	private boolean initialized = false;
 	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
@@ -214,10 +218,6 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		});
 	}
 	
-	public void set(String selector, NodeLister lister){
-		selectmap.put(selector, lister);
-		initialized = false;
-	}
 	*/
 
 	/*
@@ -335,7 +335,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		if(out instanceof String)
 			append((String)out);
 		else
-			append(ObjectConverter.stringify(out));
+			append(JSON.encode(out));
 	}
 
 	public void writeln(Object out) throws IOException{

@@ -14,10 +14,10 @@ import java.util.Set;
 
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
-import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
+import org.qrone.util.QrONEUtils;
 import org.qrone.util.XDeck;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;

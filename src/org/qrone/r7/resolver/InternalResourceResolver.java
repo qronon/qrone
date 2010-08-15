@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
-import org.qrone.r7.QrONEUtils;
+import org.qrone.util.QrONEUtils;
 import org.qrone.util.UnicodeInputStream;
 
 public class InternalResourceResolver implements URIResolver{

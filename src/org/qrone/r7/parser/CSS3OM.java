@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.qrone.r7.QrONEUtils;
+import org.qrone.util.QrONEUtils;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRuleList;
 import org.w3c.dom.css.CSSStyleSheet;

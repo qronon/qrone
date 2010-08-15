@@ -11,8 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.qrone.r7.QrONEUtils;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.QrONEUtils;
 
 public class ResolverHandler implements URIHandler{
 	private URIResolver resolver;
