@@ -41,6 +41,10 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		visit(e);
 	}
 	
+	public HTML5Writer getWriter(){
+		return b;
+	}
+	
 	protected void out(String str){
 		if(str == null) return;
 		b.append(str);

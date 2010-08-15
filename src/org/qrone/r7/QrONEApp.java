@@ -14,7 +14,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.servlet.GzipFilter;
 import org.qrone.r7.app.QrONEServlet;
 
 public class QrONEApp {
@@ -27,6 +29,10 @@ public class QrONEApp {
 		server.addConnector(connector);
 
 		ServletHandler handler = new ServletHandler();
+		FilterHolder gzip = handler.addFilterWithMapping(GzipFilter.class,"/*",0);
+        //gzip.setAsyncSupported(true);
+        gzip.setInitParameter("minGzipSize","256");
+        
 		handler.addServletWithMapping(QrONEServlet.class, "/*");
 		server.addHandler(handler);
 

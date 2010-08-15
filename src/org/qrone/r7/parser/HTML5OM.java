@@ -299,10 +299,11 @@ public class HTML5OM {
 			if(path != null){
 				final String[] paths = path.split("#", 2);
 				if(paths.length == 2){
-					HTML5OM xom = deck.compile(getURI().resolve(paths[0]));
+					final HTML5OM xom = deck.compile(getURI().resolve(paths[0]));
 					if(xom != null){
 						xomlist.add(this);
 						xom.process(t, new NodeProcessor() {
+							/*
 							@Override
 							public void processTarget(HTML5Writer w, HTML5OM om, Element node) {
 								HTML5OM.this.process(t, p, null, null, xomlist);
@@ -312,6 +313,22 @@ public class HTML5OM {
 							public boolean isTarget(Element node) {
 								String id = node.getAttribute("id");
 								return id != null && id.equals(paths[1]);
+							}
+							*/
+
+							@Override
+							public HTML5Element get(Element node) {
+								HTML5Element e = new HTML5Element(xom, node);
+								String id = node.getAttribute("id");
+								if(id != null && id.equals(paths[1])){
+									e.html(new NodeLister() {
+										@Override
+										public void accept(HTML5Template t, HTML5Element e) {
+											HTML5OM.this.process(t, p, null, null, xomlist);
+										}
+									});
+								}
+								return e;
 							}
 						}, null, null, xomlist);
 						return;
@@ -336,7 +353,7 @@ public class HTML5OM {
 					end(e);
 				}else if(e.getNodeName().equals("style")){
 				}else if(e.getNodeName().equals("link")){
-				}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code")){
+				}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code") || e.getNodeName().equals("textarea")){
 					formatting++;
 					out(e);
 					formatting--;
@@ -366,16 +383,21 @@ public class HTML5OM {
 			}
 			
 			@Override
-			protected void out(final Element e) {
-				HTML5Element e5 = new HTML5Element(om, e);
-				final CSS3Value include = e5.getPropertyValue("include");
+			protected void out(final Element e4) {
+				HTML5Element e1 = null;
+				if(p != null)
+					e1 = p.get(e4);
+				else
+					e1 = new HTML5Element(om, e4);
+				final HTML5Element e = e1;
+				final CSS3Value include = e.getPropertyValue("include");
 				if(include != null){
 					final String uniqueid = QrONEUtils.uniqueid();
 					final String path = include.getURL();
 					if(path != null && path.trim().length() > 0){
-						super.out(e,new Delegate() {
+						e.html(new NodeLister() {
 							@Override
-							public void accept() {
+							public void accept(HTML5Template t, HTML5Element e) {
 								HTML5OM xom = deck.compile(getURI().resolve(path));
 								xom.process(t, p, null, uniqueid, xomlist);
 							}
@@ -383,19 +405,23 @@ public class HTML5OM {
 					}else{
 						try{
 							throw new IOException();
-						}catch(IOException e1){
-							e1.printStackTrace();
+						}catch(IOException e2){
+							e2.printStackTrace();
 						}
 					}
-				}else if(p != null && p.isTarget(e)){
-					super.out(e,new Delegate() {
+				}
+				
+				if(e.hasContent()){
+					super.out(e.get(), new Delegate() {				
 						@Override
 						public void accept() {
-							p.processTarget(t, HTML5OM.this, e);
+							HTML5Template t = new HTML5Template(om, xomlist, uri);
+							e.accept(t);
+							getWriter().append(t);
 						}
 					});
 				}else{
-					super.out(e);
+					super.out(e.get());
 				}
 			}
 		};
@@ -404,11 +430,11 @@ public class HTML5OM {
 
 	public String serialize(){
 		HTML5Template t = new HTML5Template(this);
-		String o = t.out();
+		t.out();
 		try {
 			deck.getSpriter().create();
 		} catch (IOException e) {}
-		return o;
+		return t.toString();
 	}
 	
 	private void parseStyleSheet(final CSS3OM cssom) throws IOException{
@@ -541,8 +567,8 @@ public class HTML5OM {
 			js.append(c.getScripts(!first));
 			css.addAll(stylesheets);
 			
-			jslibs.addAll(jslibs);
-			csslibs.addAll(csslibs);
+			jslibs.addAll(this.jslibs);
+			csslibs.addAll(this.csslibs);
 	
 			for (Iterator<String> iter = requires.iterator(); iter.hasNext();) {
 				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false);

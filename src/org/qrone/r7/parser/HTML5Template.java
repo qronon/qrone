@@ -2,14 +2,15 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.qrone.r7.ObjectConverter;
 import org.w3c.dom.Element;
@@ -20,11 +21,11 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	private List<Object> list = new ArrayList<Object>();
 	private StringBuilder b = new StringBuilder(10240);
 	
-	private HTML5OM om;
-	private Set<HTML5OM> xomlist;
-	private URI uri;
+	protected HTML5OM om;
+	protected Set<HTML5OM> xomlist;
+	protected URI uri;
 	
-	private HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
+	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
 		this.uri = uri;
 		this.om = om;
 		this.xomlist = xomlist;
@@ -37,6 +38,24 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
 	public HTML5Template(HTML5OM om){
 		this(om, new HashSet<HTML5OM>(), null);
+	}
+	
+	public HTML5Template(HTML5Deck deck, String path){
+		this(null, new HashSet<HTML5OM>(), null);
+		if(deck.getResolver().exist(path)){
+			try {
+				om = deck.compile(new URI(path));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void load(String path) throws IOException, URISyntaxException{
+		URI u = uri.resolve(path);
+		if(om.getDeck().getResolver().exist(u.toString())){
+			om = om.getDeck().compile(u);
+		}
 	}
 
 	public HTML5Template append(){
@@ -79,58 +98,112 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}
 		return b.toString();
 	}
+	
+	public HTML5NodeSet select(String selector){
+		return new HTML5NodeSet(this, om.select(selector));
+	}
 
-	private boolean initialized = false;
-	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
-	private Map<Element, NodeLister> nodemap;
+	private Map<Element, HTML5Element> node5map = new Hashtable<Element, HTML5Element>();
+	public HTML5Element override(Element node){
+		HTML5Element e = node5map.get(node);
+		if(e == null){
+			e = new HTML5Element(om, node);
+			node5map.put(node, e);
+		}
+		return e;
+	}
+
+	@Override
+	public HTML5Element get(Element node) {
+		HTML5Element e = node5map.get(node);
+		if(e == null){
+			e = new HTML5Element(om, node);
+		}
+		return e;
+	}
+	
+	/*
+	private void set(Element node, String html){
+		HTML5Element e = node5map.get(node);
+		if(e == null){
+			e = new HTML5Element(om, node);
+			node5map.put(node, e);
+		}
+		e.html(html);
+	}
+	
+	private void set(Element node, NodeLister lister){
+		HTML5Element e = node5map.get(node);
+		if(e == null){
+			e = new HTML5Element(om, node);
+			node5map.put(node, e);
+		}
+		e.list(lister);
+	}
+	*/
+	
 	public void set(Object o){
-		if(o instanceof Map){
-			for (Iterator iterator = ((Map)o).entrySet().iterator(); iterator
-					.hasNext();) {
-				set(iterator.next());
+		if(o instanceof List){
+			for(Object i : (List)o){
+				set(i);
+			}
+		}else if(o instanceof Map){
+			for (Object i : ((Map)o).entrySet()) {
+				set(i);
 			}
 		}else if(o instanceof Entry){
 			Entry e = (Entry)o;
 			set("#" + e.getKey(), e.getValue());
 		}
 	}
-
+	
 	public void set(final String selector, final Object o){
-		if(o instanceof HTML5Element){
-			set(selector, new NodeLister(){
-				@Override
-				public void accept(HTML5Template t, HTML5Element e) {
-					t.out((HTML5Element)o);
-				}
-			});
-		}else if(o instanceof Map){
-			set(selector, new NodeLister(){
-				@Override
-				public void accept(HTML5Template t, HTML5Element e) {
-					for (Iterator iterator = ((Map)o).entrySet().iterator(); iterator
-					.hasNext();) {
-						Entry el = (Entry)iterator.next();
-						t.set(selector + " .key", el.getKey());
-						t.set(selector + " .value", el.getValue());
-						t.out(e);
-					}
+		if(o instanceof Map){
+			select(selector).exec(new HTML5NodeSet.Delegate() {
+				public void call(HTML5Element e) {
+					e.html(new NodeLister() {
+						@Override
+						public void accept(HTML5Template t, HTML5Element e) {
+							Set<Entry> entryset = ((Map)o).entrySet();
+							for (Entry el : entryset) {
+								HTML5Template tt = new HTML5Template(om, xomlist, uri);
+								tt.set(selector + ".key", el.getKey());
+								tt.set(selector + ".value", el.getValue());
+								tt.visit(e);
+								t.append(tt);
+							}
+						}
+					});
 				}
 			});
 		}else if(o instanceof List){
-			set(selector, new NodeLister() {
-				@Override
-				public void accept(HTML5Template t, HTML5Element e) {
-					for (Iterator iterator = ((List)o).iterator(); iterator
-							.hasNext();) {
-						t.set(iterator.next());
-						t.out(e);
-					}
+			select(selector).exec(new HTML5NodeSet.Delegate() {
+				public void call(HTML5Element e) {
+					e.html(new NodeLister() {
+						@Override
+						public void accept(HTML5Template t, HTML5Element e) {
+							for (Iterator iterator = ((List)o).iterator(); iterator
+									.hasNext();) {
+								HTML5Template tt = new HTML5Template(om, xomlist, uri);
+								tt.set(iterator.next());
+								tt.visit(e);
+								t.append(tt);
+							}
+						}
+					});
 				}
 			});
+		}else if(o instanceof NodeLister){
+			select(selector).listup((NodeLister)o);
 		}else{
-			set(selector, o.toString().replaceAll("\n", "<br>"));
+			select(selector).html(o.toString().replaceAll("\n", "<br>"));
 		}
 	}
+	
+	/*
+	private boolean initialized = false;
+	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
+	private Map<Element, NodeLister> nodemap;
 	
 	public void set(String selector, final String value){
 		set(selector, new NodeLister() {
@@ -145,26 +218,42 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		selectmap.put(selector, lister);
 		initialized = false;
 	}
+	*/
 
+	/*
 	@Override
 	public boolean isTarget(Element node) {
-		return nodemap.containsKey(node);
+		return node5map.containsKey(node);
 	}
 
 	@Override
 	public void processTarget(HTML5Writer w, HTML5OM om, Element node) {
-		NodeLister o = nodemap.get(node);
+		HTML5Element o = node5map.get(node);
 		if(o != null){
 			HTML5Template t = new HTML5Template(om, xomlist, uri);
-			o.accept(t, new HTML5Element(om, (Element)node));
+			o.accept(t);
+			
 			w.append(t);
 		}
 	}
+	*/
+
+	
+	public void visit(HTML5Element e){
+		//initialize(om);
+		e.getOM().process(this, this, e.get(), null, xomlist);
+	}
+
+	public void visit(HTML5OM om) {
+		//initialize(om);
+		om.process(this, this, null, null, xomlist);
+	}
+
 	
 	private Map<String, Iterator<Node>> selecting
 		= new Hashtable<String, Iterator<Node>>();
-	public void visit(String selector){
-		initialize(om);
+	public void out(String selector){
+		//initialize(om);
 		if(selecting.containsKey(selector)){
 			Iterator<Node> iter = selecting.get(selector);
 			if(iter != null){
@@ -182,31 +271,18 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 				selecting.put(selector, null);
 			}
 		}
-		selectmap = new Hashtable<String, NodeLister>();
-	}
-	
-	public void visit(HTML5Element e){
-		initialize(om);
-		e.getOM().process(this, this, e.get(), null, xomlist);
-		selectmap = new Hashtable<String, NodeLister>();
-	}
-
-	public void visit(HTML5OM om) {
-		initialize(om);
-		om.process(this, this, null, null, xomlist);
-		selectmap = new Hashtable<String, NodeLister>();
 	}
 	
 	public void out(HTML5Element e) {
 		visit(e);
 	}
 	
-	public String out() {
-		initialize(om);
+	public void out() {
+		//initialize(om);
 		om.process(this, xomlist);
-		return toString();
 	}
 	
+	/*
 	private void initialize(HTML5OM om){
 		if(!initialized){
 			nodemap = new Hashtable<Element, NodeLister>();
@@ -225,11 +301,13 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			initialized = true;
 		}
 	}
+	*/
 
 	public HTML5Element getBody() {
 		return om.getBody();
 	}
 	
+	/*
 	public void write(String str){
 		append(str);
 	}
@@ -247,9 +325,22 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		write(out);
 		write("\n");
 	}
+	*/
 
 	public URI getURI() {
 		return uri;
+	}
+
+	public void write(Object out) throws IOException{
+		if(out instanceof String)
+			append((String)out);
+		else
+			append(ObjectConverter.stringify(out));
+	}
+
+	public void writeln(Object out) throws IOException{
+		write(out);
+		write("\n");
 	}
 	
 }

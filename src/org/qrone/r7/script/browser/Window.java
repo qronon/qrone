@@ -40,11 +40,9 @@ public class Window extends ServletScopeObject{
 	public Window(ServletScope ss) throws IOException, URISyntaxException{
 		super(ss);
 		document = new Document(ss);
-		document.load(ss.path + ".html");
 		
 		location = new Location(ss);
 		navigator = new Navigator(ss);
-		document.location = location;
 		
 		query = getQuery();
 		JSON = new JSON(ss);
@@ -87,14 +85,12 @@ public class Window extends ServletScopeObject{
 		}
 	}
 
-	public Document load_html(String uri) throws IOException, URISyntaxException{
+	public HTML5Template load_html(String uri) throws IOException, URISyntaxException{
 		URI u = ss.uri.resolve(uri);
 		if(ss.resolver.exist(u.toString())){
 			HTML5OM om = ss.deck.compile(u);
 			if(om != null){
-				Document doc = new Document(ss);
-				doc.load(new HTML5Template(om, u));
-				return doc;
+				return new HTML5Template(om, u);
 			}
 		}
 		return null;

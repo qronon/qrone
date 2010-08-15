@@ -10,7 +10,6 @@ import org.qrone.r7.handler.PathFinderHandler;
 import org.qrone.r7.handler.ResolverHandler;
 import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
-import org.qrone.r7.resolver.MemoryResolver;
 import org.qrone.r7.resolver.ServletResolver;
 import org.qrone.r7.store.MemoryStore;
 
@@ -19,8 +18,8 @@ import com.google.appengine.api.users.UserServiceFactory;
 public class AppEngineURIHandler extends ExtendableURIHandler{
 	public AppEngineURIHandler(ServletContext cx) {
 		resolver.add(new FilteredResolver("/qrone-server/", new InternalResourceResolver()));
-		resolver.add(new MemoryResolver());
 		resolver.add(new ServletResolver(cx));
+		resolver.add(new AppEngineResolver());
 		
 		OpenIDHandler openidHandler = new OpenIDHandler(
 				new MemoryStore(), UserServiceFactory.getUserService());

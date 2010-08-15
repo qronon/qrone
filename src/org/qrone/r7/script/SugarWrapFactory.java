@@ -76,10 +76,10 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
 	}
 
 	public void addExtension(Class wrapper) {
-		if(ScriptablePrototype.class.isAssignableFrom(wrapper.getClass())){
+		if(ScriptablePrototype.class.isAssignableFrom(wrapper)){
 			Class cls = getInterfaceGenericType(wrapper);
 			addPrototypeClass(cls, wrapper);
-		}else if(ScriptableWrapper.class.isAssignableFrom(wrapper.getClass())){
+		}else if(ScriptableWrapper.class.isAssignableFrom(wrapper)){
 			Class cls = getSuperGenericType(wrapper);
 			setWrapperClass(cls, wrapper);
 		}
@@ -159,7 +159,7 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
 					return wrapper;
 				}
 			}
-			return super.wrapAsJavaObject(cx, scope, javaObject, staticType);
+			return wrapper;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

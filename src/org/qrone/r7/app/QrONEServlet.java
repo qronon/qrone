@@ -28,7 +28,7 @@ public class QrONEServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(handler == null)
-			handler = new QrONEURIHandler(getServletContext());
+			handler = new QrONEURIHandler(this);
 		handler.handle(request, response, request.getPathInfo(), "");
 		/*
 		try {

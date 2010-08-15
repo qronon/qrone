@@ -2,7 +2,7 @@ package org.qrone.r7.handler;
 
 import java.io.File;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
 
 import org.qrone.r7.ExtensionIndex;
 import org.qrone.r7.app.AwtImageBufferService;
@@ -12,7 +12,7 @@ import org.qrone.r7.store.MemoryStore;
 
 public class LocalURIHandler extends ExtendableURIHandler{
 	
-	public LocalURIHandler(ServletContext cx) {
+	public LocalURIHandler(HttpServlet serv) {
 		resolver.add(new MemoryResolver());
 		resolver.add(new FileResolver(new File(".")));
 		
@@ -31,5 +31,7 @@ public class LocalURIHandler extends ExtendableURIHandler{
 		handler.add(new PathFinderHandler(html5handler));
 		handler.add(openidHandler);
 		handler.add(new ResolverHandler(resolver));
+		handler.add(new FaviconHandler(resolver));
+		handler.add(new ProxyHandler(serv.getServletConfig(), 8080));
 	}
 }

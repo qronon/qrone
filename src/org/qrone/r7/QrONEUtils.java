@@ -1,6 +1,5 @@
 package org.qrone.r7;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Externalizable;
@@ -8,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -17,6 +15,10 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.servlet.http.Cookie;
 
@@ -40,7 +42,8 @@ public class QrONEUtils{
     	QrONECompressor.main(a);
     	QrONECompressor.main(a);
 	}
-
+    
+    
     public static URI relativize(URI basePath, URI targetPathString) {
     	String uri = relativize(basePath.toString(), targetPathString.toString());
     	try {
@@ -115,23 +118,24 @@ public class QrONEUtils{
 		return convertStreamToString(in);
 	}
 	
-	public static String convertStreamToString(InputStream is) throws IOException {
-        if (is != null) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-            } finally {
-                is.close();
-            }
-            return sb.toString();
-        } else {        
-            return "";
-        }
+	public static byte[] read(InputStream in) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		copy(in, out);
+		in.close();
+		out.close();
+		return out.toByteArray();
+	}
+	
+	public static byte[] base64_decode(String base64String){
+		return Base64.decodeBase64(base64String);
+	}
+	
+	public static String base64_encode(byte[] binaryData){
+		return Base64.encodeBase64String(binaryData);
+	}
+	
+	public static String convertStreamToString(InputStream in) throws IOException {
+        return new String(read(in), "utf8");
     }
 
 	public static String escape(String str){
@@ -340,6 +344,16 @@ public class QrONEUtils{
 			}
 		}
 		return null;
+	}
+	
+	public static Date now(){
+		return Calendar.getInstance(Locale.ENGLISH).getTime();
+	}
+
+	public static String toGMTString(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat(
+				"E, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
+		return sdf.format(date);
 	}
 	
 }
