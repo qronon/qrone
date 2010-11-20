@@ -61,6 +61,9 @@ public class GitHubResolver implements URIResolver, URIHandler {
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
+		InputStream in = cacheresolver.getInputStream(uri);
+		if(in != null) return in;
+		
 		updatedSet.remove(uri.toString());
 		String sha = getFiles().get(uri.toString());
 		return fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
@@ -69,7 +72,8 @@ public class GitHubResolver implements URIResolver, URIHandler {
 
 	@Override
 	public OutputStream getOutputStream(URI uri) throws IOException {
-		return null;
+		OutputStream out = cacheresolver.getOutputStream(uri);
+		return out;
 	}
 
 	@Override
@@ -88,6 +92,8 @@ public class GitHubResolver implements URIResolver, URIHandler {
 						try {
 							cacheresolver.remove(new URI(e.getKey()));
 						} catch (URISyntaxException e1) {}
+					}else{
+						updatedSet.add(e.getKey());
 					}
 				}
 				
