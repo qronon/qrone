@@ -56,4 +56,12 @@ public class FilteredResolver implements URIResolver{
 		return false;
 	}
 
+	@Override
+	public boolean remove(URI uri) {
+		uri = prefixed(uri);
+		if(uri != null)
+			return r.remove(uri);
+		return false;
+	}
+
 }

@@ -55,4 +55,12 @@ public class MemoryResolver implements URIResolver{
 			return new ByteArrayInputStream(buf);
 		}
 	}
+
+	@Override
+	public boolean remove(URI uri) {
+		map.remove(uri);
+		lastModifiedMap.remove(uri);
+		existsMap.remove(uri.toString());
+		return true;
+	}
 }

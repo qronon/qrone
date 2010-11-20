@@ -62,4 +62,13 @@ public class CascadeResolver implements URIResolver{
 		return false;
 	}
 	
+	@Override
+	public boolean remove(URI uri) {
+		for (Iterator<URIResolver> i = list.iterator(); i
+				.hasNext();) {
+			URIResolver r = i.next();
+			if(r.remove(uri)) return true;
+		}
+		return false;
+	}
 }

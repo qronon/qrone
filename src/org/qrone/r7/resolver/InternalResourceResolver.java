@@ -31,4 +31,9 @@ public class InternalResourceResolver implements URIResolver{
 	public OutputStream getOutputStream(URI uri) throws IOException {
 		return null;
 	}
+
+	@Override
+	public boolean remove(URI uri) {
+		return false;
+	}
 }

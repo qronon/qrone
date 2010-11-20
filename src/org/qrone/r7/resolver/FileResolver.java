@@ -46,4 +46,9 @@ public class FileResolver implements URIResolver {
 		return new FileOutputStream(new File(root, uri.getPath()));
 	}
 
+	@Override
+	public boolean remove(URI uri) {
+		return new File(root, uri.getPath()).delete();
+	}
+
 }

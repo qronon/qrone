@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -76,6 +75,10 @@ public class ZipResolver implements URIResolver{
 	public OutputStream getOutputStream(URI uri) throws IOException {
 		return null;
 	}
-	
+
+	@Override
+	public boolean remove(URI uri) {
+		return false;
+	}
 	
 }
