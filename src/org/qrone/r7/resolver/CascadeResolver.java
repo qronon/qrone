@@ -19,6 +19,10 @@ public class CascadeResolver implements URIResolver{
 	public void add(int index, URIResolver r){
 		list.add(index, r);
 	}
+	
+	public List<URIResolver> asList(){
+		return list;
+	}
 
 	@Override
 	public boolean exist(String uri) {
