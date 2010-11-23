@@ -12,4 +12,8 @@ public class ImageRect {
 		this.w = w;
 		this.h = h;
 	}
+
+	public String toString(){
+		return "[" + x + "," + y + "," + w + "," + h + "]";
+	}
 }

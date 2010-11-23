@@ -92,13 +92,33 @@ public class PNGMemoryImage implements ImageBuffer{
 		
 		int w = Math.min(to.w, from.w);
 		int h = Math.min(to.h, from.h);
+
+		if(to.w + to.x > width)
+			w = width - to.x;
+		if(to.h + to.y > height)
+			h = height - to.y;
+		
+		System.out.println(toString() + " To:" + to.toString() + " From:" + from.toString());
 		
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
-				buf[to.y * width + to.x + j]
-				    = pix[from.y * img.getWidth() + from.x + j];
+				if(from.y * img.getWidth() + from.x + j >= pix.length){
+					System.out.println("pix overflow");
+				}
+				if(to.y * width + to.x + j >= buf.length){
+					System.out.println("buf overflow");
+					System.out.println(to.y * width + to.x + j);
+					System.out.println(buf.length);
+				}
+				
+				buf[(to.y + i) * width + to.x + j]
+				    = pix[(from.y + i) * img.getWidth() + from.x + j];
 			}
 		}
+	}
+	
+	public String toString(){
+		return "PNG(" + width + "," + height + ")";
 	}
 	
 	public int[] getPixels(){
@@ -125,6 +145,7 @@ public class PNGMemoryImage implements ImageBuffer{
 		PngEncoder e = new PngEncoder(this, true);
 		e.setCompressionLevel(9);
 		out.write(e.pngEncode(true));
+		out.close();
 	}
 
 }

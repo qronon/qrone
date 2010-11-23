@@ -56,12 +56,14 @@ public class ImageSpriter {
 	}
 	
 	private ImagePack unpack() {
+		/*
 		if (pack == null && pspriteURI != null) {
 			try {
 				pack = (ImagePack) QrONEUtils.unserialize(
 						resolver.getInputStream(pspriteURI));
 			} catch (IOException e) {}
 		}
+		*/
 		if(pack == null)
 			pack = new ImagePack();
 		return pack;
@@ -151,6 +153,7 @@ public class ImageSpriter {
 	
 				currentY = 0;
 				while (currentY < pack.vWidth) {
+					/*
 					if(currentY + part.h > pack.vWidth){
 						vimage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
@@ -160,6 +163,7 @@ public class ImageSpriter {
 								part.w, 
 								part.h - (currentY + part.h - pack.vWidth)));
 					}else{
+						*/
 						vimage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
 								part.w, 
@@ -167,7 +171,7 @@ public class ImageSpriter {
 								new ImageRect(part.x, part.y, 
 								part.w, 
 								part.h));
-					}
+					//}
 					currentY += part.h;
 				}
 	
@@ -192,6 +196,7 @@ public class ImageSpriter {
 	
 				currentX = 0;
 				while (currentX < pack.hHeight) {
+					/*
 					if(currentX + part.w > pack.hHeight){
 						himage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
@@ -201,7 +206,7 @@ public class ImageSpriter {
 								part.w - (currentX + part.w - pack.hHeight), 
 								part.h));
 					}else{
-	
+					 */
 						himage.drawImage(getImage(part.file), 
 								new ImageRect(currentX, currentY, 
 								part.w, 
@@ -209,7 +214,7 @@ public class ImageSpriter {
 								new ImageRect(part.x, part.y, 
 								part.w, 
 								part.h));
-					}
+					//}
 					currentX += part.w;
 				}
 	
