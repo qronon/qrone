@@ -15,6 +15,7 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.browser.LoginService;
+import org.qrone.r7.script.browser.PortingService;
 
 public class ServletScope {
 	public HttpServletRequest request;
@@ -22,7 +23,7 @@ public class ServletScope {
 	public Scriptable scope;
 	public HTML5Deck deck;
 	public JSDeck vm;
-	public LoginService service;
+	public PortingService service;
 	public URIResolver resolver;
 
 	public URI uri;
@@ -35,7 +36,7 @@ public class ServletScope {
 	
 	public ServletScope(HttpServletRequest request, HttpServletResponse response, 
 			String path, String pathArg,
-			Scriptable scope, HTML5Deck deck, JSDeck vm, URI uri, LoginService service) {
+			Scriptable scope, HTML5Deck deck, JSDeck vm, URI uri, PortingService service) {
 		this.request = request;
 		this.response = response;
 		this.scope = scope;

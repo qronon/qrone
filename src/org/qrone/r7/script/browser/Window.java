@@ -219,18 +219,18 @@ public class Window extends ServletScopeObject{
 				}
 			}
 		}
-		return ss.service.loginURL(url, attrMap, doneURL);
+		return ss.service.getLoginService().loginURL(url, attrMap, doneURL);
 	}
 
 	public String loginURL(String doneURL) {
-		return ss.service.loginURL(doneURL);
+		return ss.service.getLoginService().loginURL(doneURL);
 	}
 	
 	public String logoutURL(String doneURL){
-		return ss.service.logoutURL(doneURL);
+		return ss.service.getLoginService().logoutURL(doneURL);
 	}
 	
 	public User getUser(){
-		return ss.service.getUser();
+		return ss.service.getLoginService().getUser();
 	}
 }
