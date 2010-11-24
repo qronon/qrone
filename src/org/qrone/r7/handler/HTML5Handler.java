@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
+import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
@@ -21,15 +22,15 @@ import org.qrone.r7.script.browser.LoginService;
 import org.qrone.r7.script.browser.Window;
 
 public class HTML5Handler implements URIHandler, Extendable{
+	private PortingService services;
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
-	private LoginService loginService;
 	
-	public HTML5Handler(URIResolver resolver, ImageBufferService service, LoginService loginService) {
-		this.resolver = resolver;
-		this.loginService = loginService;
-		deck = new HTML5Deck(resolver, service);
+	public HTML5Handler(PortingService services) {
+		this.services = services;
+		this.resolver = services.getURIResolver();
+		deck = new HTML5Deck(resolver, services.getImageBufferService());
 		vm = new JSDeck(resolver, deck);
 	}
 	
@@ -51,7 +52,7 @@ public class HTML5Handler implements URIHandler, Extendable{
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
 							request,response,path,pathArg,
-							scope,deck,vm,uri,loginService);
+							scope,deck,vm,uri,services);
 					om.run(scope, new Window(ss));
 					ss.writer.flush();
 					ss.writer.close();
