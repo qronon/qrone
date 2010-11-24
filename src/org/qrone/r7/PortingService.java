@@ -14,4 +14,5 @@ public interface PortingService {
 	public URIResolver getURIResolver();
 	public KVSService getKVSService();
 	public MemcachedService getMemcachedService();
+	public RepositoryService getRepositoryService();
 }

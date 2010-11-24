@@ -14,6 +14,7 @@ public class PortingServiceBase  implements PortingService{
 	private URIResolver resolver;
 	private KVSService database;
 	private MemcachedService memcached;
+	private RepositoryService repository;
 	
 	public PortingServiceBase(
 			URLFetcher fetcher,
@@ -21,7 +22,8 @@ public class PortingServiceBase  implements PortingService{
 			KVSService database,
 			MemcachedService memcached,
 			LoginService login,
-			ImageBufferService imagebuffer
+			ImageBufferService imagebuffer,
+			RepositoryService repository
 			){
 		this.imagebuffer = imagebuffer;
 		this.login = login;
@@ -29,6 +31,7 @@ public class PortingServiceBase  implements PortingService{
 		this.resolver = resolver;
 		this.database = database;
 		this.memcached = memcached;
+		this.repository = repository;
 	}
 
 	@Override
@@ -59,6 +62,11 @@ public class PortingServiceBase  implements PortingService{
 	@Override
 	public MemcachedService getMemcachedService() {
 		return memcached;
+	}
+
+	@Override
+	public RepositoryService getRepositoryService() {
+		return repository;
 	}
 
 }
