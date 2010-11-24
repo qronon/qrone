@@ -19,6 +19,8 @@ import org.mozilla.javascript.Scriptable;
 import org.qrone.deck.PropertiesDeck;
 import org.qrone.deck.TextileDeck;
 import org.qrone.deck.YamlDeck;
+import org.qrone.kvs.KVSService;
+import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSOM;
@@ -35,6 +37,8 @@ public class Window extends ServletScopeObject{
 	public Navigator navigator;
 	public Object query;
 	public JSON JSON;
+	public KVSService db;
+	public MemcachedService memcached;
 	
 	public Window(ServletScope ss) throws IOException, URISyntaxException{
 		super(ss);
@@ -45,6 +49,9 @@ public class Window extends ServletScopeObject{
 		
 		query = getQuery();
 		JSON = new JSON(ss);
+		
+		db = ss.service.getKVSService();
+		memcached = ss.service.getMemcachedService();
 	}
 	
 	public Object getQuery(){
