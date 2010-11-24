@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Scriptable;
-import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
@@ -18,7 +17,6 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.browser.LoginService;
 import org.qrone.r7.script.browser.Window;
 
 public class HTML5Handler implements URIHandler, Extendable{

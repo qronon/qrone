@@ -15,7 +15,6 @@ import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.browser.LoginService;
 
 public class ServletScope {
 	public HttpServletRequest request;
