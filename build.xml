@@ -16,47 +16,19 @@
 	<property name="tmp" value="tmp"/>
 	<property name="lib.dir" value="C:\Users\Qronon\Java Libraries"/>
 	<property name="javadoc" value="doc"/>
-	<property name="output.dir" value="../qrone/package/"/>
-	<property name="lib.output.dir" value="../qrone/package/lib/"/>
-	<property name="qrone-base.jar" value="qrone-base-0.0.6.jar"/>
-	<property name="qrone.jar" value="qrone-0.0.6.jar"/>
+	<property name="output.dir" value=""/>
+	<property name="lib.output.dir" value="lib"/>
+	<property name="qrone.jar" value="qrone-0.1.0.jar"/>
 
-    <target name="package" depends="unjar">
-		<jar basedir="${output.dir}tmp" destfile="${qrone.jar}"></jar>
-    </target>
-
-	<target name="unjar" depends="jar">
-    	<mkdir dir="${output.dir}tmp"/>
-		<unjar dest="${output.dir}tmp">
-			<fileset dir="${output.dir}" id="id">
-		    	<include name="*.jar" />
-			</fileset>
-		</unjar>
-	</target>
 		    		
-    <target name="jar" depends="jar-child">
+    <target name="package" depends="clean,copy-lib,compile" >
     	<mkdir dir="${output.dir}"/>
-		<jar basedir="${bin}" destfile="${output.dir}${qrone-base.jar}">
+		<jar basedir="${bin}" destfile="${output.dir}${qrone.jar}">
 			<manifest>
 				<attribute name="Main-Class" value="org.qrone.r7.QrONECompressor"/>
 			</manifest>
     	</jar>
     </target>
-		
-    <target name="jar-child">
-    	<ant antfile="../qrone-appengine/build.xml" dir="../qrone-appengine"></ant>
-    	<ant antfile="../qrone-ext/build.xml" dir="../qrone-ext"></ant>
-        <ant antfile="../qrone-local/build.xml" dir="../qrone-local"></ant>
-	</target>
-		
-	<target name="unjar-lib" depends="copy-lib">
-    	<mkdir dir="${output.dir}tmp"/>
-		<unjar dest="${output.dir}tmp">
-			<fileset dir="${lib.output.dir}" id="id">
-		    	<include name="*.jar" />
-			</fileset>
-		</unjar>
-	</target>
 	
     <target name="copy-lib">
     	<mkdir dir="${lib.output.dir}"/>
@@ -71,6 +43,8 @@
         <copy file="${lib.dir}/jetty-6.1.24/jetty-6.1.24.jar" todir="${lib.output.dir}"/>
         <copy file="${lib.dir}/jetty-6.1.24/jetty-util-6.1.24.jar" todir="${lib.output.dir}"/>
         <copy file="${lib.dir}/jetty-6.1.24/servlet-api-2.5-20081211.jar" todir="${lib.output.dir}"/>
+        <copy file="${lib.dir}/jetty-6.1.24/ext/jetty-client-6.1.24.jar" todir="${lib.output.dir}"/>
+        <copy file="${lib.dir}/jetty-6.1.24/ext/jetty-sslengine-6.1.24.jar" todir="${lib.output.dir}"/>
         <copy file="${lib.dir}/swt-3.5.2-win32-win32-x86/swt.jar" todir="${lib.output.dir}"/>
     	<copy file="${lib.dir}/jdbm-1.0/lib/jdbm-1.0.jar" todir="${lib.output.dir}"/>
     	<copy file="${lib.dir}/mysql-connector-java-5.1.13/mysql-connector-java-5.1.13-bin.jar" todir="${lib.output.dir}"/>
@@ -99,9 +73,14 @@
     	<mkdir dir="${bin}"/>
         <javac srcdir="${src}"
          destdir="${bin}"
-         classpath="./"
-         debug="on"
-	/>
+         debug="on">
+            <classpath>
+                <pathelement path="${classpath}"/>
+                <fileset dir=".">
+                  <include name="**/*.jar"/>
+                </fileset>
+              </classpath>
+   		</javac>
     </target>
 </project>
 

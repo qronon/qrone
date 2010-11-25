@@ -102,6 +102,7 @@ public class PNGMemoryImage implements ImageBuffer{
 		
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
+				/*
 				if(from.y * img.getWidth() + from.x + j >= pix.length){
 					System.out.println("pix overflow");
 				}
@@ -110,6 +111,7 @@ public class PNGMemoryImage implements ImageBuffer{
 					System.out.println(to.y * width + to.x + j);
 					System.out.println(buf.length);
 				}
+				*/
 				
 				buf[(to.y + i) * width + to.x + j]
 				    = pix[(from.y + i) * img.getWidth() + from.x + j];

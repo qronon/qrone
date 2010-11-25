@@ -56,14 +56,13 @@ public class ImageSpriter {
 	}
 	
 	private ImagePack unpack() {
-		/*
 		if (pack == null && pspriteURI != null) {
 			try {
 				pack = (ImagePack) QrONEUtils.unserialize(
 						resolver.getInputStream(pspriteURI));
 			} catch (IOException e) {}
 		}
-		*/
+		
 		if(pack == null)
 			pack = new ImagePack();
 		return pack;

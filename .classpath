@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Validator.nu"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/CSSParser"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.preview.runtimeTarget/J2EE Preview"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jetty"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache HTTPClient"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Commons Codec"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSONIC"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressorDependencies"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Javassist"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSONIC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JYaml"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/CSSParser"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Validator.nu"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressor"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Scannotation"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Textile"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YUICompressorDependencies"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Memcached"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AppEngine SDK"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jetty"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
