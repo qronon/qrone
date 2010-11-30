@@ -12,14 +12,24 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.codec.binary.Base64;
@@ -338,4 +348,44 @@ public class QrONEUtils{
 		return sdf.format(date);
 	}
 	
+	public static byte[] generateKey(){
+		KeyGenerator keyGenerator;
+		try {
+			keyGenerator = KeyGenerator.getInstance("Blowfish");
+			keyGenerator.init(128);
+			return keyGenerator.generateKey().getEncoded();
+		} catch (NoSuchAlgorithmException e) {}
+		return null;
+	}
+	
+
+	public static byte[] encrypt(byte[] data, byte[] key){
+		Cipher cipher;
+		try {
+			cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "Blowfish"));
+			return cipher.doFinal(data);
+		} catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchPaddingException e) {
+		} catch (InvalidKeyException e) {
+		} catch (IllegalBlockSizeException e) {
+		} catch (BadPaddingException e) {
+		}
+		return null;
+	}
+
+	public static byte[] decrypt(byte[] data, byte[] key){
+		Cipher cipher;
+		try {
+			cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
+			cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "Blowfish"));
+			return cipher.doFinal(data);
+		} catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchPaddingException e) {
+		} catch (InvalidKeyException e) {
+		} catch (IllegalBlockSizeException e) {
+		} catch (BadPaddingException e) {
+		}
+		return null;
+	}
 }

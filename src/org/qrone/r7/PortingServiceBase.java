@@ -1,29 +1,32 @@
 package org.qrone.r7;
 
+import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageBufferService;
-import org.qrone.kvs.KVSService;
+import org.qrone.login.LoginService;
+import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.fetcher.URLFetcher;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.browser.LoginService;
 
 public class PortingServiceBase  implements PortingService{
 	private ImageBufferService imagebuffer;
 	private LoginService login;
 	private URLFetcher fetcher;
 	private URIResolver resolver;
-	private KVSService database;
+	private DatabaseService database;
 	private MemcachedService memcached;
 	private RepositoryService repository;
+	private SecurityService security;
 	
 	public PortingServiceBase(
 			URLFetcher fetcher,
 			URIResolver resolver,
-			KVSService database,
+			DatabaseService database,
 			MemcachedService memcached,
 			LoginService login,
 			ImageBufferService imagebuffer,
-			RepositoryService repository
+			RepositoryService repository,
+			SecurityService security
 			){
 		this.imagebuffer = imagebuffer;
 		this.login = login;
@@ -32,6 +35,7 @@ public class PortingServiceBase  implements PortingService{
 		this.database = database;
 		this.memcached = memcached;
 		this.repository = repository;
+		this.security = security;
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class PortingServiceBase  implements PortingService{
 	}
 
 	@Override
-	public KVSService getKVSService() {
+	public DatabaseService getKVSService() {
 		return database;
 	}
 
@@ -67,6 +71,11 @@ public class PortingServiceBase  implements PortingService{
 	@Override
 	public RepositoryService getRepositoryService() {
 		return repository;
+	}
+
+	@Override
+	public SecurityService getSecurityService() {
+		return security;
 	}
 
 }

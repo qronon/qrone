@@ -59,5 +59,10 @@ public class ListWrapper extends ScriptableWrapper<List> implements Indexer, Ser
 		}
 		return l.toArray();
 	}
+
+	@Override
+	public int size() {
+		return list.size();
+	}
 }
 

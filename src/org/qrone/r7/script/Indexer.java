@@ -5,4 +5,5 @@ public interface Indexer {
 	public void put(int index, Object value);
 	public Object get(int index);
 	public Object remove(int index);
+	public int size();
 }

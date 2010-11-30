@@ -226,16 +226,16 @@ public class ImageSpriter {
 	public void createt() throws IOException {
 		if(useTransparentDot && !outTransparentDot){
 			outTransparentDot = true;
-			InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
+			//InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
 			OutputStream out = resolver.getOutputStream(tspriteURI);
-			try{
-				int buf;
-			    while ((buf = in.read()) >= 0)
-			        out.write(buf);
-			}finally{
-				in.close();
+			//try{
+				//int buf;
+			   // while ((buf = in.read()) >= 0)
+			        out.write(QrONEUtils.base64_decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGOfPtRkwAAACBjSFJNAAB6JQAAgIMAAPn/AACA6QAAdTAAAOpgAAA6mAAAF2+SX8VGAAAAEElEQVR42mL4//8/A0CAAQAI/AL+26JNFgAAAABJRU5ErkJggg=="));
+			//}finally{
+			//	in.close();
 				out.close();
-			}
+			//}
 		}
 	}
 	

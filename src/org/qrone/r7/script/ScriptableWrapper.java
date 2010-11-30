@@ -23,7 +23,7 @@ public abstract class ScriptableWrapper<T> extends NativeJavaObject implements S
     }
 
     public boolean has(String name, Scriptable start) {
-        return (super.has(name, start) || 
+        return (super.has(name, start) || (this instanceof Indexer && name.equals("length")) ||
         		(this instanceof Mapper && ((Mapper)this).exist(name)));
     }
     
@@ -33,7 +33,9 @@ public abstract class ScriptableWrapper<T> extends NativeJavaObject implements S
     }
     
     public Object get(String name, Scriptable start) {
-    	if (super.has(name, start)) {
+    	if (this instanceof Indexer && name.equals("length")){
+    		return ((Indexer)this).size();
+    	}else if (super.has(name, start)) {
             return super.get(name, start);
         } else if (this instanceof Mapper && ((Mapper)this).exist(name)) {
             return ((Mapper)this).get(name);

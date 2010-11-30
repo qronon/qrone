@@ -1,4 +1,4 @@
-package org.qrone.r7.store;
+package org.qrone.kvs;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -15,10 +15,9 @@ public class MemoryStore implements KeyValueStore{
 	public void set(String key, byte[] value) {
 		map.put(key, value);
 	}
-
+	
 	@Override
-	public void set(String key, byte[] value, long expire) {
+	public void set(String key, byte[] value, boolean weak) {
 		map.put(key, value);
 	}
-
 }

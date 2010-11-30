@@ -107,7 +107,7 @@ public class Scale9Handler implements HTML5TagHandler {
 					public String prestart() {
 						try {
 							return startScale3(f.resolve(u),
-									l.get(0), l.get(1), c);
+									l.get(0), l.get(1), c, w);
 						} catch (IOException e) {
 							return null;
 						}
@@ -138,14 +138,14 @@ public class Scale9Handler implements HTML5TagHandler {
 		return null;
 	}
 
-	public String startScale3(URI file, int left, int right, String color) throws IOException{
+	public String startScale3(URI file, int left, int right, String color, String w) throws IOException{
 		ImageBuffer image = deck.getSpriter().getImage(file);
 		//int width = image.getWidth();
 		int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
 
-		b.append("<table style=\"width:100%;\" cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");
+		b.append("<table" + ( w != null ? " style=\"" + w + "\"" : "" ) + " cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"");
 		b.append(deck.getSpriter().addISprite(new ImagePart(file, 0, 0, left, height)));
 		b.append("\"></td><td valign=\"top\" style=\"" + color);
 		b.append(deck.getSpriter().addHSprite(new ImagePart(file, left, 0, right-left, height)) + "\">");

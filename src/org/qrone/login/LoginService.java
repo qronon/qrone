@@ -1,6 +1,8 @@
-package org.qrone.r7.script.browser;
+package org.qrone.login;
 
 import java.util.Map;
+
+import org.qrone.r7.script.browser.User;
 
 public interface LoginService {
 	public String loginURL(String doneURL);

@@ -6,8 +6,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -16,10 +19,10 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.database.DatabaseService;
 import org.qrone.deck.PropertiesDeck;
 import org.qrone.deck.TextileDeck;
 import org.qrone.deck.YamlDeck;
-import org.qrone.kvs.KVSService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.RepositoryService;
 import org.qrone.r7.parser.HTML5OM;
@@ -38,7 +41,7 @@ public class Window extends ServletScopeObject{
 	public Navigator navigator;
 	public Object query;
 	public JSON JSON;
-	public KVSService db;
+	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
 	
@@ -111,6 +114,18 @@ public class Window extends ServletScopeObject{
 		}
 		return null;
 	}
+	
+
+	public void redirect(String uri) throws URISyntaxException{
+		String url = ss.uri.resolve(uri).toString();
+		if(!url.startsWith("http://") && !url.startsWith("https://")){
+			url = "http://" + ss.request.getRemoteHost() + url;
+		}
+		
+		header("Location: " + url);
+	}
+	
+	
 	
 	private PropertiesDeck propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{

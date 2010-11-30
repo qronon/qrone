@@ -273,6 +273,15 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}
 	}
 	
+	public void out(HTML5NodeSet e) {
+		e.exec(new HTML5NodeSet.Delegate() {
+			@Override
+			public void call(HTML5Element e) {
+				visit(e);
+			}
+		});
+	}
+	
 	public void out(HTML5Element e) {
 		visit(e);
 	}
