@@ -23,6 +23,7 @@ import org.qrone.database.DatabaseService;
 import org.qrone.deck.PropertiesDeck;
 import org.qrone.deck.TextileDeck;
 import org.qrone.deck.YamlDeck;
+import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.RepositoryService;
 import org.qrone.r7.parser.HTML5OM;
@@ -44,6 +45,7 @@ public class Window extends ServletScopeObject{
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
+	public SecurityService security;
 	
 	public Window(ServletScope ss) throws IOException, URISyntaxException{
 		super(ss);
@@ -58,6 +60,7 @@ public class Window extends ServletScopeObject{
 		db = ss.service.getKVSService();
 		memcached = ss.service.getMemcachedService();
 		repository = ss.service.getRepositoryService();
+		security = ss.service.getSecurityService();
 	}
 	
 	public Object getQuery(){
