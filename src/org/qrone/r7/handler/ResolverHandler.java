@@ -23,12 +23,12 @@ public class ResolverHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String path, String pathArg){
+			String uri, String path, String pathArg){
 		InputStream in = null;
 		try{
-			URI uri = new URI(request.getPathInfo());
-			if(resolver.exist(path)){
-				byte[] buf = QrONEUtils.read(resolver.getInputStream(uri));
+			URI urio = new URI(uri);
+			if(resolver.exist(uri)){
+				byte[] buf = QrONEUtils.read(resolver.getInputStream(urio));
 				String str = QrONEUtils.base64_encode(MessageDigest.getInstance("SHA-1").digest(buf));
 				String etag = request.getHeader("If-None-Match");
 				if(etag != null && etag.equals(str.trim())){

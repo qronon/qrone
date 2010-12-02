@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
@@ -19,63 +20,50 @@ import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.Window;
 
-public class HTML5Handler implements URIHandler, Extendable{
+public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
-	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
+	private URIResolver resolver;
 	
-	public HTML5Handler(PortingService services) {
+	public JavaScriptHandler(PortingService services, JSDeck vm, HTML5Deck deck) {
 		this.services = services;
 		this.resolver = services.getURIResolver();
-		deck = new HTML5Deck(resolver, services.getImageBufferService());
-		vm = new JSDeck(resolver, deck);
-	}
-	
-	public void addExtension(Class c){
-		vm.addExtension(c);
-		deck.addExtension(c);
+		this.deck = deck;
+		this.vm = vm;
 	}
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String path, String pathArg) {
+			String uri, String path, String pathArg) {
 		try {
-			deck.update(new URI(path));
-			response.setCharacterEncoding("utf8");
-			if(resolver.exist(path + ".server.js")){
-				URI uri = new URI(path + ".server.js");
-				JSOM om = vm.compile(uri);
+			if(resolver.exist(uri)){
+				URI urio = new URI(uri);
+				JSOM om = vm.compile(urio);
 				if(om != null){
 					Scriptable scope = vm.createScope();
 					ServletScope ss = new ServletScope(
 							request,response,path,pathArg,
-							scope,deck,vm,uri,services);
+							scope,deck,vm,urio,services);
 					om.run(scope, new Window(ss));
 					ss.writer.flush();
 					ss.writer.close();
 					return true;
 				}
 			}
-			
-			if(resolver.exist(path + ".html")){
-				URI uri = new URI(path + ".html");
-				HTML5OM om = deck.compile(uri);
-				if(om != null){
-					response.setContentType("text/html; charset=utf8");
-					deck.getSpriter().create();
-
-					Writer out = response.getWriter();
-					out.append(om.serialize());
-					out.flush();
-					out.close();
-					return true;
-				}
+		} catch (Exception e) {
+			try{
+				URI urio = new URI("/system/exception.server.js");
+				Scriptable scope = vm.createScope();
+				ServletScope ss = new ServletScope(
+						request,response,path,pathArg,
+						scope,deck,vm,urio,services);
+				scope.put("exception", scope, e);
+				JSOM om = vm.compile(urio);
+				om.run(scope, new Window(ss));
+			}catch (Exception e1){
+				e1.printStackTrace();
 			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return false;
 	}

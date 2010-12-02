@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
@@ -31,17 +32,12 @@ public class JSOM implements Comparable<JSOM>{
 		}
 	}
 
-	public void run(Scriptable scope) {
+	public void run(Scriptable scope){
 		scope.put("window", scope, scope);
-		
-		try{
-			script.exec(JSDeck.getContext(), scope);
-		}catch(WrappedException e){
-			e.getWrappedException().printStackTrace();
-		}
+		script.exec(JSDeck.getContext(), scope);
 	}
 
-	public void run(Scriptable scope, Object... prototypes) {
+	public void run(Scriptable scope, Object... prototypes){
 		Scriptable parent = scope;
 		for (int i = 0; i < prototypes.length; i++) {
 			Scriptable window = (Scriptable)Context.javaToJS(prototypes[i], scope);

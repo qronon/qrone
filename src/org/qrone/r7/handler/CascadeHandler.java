@@ -1,5 +1,6 @@
 package org.qrone.r7.handler;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,10 +21,10 @@ public class CascadeHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String path, String pathArg) {
+			String uri, String path, String pathArg) {
 		for (Iterator<URIHandler> i = list.iterator(); i.hasNext();) {
 			URIHandler r = i.next();
-			if(r.handle(request,response,path,pathArg)){
+			if(r.handle(request,response,uri,path,pathArg)){
 				return true;
 			}
 		}

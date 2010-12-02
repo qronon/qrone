@@ -64,6 +64,11 @@ public class Window extends ServletScopeObject{
 	}
 	
 	public Object getQuery(){
+		if(ss.request.getMethod().toUpperCase().equals("POST")
+				&& !security.isSecured(ss.request)){
+			return newScriptable();
+		}
+		
 		Scriptable o = newScriptable();
 		Map<String, String[]> map = ss.request.getParameterMap();
 		for (Iterator<Entry<String, String[]>> i = map.entrySet().iterator(); i

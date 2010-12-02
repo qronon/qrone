@@ -20,7 +20,7 @@ public class FaviconHandler implements URIHandler{
 	
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String path, String pathArg) {
+			HttpServletResponse response, String uri, String path, String pathArg) {
 		if(path.equals("/favicon.ico")){
 			try {
 				InputStream in;

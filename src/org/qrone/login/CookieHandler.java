@@ -34,7 +34,7 @@ public class CookieHandler implements URIHandler, SecurityService{
 
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String path, String pathArg) {
+			HttpServletResponse response, String uri, String path, String pathArg) {
 		
 		Cookie[] cookies = request.getCookies();
 		if(cookies != null){
@@ -88,9 +88,8 @@ public class CookieHandler implements URIHandler, SecurityService{
 	}
 
 	@Override
-	public boolean isSecured() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isSecured(HttpServletRequest request) {
+		return validateTicket(request.getParameter(".ticket"));
 	}
 
 }

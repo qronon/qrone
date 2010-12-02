@@ -36,7 +36,7 @@ public class ProxyHandler implements URIHandler{
 	}
 	@Override
 	public boolean handle(final HttpServletRequest request,
-			final HttpServletResponse response, final String path, final String pathArg) {
+			final HttpServletResponse response, final String uri, final String path, final String pathArg) {
 		try {
 			AsyncProxyServlet serv = new AsyncProxyServlet(){
 				@Override

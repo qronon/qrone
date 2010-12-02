@@ -1,5 +1,7 @@
 package org.qrone.r7.handler;
 
+import java.net.URI;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,19 +14,19 @@ public class PathFinderHandler implements URIHandler {
 	
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String path, String pathArg) {
+			String uri, String path, String pathArg) {
 		
 		if(path.endsWith("/")){
-			if(handler.handle(request, response, path + "index", pathArg)) 
+			if(handler.handle(request, response, uri + "index", path + "index", pathArg)) 
 				return true;
 		}else{
-			if(handler.handle(request, response, path, pathArg)) 
+			if(handler.handle(request, response, uri, path, pathArg)) 
 				return true;
 		}
 		
 		int index = path.lastIndexOf('/');
 		if(index > 0){
-			if(handle(request, response, path.substring(0, index), 
+			if(handle(request, response, uri.substring(0, index), path.substring(0, index), 
 					path.substring(index) + pathArg))
 				return true;
 		}
