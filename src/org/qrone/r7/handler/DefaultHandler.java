@@ -29,10 +29,9 @@ public class DefaultHandler implements URIHandler, Extendable{
 	private URIHandler html5Handler;
 	private URIHandler jsHandler;
 	private URIHandler resolverHandler;
-	private URIHandler doneHandler;
 	private URIHandler handler;
 	
-	public DefaultHandler(PortingService services, URIHandler finalizer) {
+	public DefaultHandler(PortingService services) {
 		this.services = services;
 		this.resolver = services.getURIResolver();
 		deck = new HTML5Deck(resolver, services.getImageBufferService());
@@ -41,7 +40,6 @@ public class DefaultHandler implements URIHandler, Extendable{
 		html5Handler = new HTML5Handler(services, deck);
 		jsHandler = new JavaScriptHandler(services, vm, deck);
 		resolverHandler = new ResolverHandler(resolver);
-		doneHandler = finalizer;
 		handler = new URIHandler() {
 			@Override
 			public boolean handle(HttpServletRequest request,
@@ -65,37 +63,37 @@ public class DefaultHandler implements URIHandler, Extendable{
 			deck.update(new URI(path));
 			response.setCharacterEncoding("utf8");
 			
+
+			if(uri.endsWith(".action.js") && 
+					jsHandler.handle(request, response, uri, path, pathArg)){
+				return true;
+			}
+			
+			if(jsHandler.handle(request, response, uri + ".action.js", path, pathArg)){
+				return true;
+			}
 			
 			if(uri.endsWith(".server.js") && 
 					jsHandler.handle(request, response, uri, path, pathArg)){
-				doneHandler.handle(request, response, uri, path, pathArg);
 				return true;
 			}
 			
 			if(jsHandler.handle(request, response, uri + ".server.js", path, pathArg)){
-				doneHandler.handle(request, response, uri, path, pathArg);
 				return true;
 			}
 			
 			if(html5Handler.handle(request, response, uri, path, pathArg)){
-				doneHandler.handle(request, response, uri, path, pathArg);
 				return true;
 			}
 
 			if(html5Handler.handle(request, response, uri + ".html", path, pathArg)){
-				doneHandler.handle(request, response, uri, path, pathArg);
-				return true;
-			}
-			
-			if(html5Handler.handle(request, response, uri + ".htm", path, pathArg)){
-				doneHandler.handle(request, response, uri, path, pathArg);
 				return true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		if(!uri.endsWith(".server.js") && 
+		if(!uri.endsWith(".server.js") && !uri.endsWith(".action.js") && 
 				resolverHandler.handle(request, response, uri, path, pathArg)){
 			return true;
 		}
@@ -106,6 +104,22 @@ public class DefaultHandler implements URIHandler, Extendable{
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
 			String uri, String path, String pathArg) {
 		if(pathFinderHandler.handle(request, response, uri, path, pathArg)){
+			return true;
+		}
+
+		if(jsHandler.handle(request, response, "/404.server.js", path, pathArg)){
+			return true;
+		}
+
+		if(html5Handler.handle(request, response, "/404.html", path, pathArg)){
+			return true;
+		}
+
+		if(jsHandler.handle(request, response, "/admin/404.server.js", path, pathArg)){
+			return true;
+		}
+
+		if(html5Handler.handle(request, response, "/admin/404.html", path, pathArg)){
 			return true;
 		}
 		return false;

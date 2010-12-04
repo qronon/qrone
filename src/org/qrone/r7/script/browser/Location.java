@@ -1,22 +1,17 @@
 package org.qrone.r7.script.browser;
 
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 
-import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.ServletScopeObject;
-
-public class Location extends ServletScopeObject{
+public class Location{
 	
-	public Location(ServletScope ss) throws IOException{
-		super(ss);
-		
-		href = ss.request.getRequestURL().toString();
-		protocol = ss.request.getProtocol();
-		hostname = ss.request.getServerName();
-		host = ss.request.getServerName() + ":" + ss.request.getServerPort();
-		port = ss.request.getServerPort();
-		pathname = ss.request.getPathInfo();
-		search = ss.request.getQueryString();
+	public Location(HttpServletRequest request){
+		href = request.getRequestURL().toString();
+		protocol = request.getProtocol();
+		hostname = request.getServerName();
+		host = request.getServerName() + ":" + request.getServerPort();
+		port = request.getServerPort();
+		pathname = request.getPathInfo();
+		search = request.getQueryString();
 		hash = "";
 	}
 	

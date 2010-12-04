@@ -1,13 +1,19 @@
 package org.qrone.r7.handler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.arnx.jsonic.JSON;
+
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
@@ -17,8 +23,10 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.Window;
+import org.qrone.util.QrONEUtils;
 
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
@@ -38,32 +46,65 @@ public class JavaScriptHandler implements URIHandler{
 			String uri, String path, String pathArg) {
 		try {
 			if(resolver.exist(uri)){
-				URI urio = new URI(uri);
+				URI urio = urio = new URI(uri);
 				JSOM om = vm.compile(urio);
 				if(om != null){
 					Scriptable scope = vm.createScope();
-					ServletScope ss = new ServletScope(
-							request,response,path,pathArg,
-							scope,deck,vm,urio,services);
-					om.run(scope, new Window(ss));
-					ss.writer.flush();
-					ss.writer.close();
+					ServletScope ss = new ServletScope(urio,path,pathArg);
+					Window window = new Window(ss,scope,request,response,deck,vm,services);
+					scope.put("query", scope, window.getQueryMap());
+					
+					Object result = om.run(scope, window);
+					if(uri.endsWith(".action.js") && result instanceof Function){
+						Object fr = ((Function)result).call(
+								JSDeck.getContext(), scope, scope, new Object[0]);
+					}
+					window.document.flush();
+					window.document.close();
+					
+					String done = request.getParameter(".done");
+					if(done != null && services.getSecurityService().isSecured(request)){
+						String r = QrONEUtils.escape(JSON.encode(result));
+						try {
+							if(done.indexOf('?') >= 0){
+								response.sendRedirect(done);
+							}else{
+								response.sendRedirect(done);
+							}
+						} catch (IOException e) {
+						}
+					}
 					return true;
 				}
 			}
-		} catch (Exception e) {
+		} catch (RhinoException e) {
+			e.printStackTrace();
 			try{
-				URI urio = new URI("/system/exception.server.js");
+				Map map = new HashMap();
+				map.put("line", e.lineNumber());
+				map.put("file", e.sourceName());
+				map.put("stacktrace", e.getScriptStackTrace());
+				InputStream in = resolver.getInputStream(new URI(e.sourceName()));
+				if(in != null){
+					map.put("source", new String(QrONEUtils.read(in)));
+				}
+				
+				URI urio = new URI("/admin/error.server.js");
 				Scriptable scope = vm.createScope();
-				ServletScope ss = new ServletScope(
-						request,response,path,pathArg,
-						scope,deck,vm,urio,services);
-				scope.put("exception", scope, e);
+				ServletScope ss = new ServletScope(urio,path,pathArg);
+				scope.put("exception", scope, map);
 				JSOM om = vm.compile(urio);
-				om.run(scope, new Window(ss));
+				Window window = new Window(ss,scope,request,response,deck,vm,services);
+				om.run(scope, window);
+				window.document.flush();
+				window.document.close();
 			}catch (Exception e1){
 				e1.printStackTrace();
 			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}

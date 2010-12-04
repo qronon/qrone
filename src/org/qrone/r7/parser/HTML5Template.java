@@ -157,8 +157,12 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			set("#" + e.getKey(), e.getValue());
 		}
 	}
-	
+
 	public void set(final String selector, final Object o){
+		set(selector, o, false);
+	}
+	
+	public void set(final String selector, final Object o, boolean raw){
 		if(o instanceof Map){
 			select(selector).exec(new HTML5NodeSet.Delegate() {
 				public void call(HTML5Element e) {
@@ -197,7 +201,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}else if(o instanceof NodeLister){
 			select(selector).listup((NodeLister)o);
 		}else{
-			select(selector).html(o.toString().replaceAll("\n", "<br>"));
+			if(raw)
+				select(selector).html(o.toString());
+			else
+				select(selector).html(o.toString().replaceAll("\n", "<br>"));
 		}
 	}
 

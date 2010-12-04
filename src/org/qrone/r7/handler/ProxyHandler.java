@@ -60,11 +60,6 @@ public class ProxyHandler implements URIHandler{
 		return false;
 	}
 	
-	public static void proxy(ServletScope ss, String host, int port, String altPath) 
-			throws ServletException, IOException {
-		proxy(ss.request, ss.response, ss.path, ss.pathArg, host, port, altPath);
-	}
-	
 	public static void proxy(final HttpServletRequest request, final HttpServletResponse response, 
 			final String path, final String pathArg, final String host, final int port, final String altPath) 
 				throws ServletException, IOException {

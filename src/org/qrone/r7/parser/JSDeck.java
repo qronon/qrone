@@ -57,7 +57,8 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 		Context cx = map.get(t);
 		if(cx == null){
 			cx = Context.enter();
-			cx.setOptimizationLevel(9);
+			cx.setOptimizationLevel(-1);
+			//cx.setOptimizationLevel(9);
 			cx.setWrapFactory(wrapFactory);
 			map.put(t, cx);
 		}

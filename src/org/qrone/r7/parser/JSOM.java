@@ -31,20 +31,20 @@ public class JSOM implements Comparable<JSOM>{
 			in.close();
 		}
 	}
-
-	public void run(Scriptable scope){
+	
+	public Object run(Scriptable scope){
 		scope.put("window", scope, scope);
-		script.exec(JSDeck.getContext(), scope);
+		return script.exec(JSDeck.getContext(), scope);
 	}
 
-	public void run(Scriptable scope, Object... prototypes){
+	public Object run(Scriptable scope, Object... prototypes){
 		Scriptable parent = scope;
 		for (int i = 0; i < prototypes.length; i++) {
 			Scriptable window = (Scriptable)Context.javaToJS(prototypes[i], scope);
 			parent.setPrototype(window);
 			parent = window;
 		}
-		run(scope);
+		return run(scope);
 	}
 
 	@Override

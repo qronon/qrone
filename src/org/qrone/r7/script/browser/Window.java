@@ -1,6 +1,9 @@
 package org.qrone.r7.script.browser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,65 +15,98 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.json.JsonParser;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
+import org.mozilla.javascript.serialize.ScriptableOutputStream;
 import org.qrone.database.DatabaseService;
 import org.qrone.deck.PropertiesDeck;
 import org.qrone.deck.TextileDeck;
 import org.qrone.deck.YamlDeck;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
+import org.qrone.r7.PortingService;
 import org.qrone.r7.RepositoryService;
+import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
+import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
+import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.ServletScopeObject;
 import org.qrone.util.QrONEUtils;
 
 
-public class Window extends ServletScopeObject{
+public class Window{
+	private ServletScope ss;
+	private Scriptable scope;
+	private PortingService service;
+	private HTML5Deck deck;
+	private JSDeck vm;
+	private HttpServletRequest request;
+	private HttpServletResponse response;
+	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
+	
 	public PrintStream in = System.out;
 	public PrintStream out = System.out;
 	public Document document;
 	public Location location;
 	public Navigator navigator;
-	public Object query;
 	public JSON JSON;
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
 	public SecurityService security;
+	public URIResolver resolver;
 	
-	public Window(ServletScope ss) throws IOException, URISyntaxException{
-		super(ss);
-		document = new Document(ss);
+	public Window(ServletScope ss, Scriptable scope, HttpServletRequest request, HttpServletResponse response,
+			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
+		this.ss = ss;
+		this.scope = scope;
+		this.request = request;
+		this.response = response;
+		this.deck = deck;
+		this.vm = vm;
 		
-		location = new Location(ss);
-		navigator = new Navigator(ss);
-		
-		query = getQuery();
-		JSON = new JSON(ss);
-		
-		db = ss.service.getKVSService();
-		memcached = ss.service.getMemcachedService();
-		repository = ss.service.getRepositoryService();
-		security = ss.service.getSecurityService();
+		db = service.getKVSService();
+		memcached = service.getMemcachedService();
+		repository = service.getRepositoryService();
+		security = service.getSecurityService();
+		resolver = service.getURIResolver();
+
+		document = new Document(request, response, deck, ss.uri.toString().replaceAll("\\.server\\.js$", ".html"));
+		location = new Location(request);
+		navigator = new Navigator(request);
+		JSON = new JSON(scope);
 	}
 	
-	public Object getQuery(){
-		if(ss.request.getMethod().toUpperCase().equals("POST")
-				&& !security.isSecured(ss.request)){
+	private Scriptable newScriptable(){
+		return JSDeck.getContext().newObject(scope);
+	}
+
+	private URI resolvePath(String path) throws URISyntaxException {
+		return ss.uri.resolve(new URI(path));
+	}
+	
+	public Object getQueryMap(){
+		if(request.getMethod().toUpperCase().equals("POST")
+				&& !security.isSecured(request)){
 			return newScriptable();
 		}
 		
 		Scriptable o = newScriptable();
-		Map<String, String[]> map = ss.request.getParameterMap();
+		Map<String, String[]> map = request.getParameterMap();
 		for (Iterator<Entry<String, String[]>> i = map.entrySet().iterator(); i
 				.hasNext();) {
 			Entry<String, String[]> e = i.next();
@@ -84,31 +120,31 @@ public class Window extends ServletScopeObject{
 				o.put(e.getKey(), o, l);
 			}
 		}
-		if(!o.has("path", o))
-			o.put("path", o, ss.pathArg);
+		if(!o.has(".path", o))
+			o.put(".path", o, ss.pathArg);
 		return o;
 	}
 	
 	public void require(String path) throws IOException, URISyntaxException{
-		JSOM om = ss.vm.compile(resolvePath(path));
-		if(!ss.required.contains(om)){
-			ss.required.add(om);
+		JSOM om = vm.compile(resolvePath(path));
+		if(!required.contains(om)){
+			required.add(om);
 		}
-		om.run(ss.scope);
+		om.run(scope);
 	}
 	
 	public void require_once(String path) throws IOException, URISyntaxException{
-		JSOM om = ss.vm.compile(resolvePath(path));
-		if(!ss.required.contains(om)){
-			ss.required.add(om);
-			om.run(ss.scope);
+		JSOM om = vm.compile(resolvePath(path));
+		if(!required.contains(om)){
+			required.add(om);
+			om.run(scope);
 		}
 	}
 
 	public HTML5Template load_html(String uri) throws IOException, URISyntaxException{
-		URI u = ss.uri.resolve(uri);
-		if(ss.resolver.exist(u.toString())){
-			HTML5OM om = ss.deck.compile(u);
+		URI u = resolvePath(uri);
+		if(resolver.exist(u.toString())){
+			HTML5OM om = deck.compile(u);
 			if(om != null){
 				return new HTML5Template(om, u);
 			}
@@ -117,17 +153,17 @@ public class Window extends ServletScopeObject{
 	}
 	
 	public String load_file(String path) throws IOException, URISyntaxException{
-		if(ss.resolver.exist(resolvePath(path).toString())){
-			return QrONEUtils.convertStreamToString(ss.resolver.getInputStream(resolvePath(path)));
+		if(resolver.exist(resolvePath(path).toString())){
+			return QrONEUtils.convertStreamToString(resolver.getInputStream(resolvePath(path)));
 		}
 		return null;
 	}
 	
 
 	public void redirect(String uri) throws URISyntaxException{
-		String url = ss.uri.resolve(uri).toString();
+		String url = resolvePath(uri).toString();
 		if(!url.startsWith("http://") && !url.startsWith("https://")){
-			url = "http://" + ss.request.getRemoteHost() + url;
+			url = "http://" + request.getRemoteHost() + url;
 		}
 		
 		header("Location: " + url);
@@ -138,22 +174,22 @@ public class Window extends ServletScopeObject{
 	private PropertiesDeck propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{
 		if(propDeck == null)
-			propDeck = new PropertiesDeck(ss.resolver);
-		return propDeck.compile(ss.uri.resolve(path));
+			propDeck = new PropertiesDeck(resolver);
+		return propDeck.compile(resolvePath(path));
 	}
 
 	private YamlDeck yamlDeck;
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
 		if(yamlDeck == null)
-			yamlDeck = new YamlDeck(ss.resolver);
-		return yamlDeck.compile(ss.uri.resolve(path));
+			yamlDeck = new YamlDeck(resolver);
+		return yamlDeck.compile(resolvePath(path));
 	}
 	
 	private TextileDeck textileDeck;
 	public String load_textile(String path) throws IOException, URISyntaxException{
 		if(textileDeck == null)
-			textileDeck = new TextileDeck(ss.resolver);
-		return textileDeck.compile(ss.uri.resolve(path));
+			textileDeck = new TextileDeck(resolver);
+		return textileDeck.compile(resolvePath(path));
 	}
 	
 	public byte[] base64_decode(String base64String){
@@ -198,6 +234,24 @@ public class Window extends ServletScopeObject{
 		return digest_safe("SHA-512", data);
 	}
 	
+	/*
+	public String serialize(Scriptable obj) throws IOException{
+		ByteArrayOutputStream bo = new ByteArrayOutputStream();
+		ScriptableOutputStream out = new ScriptableOutputStream(bo, scope.getPrototype());
+		out.writeObject(obj);
+		out.close();
+		return QrONEUtils.base64_encode(bo.toByteArray());
+	}
+	
+	public Object deserialize(String ser) throws IOException, ClassNotFoundException{
+		ByteArrayInputStream bin = new ByteArrayInputStream(QrONEUtils.base64_decode(ser));
+		ObjectInputStream in = new ScriptableInputStream(bin, scope.getPrototype());
+		Object deserialized = in.readObject();
+		in.close();
+		return deserialized;
+	}
+	*/
+	
 	private String digest_safe(String type, String data){
 		try {
 			return digest(type, data);
@@ -227,12 +281,12 @@ public class Window extends ServletScopeObject{
 	}
 
 	public void header(String header, String value){
-		ss.response.addHeader(header, value);
+		response.addHeader(header, value);
 	}
 	
 	public void header(String header){
 		String[] hs = header.split(":", 2);
-		ss.response.addHeader(hs[0], hs[1]);
+		response.addHeader(hs[0], hs[1]);
 	}
 
 	public String stringify(Object out){
@@ -252,18 +306,18 @@ public class Window extends ServletScopeObject{
 				}
 			}
 		}
-		return ss.service.getLoginService().loginURL(url, attrMap, doneURL);
+		return service.getLoginService().loginURL(url, attrMap, doneURL);
 	}
 
 	public String loginURL(String doneURL) {
-		return ss.service.getLoginService().loginURL(doneURL);
+		return service.getLoginService().loginURL(doneURL);
 	}
 	
 	public String logoutURL(String doneURL){
-		return ss.service.getLoginService().logoutURL(doneURL);
+		return service.getLoginService().logoutURL(doneURL);
 	}
 	
 	public User getUser(){
-		return ss.service.getLoginService().getUser();
+		return service.getLoginService().getUser();
 	}
 }

@@ -98,7 +98,7 @@ public class PNGMemoryImage implements ImageBuffer{
 		if(to.h + to.y > height)
 			h = height - to.y;
 		
-		System.out.println(toString() + " To:" + to.toString() + " From:" + from.toString());
+		//System.out.println(toString() + " To:" + to.toString() + " From:" + from.toString());
 		
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {

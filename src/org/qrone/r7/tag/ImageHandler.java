@@ -25,16 +25,17 @@ public class ImageHandler implements HTML5TagHandler {
 
 	public void spriteTag(URI file, Element e){
 		try {
-			String src = e.getAttribute("src");
-			URI uri = file.resolve(src);
-			if(e.getNodeName().equals("img") 
-					&& src != null
-					&& deck.getResolver().exist(uri.toString())){
-				
-				String style = e.getAttribute("style");
-				e.setAttribute("style", deck.getSpriter().addISprite(uri) + style);
-				
-				e.setAttribute("src", QrONEUtils.relativize(file,deck.getSpriter().addTransparentDot()).toString());
+			if(e.getNodeName().toLowerCase().equals("img")){
+				String src = e.getAttribute("src");
+				URI uri = file.resolve(src);
+				if(src != null
+						&& deck.getResolver().exist(uri.toString())){
+					
+					String style = e.getAttribute("style");
+					e.setAttribute("style", deck.getSpriter().addISprite(uri) + style);
+					
+					e.setAttribute("src", QrONEUtils.relativize(file,deck.getSpriter().addTransparentDot()).toString());
+				}
 			}
 		} catch (DOMException e1) {
 			e1.printStackTrace();
