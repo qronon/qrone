@@ -42,6 +42,11 @@ public class SecurityTicketHandler implements HTML5TagHandler {
 				public String postend() {
 					return null;
 				}
+
+				@Override
+				public void process(HTML5Element e) {
+					
+				}
 			};
 		}
 		return null;

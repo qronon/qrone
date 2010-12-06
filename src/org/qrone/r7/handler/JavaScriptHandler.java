@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
@@ -55,10 +54,7 @@ public class JavaScriptHandler implements URIHandler{
 					scope.put("query", scope, window.getQueryMap());
 					
 					Object result = om.run(scope, window);
-					if(uri.endsWith(".action.js") && result instanceof Function){
-						Object fr = ((Function)result).call(
-								JSDeck.getContext(), scope, scope, new Object[0]);
-					}
+					
 					window.document.flush();
 					window.document.close();
 					
@@ -80,9 +76,12 @@ public class JavaScriptHandler implements URIHandler{
 		} catch (RhinoException e) {
 			e.printStackTrace();
 			try{
+				response.setStatus(500);
+				
 				Map map = new HashMap();
 				map.put("line", e.lineNumber());
 				map.put("file", e.sourceName());
+				map.put("message", e.getMessage());
 				map.put("stacktrace", e.getScriptStackTrace());
 				InputStream in = resolver.getInputStream(new URI(e.sourceName()));
 				if(in != null){

@@ -53,7 +53,9 @@ public abstract class HTML5Visitor {
 	
 	
 	protected void dispatch(Node n){
-		if(n instanceof Element)
+		if(n instanceof Document)
+			visit((Document)n);
+		else if(n instanceof Element)
 			visit((Element)n);
 		else if(n instanceof CDATASection)
 			visit((CDATASection)n);

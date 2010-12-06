@@ -99,6 +99,11 @@ public class Scale9Handler implements HTML5TagHandler {
 							return null;
 						}
 					}
+
+					@Override
+					public void process(HTML5Element e) {
+						
+					}
 				};
 			}else if(l.size() == 2){
 				return new HTML5TagResult() {
@@ -131,6 +136,11 @@ public class Scale9Handler implements HTML5TagHandler {
 						} catch (IOException e) {
 							return null;
 						}
+					}
+
+					@Override
+					public void process(HTML5Element e) {
+						
 					}
 				};
 			}

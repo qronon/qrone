@@ -82,7 +82,8 @@ public class DefaultHandler implements URIHandler, Extendable{
 				return true;
 			}
 			
-			if(html5Handler.handle(request, response, uri, path, pathArg)){
+			if(uri.endsWith(".html") && 
+					html5Handler.handle(request, response, uri, path, pathArg)){
 				return true;
 			}
 
@@ -106,7 +107,7 @@ public class DefaultHandler implements URIHandler, Extendable{
 		if(pathFinderHandler.handle(request, response, uri, path, pathArg)){
 			return true;
 		}
-
+		
 		if(jsHandler.handle(request, response, "/404.server.js", path, pathArg)){
 			return true;
 		}
@@ -114,14 +115,8 @@ public class DefaultHandler implements URIHandler, Extendable{
 		if(html5Handler.handle(request, response, "/404.html", path, pathArg)){
 			return true;
 		}
-
-		if(jsHandler.handle(request, response, "/admin/404.server.js", path, pathArg)){
-			return true;
-		}
-
-		if(html5Handler.handle(request, response, "/admin/404.html", path, pathArg)){
-			return true;
-		}
+		
+		response.setStatus(404);
 		return false;
 	}
 }

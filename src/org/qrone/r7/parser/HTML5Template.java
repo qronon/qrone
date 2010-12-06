@@ -14,6 +14,8 @@ import java.util.Set;
 
 import net.arnx.jsonic.JSON;
 
+import org.qrone.r7.script.browser.Function;
+import org.qrone.util.QrONEUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -77,7 +79,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		b = new StringBuilder();
 		list.add(b);
 	}
-
+	
 	public void append(char str){
 		b.append(String.valueOf(str));
 	}
@@ -165,10 +167,11 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public void set(final String selector, final Object o, boolean raw){
 		if(o instanceof Map){
 			select(selector).exec(new HTML5NodeSet.Delegate() {
-				public void call(HTML5Element e) {
-					e.html(new NodeLister() {
+				public void call(final HTML5Element e) {
+					e.html(new Function() {
 						@Override
-						public void accept(HTML5Template t, HTML5Element e) {
+						public Object call(Object... args) {
+							HTML5Template t = new HTML5Template(om, xomlist, uri);
 							Set<Entry> entryset = ((Map)o).entrySet();
 							for (Entry el : entryset) {
 								HTML5Template tt = new HTML5Template(om, xomlist, uri);
@@ -177,40 +180,50 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 								tt.visit(e);
 								t.append(tt);
 							}
+							return t;
 						}
 					});
 				}
 			});
 		}else if(o instanceof List){
 			select(selector).exec(new HTML5NodeSet.Delegate() {
-				public void call(HTML5Element e) {
-					e.html(new NodeLister() {
+				public void call(final HTML5Element e) {
+					e.html(new Function() {
+
 						@Override
-						public void accept(HTML5Template t, HTML5Element e) {
+						public Object call(Object... args) {
+							HTML5Template t = new HTML5Template(om, xomlist, uri);
 							for (Iterator iterator = ((List)o).iterator(); iterator
-									.hasNext();) {
+							.hasNext();) {
 								HTML5Template tt = new HTML5Template(om, xomlist, uri);
 								tt.set(iterator.next());
 								tt.visit(e);
 								t.append(tt);
 							}
+							return t;
 						}
 					});
 				}
 			});
-		}else if(o instanceof NodeLister){
-			select(selector).listup((NodeLister)o);
+		//}else if(o instanceof NodeLister){
+		//	select(selector).listup((NodeLister)o);
 		}else{
+			String str = o.toString();
+			if(o instanceof Number && ((Number)o).doubleValue() == ((Number)o).intValue()){
+				str = String.valueOf(((Number)o).intValue());
+			}
+			
 			if(raw)
-				select(selector).html(o.toString());
+				select(selector).html(str);
 			else
-				select(selector).html(o.toString().replaceAll("\n", "<br>"));
+				select(selector).html(str.replaceAll("\n", "<br>"));
 		}
 	}
-
+/*
 	public void set(String selector, NodeLister lister){
 		select(selector).listup(lister);
 	}
+	*/
 	/*
 	private boolean initialized = false;
 	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
@@ -251,11 +264,12 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		e.getOM().process(this, this, e.get(), null, xomlist);
 	}
 
+	/*
 	public void visit(HTML5OM om) {
 		//initialize(om);
 		om.process(this, this, null, null, xomlist);
 	}
-
+*/
 	
 	private Map<String, Iterator<Node>> selecting
 		= new Hashtable<String, Iterator<Node>>();
@@ -280,6 +294,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}
 	}
 	
+	/*
 	public void out(HTML5NodeSet e) {
 		e.exec(new HTML5NodeSet.Delegate() {
 			@Override
@@ -292,10 +307,24 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public void out(HTML5Element e) {
 		visit(e);
 	}
+	*/
+
+	public void out(HTML5Element e) {
+		final String uniqueid = QrONEUtils.uniqueid();
+		om.process(this, this, e.get(), uniqueid, xomlist);
+	}
+
+	public void out(HTML5OM om, NodeProcessor p) {
+		final String uniqueid = QrONEUtils.uniqueid();
+		om.process(this, p, om.getBody(), uniqueid, xomlist);
+	}
+	
+	public void out(HTML5OM om) {
+		out(om, this);
+	}
 	
 	public void out() {
-		//initialize(om);
-		om.process(this, xomlist);
+		om.process(this, this, om.getDocument(), null, xomlist);
 	}
 	
 	/*
@@ -320,7 +349,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	*/
 
 	public HTML5Element getBody() {
-		return om.getBody();
+		return new HTML5Element(om, om.getBody());
 	}
 	
 	/*
@@ -357,6 +386,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public void writeln(Object out) throws IOException{
 		write(out);
 		write("\n");
+	}
+	
+	public HTML5Template newTemplate() {
+		return new HTML5Template(om, xomlist, uri);
 	}
 	
 }

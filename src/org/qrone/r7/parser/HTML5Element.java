@@ -1,22 +1,28 @@
 package org.qrone.r7.parser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.qrone.r7.parser.HTML5NodeSet.Delegate;
+import org.qrone.r7.script.browser.Function;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
-public class HTML5Element {
+public class HTML5Element implements HTML5Node{
 	private HTML5OM om;
 	private Element e;
 	private Element oe;
 	private Map<Node, List<CSS3Rule>> map;
 	
 	private Object content;
+	
+	private List append;
+	private List prepend;
 	
 	
 	public HTML5Element(HTML5OM om, Element e){
@@ -28,7 +34,48 @@ public class HTML5Element {
 	public HTML5OM getOM(){
 		return om;
 	}
+	
+	public HTML5Node clone(){
+		return new HTML5Element(om,(Element)e.cloneNode(false));
+	}
+	
+	public void accept(NodeProcessor t) {
+		int index = 0;
+		if(prepend != null){
+			for (Object o : prepend) {
+				appendTo(t,o,index++,null);
+			}
+		}
+		
+		appendTo(t,content,-1,null);
 
+		index = 0;
+		if(append != null){
+			for (Object o : append) {
+				appendTo(t,o,index++,null);
+			}
+		}
+	}
+	
+	public void appendTo(final NodeProcessor t, Object o, int index, String html){
+		if(o instanceof HTML5OM){
+			t.out((HTML5OM)o);
+		}else if(o instanceof HTML5NodeSet){
+			((HTML5NodeSet)o).exec(new Delegate() {
+				@Override
+				public void call(HTML5Element e) {
+					t.visit(e);
+				}
+			});
+		}else if(o instanceof HTML5Element){
+			t.visit(((HTML5Element)o));
+		}else if(o instanceof Function){
+			appendTo(t, ((Function)o).call(index, html, t), index, html);
+		}else{
+			t.append(o.toString());
+		}
+	}
+	
 	public Element get(boolean override){
 		if(override){
 			if(oe == null) oe = (Element) e.cloneNode(false);
@@ -41,6 +88,7 @@ public class HTML5Element {
 		if(oe != null) return oe;
 		return e;
 	}
+	
 	
 	public String getAttribute(String name){
 		return get().getAttribute(name);
@@ -158,44 +206,57 @@ public class HTML5Element {
 		return content != null;
 	}
 
-	public void html(Object html) {
+	public HTML5Node html(HTML5OM html) {
 		this.content = html;
+		return this;
+	}
+	
+	public HTML5Node html(HTML5Node html) {
+		this.content = html;
+		return this;
 	}
 
-	public void accept(HTML5Template t) {
-		if(content instanceof NodeLister){
-			((NodeLister)content).accept(t, this);
-		}else{
-			t.append(content.toString());
-		}
+	public HTML5Node html(Function html) {
+		this.content = html;
+		return this;
+	}
+	
+	public HTML5Node html(String html) {
+		this.content = html;
+		return this;
 	}
 
-	public void css(String prop, String value) {
+	public HTML5Node css(String prop, String value) {
 		setProperty(prop, value);
+		return this;
 	}
 
-	public void css(String prop) {
+	public HTML5Node css(String prop) {
 		getAttribute(prop);
+		return this;
 	}
 
-	public void attr(String prop, String value) {
+	public HTML5Node attr(String prop, String value) {
 		setAttribute(prop, value);
+		return this;
 	}
 
-	public void attr(String prop) {
+	public HTML5Node attr(String prop) {
 		getAttribute(prop);
+		return this;
 	}
 
-	public void addClass(String cls) {
+	public HTML5Node addClass(String cls) {
 		String classes = getAttribute("class");
 		if(classes.trim().length() > 0){
 			setAttribute("class", classes.trim() + " " + cls);
 		}else{
 			setAttribute("class", cls);
 		}
+		return this;
 	}
 
-	public void removeClass(String cls) {
+	public HTML5Node removeClass(String cls) {
 		StringBuffer buf = new StringBuffer();
 		String[] cs = getAttribute("class").split(" ");
 		for (int i = 0; i < cs.length; i++) {
@@ -203,5 +264,54 @@ public class HTML5Element {
 				buf.append(cs[i]);
 		}
 		setAttribute("class", buf.toString().trim());
+		return this;
+	}
+
+	public HTML5Node append(String o){
+		if(append == null)
+			append = new ArrayList();
+		append.add(o);
+		return this;
+	}
+
+	public HTML5Node append(HTML5Node o){
+		if(append == null)
+			append = new ArrayList();
+		append.add(o);
+		return this;
+	}
+	
+	public HTML5Node append(Function o){
+		if(append == null)
+			append = new ArrayList();
+		append.add(o);
+		return this;
+	}
+
+	public HTML5Node prepend(String o){
+		if(prepend == null)
+			prepend = new ArrayList();
+		prepend.add(o);
+		return this;
+	}
+
+	public HTML5Node prepend(HTML5Node o){
+		if(prepend == null)
+			prepend = new ArrayList();
+		prepend.add(o);
+		return this;
+	}
+	
+	public HTML5Node prepend(Function o){
+		if(prepend == null)
+			prepend = new ArrayList();
+		prepend.add(o);
+		return this;
+	}
+	
+	@Override
+	public HTML5Node each(Function func) {
+		func.call(this);
+		return this;
 	}
 }

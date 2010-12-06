@@ -49,15 +49,17 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		if(str == null) return;
 		b.append(str);
 	}
-
-	protected void out(Element e){
-		out(e,null);
-	}
 	
-	protected void out(Element e, Delegate d){
+	protected void out(HTML5Element e5, NodeProcessor template){
+		Element e = e5.get();
 		List<HTML5TagResult> r = om.getTagResult(e);
 		if(r != null){
 			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
+			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
+					.hasNext();) {
+				iterator.next().process(e5);
+			}
+			
 			Collections.reverse(rr);
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
 					.hasNext();) {
@@ -68,11 +70,16 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 					.hasNext();) {
 				out(iterator.next().poststart());
 			}
-			if(d != null){
-				d.accept();
+
+			if(e5.hasContent()){
+				e5.accept(template);
+				///HTML5Template t = template.newTemplate();
+				//e5.accept(t);
+				//getWriter().append(t);
 			}else{
 				accept(e);
 			}
+			
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
 					.hasNext();) {
 				out(iterator.next().preend());
@@ -85,8 +92,11 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 			}
 		}else{
 			start(e);
-			if(d != null){
-				d.accept();
+			if(e5.hasContent()){
+				e5.accept(template);
+				//HTML5Template t = template.newTemplate();
+				//e5.accept(t);
+				//getWriter().append(t);
 			}else{
 				accept(e);
 			}

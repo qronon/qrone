@@ -35,8 +35,8 @@ public class HTML5Handler implements URIHandler{
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
 			String uri, String path, String pathArg) {
 		try {
-			if(resolver.exist(path + ".html")){
-				URI urio = new URI(path + ".html");
+			if(resolver.exist(uri)){
+				URI urio = new URI(uri);
 				HTML5OM om = deck.compile(urio);
 				if(om != null){
 					response.setContentType("text/html; charset=utf8");
