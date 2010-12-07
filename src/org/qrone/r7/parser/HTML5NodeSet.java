@@ -75,6 +75,16 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 
+	public String html(){
+		final StringBuilder b = new StringBuilder();
+		exec(new Delegate() {
+			public void call(HTML5Element e) {
+				b.append(e.html());
+			}
+		});
+		return b.toString();
+	}
+	
 	public HTML5Node html(final HTML5Template html){
 		return exec(new Delegate() {
 			public void call(HTML5Element e) {

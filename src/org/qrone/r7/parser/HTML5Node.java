@@ -11,6 +11,7 @@ public interface HTML5Node {
 	public HTML5Node attr(String prop, String value);
 	public HTML5Node css(String prop);
 	public HTML5Node css(String prop, String value);
+	public String html();
 	public HTML5Node html(HTML5Template html);
 	public HTML5Node html(HTML5Node html);
 	public HTML5Node html(Function html);

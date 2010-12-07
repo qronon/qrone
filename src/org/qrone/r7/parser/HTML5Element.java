@@ -15,6 +15,7 @@ import org.w3c.dom.css.CSSValue;
 
 public class HTML5Element implements HTML5Node{
 	private HTML5OM om;
+	private HTML5Template t;
 	private Element e;
 	private Element oe;
 	private Map<Node, List<CSS3Rule>> map;
@@ -25,8 +26,9 @@ public class HTML5Element implements HTML5Node{
 	private List prepend;
 	
 	
-	public HTML5Element(HTML5OM om, Element e){
+	public HTML5Element(HTML5OM om, HTML5Template t, Element e){
 		this.om = om;
+		this.t = t;
 		this.e = e;
 		this.map = om.getCSSRuleMap();
 	}
@@ -36,7 +38,7 @@ public class HTML5Element implements HTML5Node{
 	}
 	
 	public HTML5Node clone(){
-		return new HTML5Element(om,(Element)e.cloneNode(false));
+		return new HTML5Element(om, t.newTemplate(), (Element)e.cloneNode(false));
 	}
 	
 	public void accept(HTML5Template t) {
@@ -64,17 +66,9 @@ public class HTML5Element implements HTML5Node{
 			HTML5Template tt = (HTML5Template)o;
 			tt.out(tt.getBody());
 			t.append(tt);
-		}else if(o instanceof HTML5NodeSet){
-			((HTML5NodeSet)o).exec(new Delegate() {
-				@Override
-				public void call(HTML5Element e) {
-					t.visit(e);
-				}
-			});
-		}else if(o instanceof HTML5Element){
-			HTML5Template tt = (HTML5Template)o;
-			tt.out((HTML5Element)o);
-			t.append(tt);
+		}else if(o instanceof HTML5Node){
+			HTML5Node e = (HTML5Node)o;
+			t.append(e.html());
 		}else if(o instanceof Function){
 			appendTo(t, ((Function)o).call(index, html), index, html);
 		}else{
@@ -212,6 +206,13 @@ public class HTML5Element implements HTML5Node{
 		return content != null;
 	}
 
+	public String html() {
+		if(t == null) return null;
+		HTML5Template tt = t.newTemplate();
+		tt.out(this);
+		return tt.toString();
+	}
+	
 	public HTML5Node html(HTML5OM html) {
 		this.content = html;
 		return this;

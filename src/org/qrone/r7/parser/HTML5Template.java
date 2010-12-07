@@ -116,7 +116,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public HTML5Element override(Element node){
 		HTML5Element e = node5map.get(node);
 		if(e == null){
-			e = new HTML5Element(om, node);
+			e = new HTML5Element(om, this, node);
 			node5map.put(node, e);
 		}
 		return e;
@@ -126,7 +126,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public HTML5Element get(Element node) {
 		HTML5Element e = node5map.get(node);
 		if(e == null){
-			e = new HTML5Element(om, node);
+			e = new HTML5Element(om, this, node);
 		}
 		return e;
 	}
@@ -307,7 +307,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 
 	public HTML5Element getBody() {
-		return new HTML5Element(om, om.getBody());
+		return new HTML5Element(om, this, om.getBody());
 	}
 
 	public URI getURI() {
@@ -327,7 +327,9 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 	
 	public HTML5Template newTemplate() {
-		return new HTML5Template(om, xomlist, uri);
+		HTML5Template t =  new HTML5Template(om, xomlist, uri);
+		t.node5map = node5map;
+		return t;
 	}
 	
 }

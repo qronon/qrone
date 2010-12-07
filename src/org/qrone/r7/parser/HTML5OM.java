@@ -124,7 +124,7 @@ public class HTML5OM {
 				for (Iterator<HTML5TagHandler> i = deck.getTagHandlers().iterator(); i
 						.hasNext();) {
 					HTML5TagHandler h = i.next();
-					HTML5TagResult r = h.process(new HTML5Element(HTML5OM.this, e));
+					HTML5TagResult r = h.process(new HTML5Element(HTML5OM.this, null, e));
 					if(r != null){
 						List<HTML5TagResult> l = extmap.get(e);
 						if(l == null){
@@ -344,7 +344,7 @@ public class HTML5OM {
 				if(p != null)
 					e = p.get(e4);
 				else
-					e = new HTML5Element(om, e4);
+					e = new HTML5Element(om, null, e4);
 				super.out(e, p);
 			}
 		};
