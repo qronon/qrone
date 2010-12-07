@@ -26,20 +26,24 @@ public class Document extends HTML5Template{
 	public String getCookie(){
 		return request.getHeader("Cookie");
 	}
-
-	public void out() {
-		super.out();
-		writer.append(toString());
-	}
 	
 	public void write(Object out) throws IOException{
-		if(out instanceof String)
+		if(out instanceof String){
 			writer.append((String)out);
-		else
+		}else if(out instanceof HTML5Template){
+			HTML5Template t = (HTML5Template)out;
+			t.out();
+			writer.append(t.toString());
+		}else{
 			writer.append(JSON.encode(out));
+		}
 	}
 	
 	public void flush() throws IOException{
+		if(loaded){
+			super.out();
+			writer.append(toString());
+		}
 		writer.flush();
 	}
 	

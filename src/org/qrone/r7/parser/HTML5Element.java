@@ -39,7 +39,7 @@ public class HTML5Element implements HTML5Node{
 		return new HTML5Element(om,(Element)e.cloneNode(false));
 	}
 	
-	public void accept(NodeProcessor t) {
+	public void accept(HTML5Template t) {
 		int index = 0;
 		if(prepend != null){
 			for (Object o : prepend) {
@@ -57,9 +57,13 @@ public class HTML5Element implements HTML5Node{
 		}
 	}
 	
-	public void appendTo(final NodeProcessor t, Object o, int index, String html){
+	public void appendTo(final HTML5Template t, Object o, int index, String html){
 		if(o instanceof HTML5OM){
 			t.out((HTML5OM)o);
+		}else if(o instanceof HTML5Template){
+			HTML5Template tt = (HTML5Template)o;
+			tt.out(tt.getBody());
+			t.append(tt);
 		}else if(o instanceof HTML5NodeSet){
 			((HTML5NodeSet)o).exec(new Delegate() {
 				@Override
@@ -68,9 +72,11 @@ public class HTML5Element implements HTML5Node{
 				}
 			});
 		}else if(o instanceof HTML5Element){
-			t.visit(((HTML5Element)o));
+			HTML5Template tt = (HTML5Template)o;
+			tt.out((HTML5Element)o);
+			t.append(tt);
 		}else if(o instanceof Function){
-			appendTo(t, ((Function)o).call(index, html, t), index, html);
+			appendTo(t, ((Function)o).call(index, html), index, html);
 		}else{
 			t.append(o.toString());
 		}
@@ -207,6 +213,11 @@ public class HTML5Element implements HTML5Node{
 	}
 
 	public HTML5Node html(HTML5OM html) {
+		this.content = html;
+		return this;
+	}
+
+	public HTML5Node html(HTML5Template html) {
 		this.content = html;
 		return this;
 	}

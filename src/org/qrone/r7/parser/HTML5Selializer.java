@@ -72,10 +72,9 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 			}
 
 			if(e5.hasContent()){
-				e5.accept(template);
-				///HTML5Template t = template.newTemplate();
-				//e5.accept(t);
-				//getWriter().append(t);
+				HTML5Template t = template.newTemplate();
+				e5.accept(t);
+				getWriter().append(t);
 			}else{
 				accept(e);
 			}
@@ -93,10 +92,9 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 		}else{
 			start(e);
 			if(e5.hasContent()){
-				e5.accept(template);
-				//HTML5Template t = template.newTemplate();
-				//e5.accept(t);
-				//getWriter().append(t);
+				HTML5Template t = template.newTemplate();
+				e5.accept(t);
+				getWriter().append(t);
 			}else{
 				accept(e);
 			}

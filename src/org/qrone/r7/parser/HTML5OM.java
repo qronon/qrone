@@ -242,32 +242,6 @@ public class HTML5OM {
 		return extmap.get(e);
 	}
 	
-	/*
-	public void process(final HTML5Template t, final Set<HTML5OM> xomlist){
-		
-		final HTML5Template bodyt = new HTML5Template(this, t.getURI());
-		//final Set<HTML5OM> xomlist = new HashSet<HTML5OM>();
-		process(bodyt, t, body, null, xomlist);
-		
-
-		
-		HTML5Selializer s = new HTML5Selializer() {
-			
-			@Override
-			public void visit(Element e) {
-				
-			}
-
-			@Override
-			public void visit(Text n) {
-				out(n.getNodeValue());
-			}
-		};
-		
-		s.visit(this, document, null, t);
-	}
-	*/
-	
 	public void process(final HTML5Writer t, final NodeProcessor p,
 			final Node node, String id, final Set<HTML5OM> xomlist){
 		if(xomlist != null && !xomlist.contains(this)){
@@ -305,7 +279,16 @@ public class HTML5OM {
 					if(node != body){
 						start(e);
 					}
-					accept(e);
+					
+					final HTML5Element e5 = p != null ? p.get(e) : null;
+					if(e5 != null && e5.hasContent()){
+						HTML5Template t = p.newTemplate();
+						e5.accept(t);
+						getWriter().append(t);
+					}else{
+						accept(e);
+					}
+					
 					if(node != body){
 						deck.outputScripts(b, set, uri);
 						end(e);
@@ -357,7 +340,11 @@ public class HTML5OM {
 			}
 			
 			protected void out(final Element e4) {
-				final HTML5Element e = p.get(e4);
+				HTML5Element e = null;
+				if(p != null)
+					e = p.get(e4);
+				else
+					e = new HTML5Element(om, e4);
 				super.out(e, p);
 			}
 		};
@@ -442,29 +429,7 @@ public class HTML5OM {
 			public void append(HTML5Template t) {
 			}
 		};
-		process(t, new NodeProcessor() {
-			
-			@Override
-			public void visit(HTML5Element e) {
-				process(t, this, e.get(), null, null);
-			}
-			
-			@Override
-			public HTML5Element get(Element node) {
-				return new HTML5Element(HTML5OM.this, node);
-			}
-
-			@Override
-			public void out(HTML5OM om) {
-				om.process(t, this, om.getBody(), null, null);
-				
-			}
-
-			@Override
-			public void append(String string) {
-				t.append(string);
-			}
-		}, body, null, null);
+		process(t, null, body, null, null);
 		
 		StringBuilder b = new StringBuilder();
 		if(!html){

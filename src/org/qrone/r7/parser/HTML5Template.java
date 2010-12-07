@@ -27,12 +27,14 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	protected HTML5OM om;
 	protected Set<HTML5OM> xomlist;
 	protected URI uri;
+	protected boolean loaded = false;
 	
 	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
 		this.uri = uri;
 		this.om = om;
 		this.xomlist = xomlist;
 		list.add(b);
+		loaded = true;
 	}
 
 	public HTML5Template(HTML5OM om, URI uri){
@@ -48,8 +50,8 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		if(deck.getResolver().exist(path)){
 			try {
 				om = deck.compile(new URI(path));
+				loaded = true;
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -59,6 +61,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		if(om.getDeck().getResolver().exist(u.toString())){
 			om = om.getDeck().compile(u);
 		}
+	}
+	
+	public boolean isLoaded(){
+		return loaded;
 	}
 
 	public HTML5Template append(){
@@ -240,41 +246,14 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
 	*/
 
-	/*
-	@Override
-	public boolean isTarget(Element node) {
-		return node5map.containsKey(node);
-	}
-
-	@Override
-	public void processTarget(HTML5Writer w, HTML5OM om, Element node) {
-		HTML5Element o = node5map.get(node);
-		if(o != null){
-			HTML5Template t = new HTML5Template(om, xomlist, uri);
-			o.accept(t);
-			
-			w.append(t);
-		}
-	}
-	*/
-
 	
 	public void visit(HTML5Element e){
-		//initialize(om);
 		e.getOM().process(this, this, e.get(), null, xomlist);
 	}
-
-	/*
-	public void visit(HTML5OM om) {
-		//initialize(om);
-		om.process(this, this, null, null, xomlist);
-	}
-*/
 	
 	private Map<String, Iterator<Node>> selecting
 		= new Hashtable<String, Iterator<Node>>();
 	public void out(String selector){
-		//initialize(om);
 		if(selecting.containsKey(selector)){
 			Iterator<Node> iter = selecting.get(selector);
 			if(iter != null){
@@ -326,51 +305,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public void out() {
 		om.process(this, this, om.getDocument(), null, xomlist);
 	}
-	
-	/*
-	private void initialize(HTML5OM om){
-		if(!initialized){
-			nodemap = new Hashtable<Element, NodeLister>();
-			for (Iterator<Entry<String, NodeLister>> iterator = selectmap.entrySet().iterator(); iterator
-					.hasNext();) {
-				Entry<String, NodeLister> e = iterator.next();
-				Set<Node> set = om.select(e.getKey());
-				if(set != null){
-					for (Iterator<Node> iter = set.iterator(); iter.hasNext();) {
-						Node n = iter.next();
-						if(n instanceof Element)
-							nodemap.put((Element)n, e.getValue());
-					}
-				}
-			}
-			initialized = true;
-		}
-	}
-	*/
 
 	public HTML5Element getBody() {
 		return new HTML5Element(om, om.getBody());
 	}
-	
-	/*
-	public void write(String str){
-		append(str);
-	}
-	
-	public void write(Object out) throws IOException{
-		append(ObjectConverter.stringify(out));
-	}
-
-	public void writeln(Object out) throws IOException{
-		write(out);
-		write("\n");
-	}
-	
-	public void writeln(String out) throws IOException{
-		write(out);
-		write("\n");
-	}
-	*/
 
 	public URI getURI() {
 		return uri;

@@ -74,6 +74,14 @@ public class HTML5NodeSet implements HTML5Node{
 			}
 		});
 	}
+
+	public HTML5Node html(final HTML5Template html){
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.html(html);
+			}
+		});
+	}
 	
 	public HTML5Node html(final HTML5Node html){
 		return exec(new Delegate() {

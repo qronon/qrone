@@ -145,7 +145,7 @@ public class Window{
 		}
 	}
 
-	public HTML5Template load_html(String uri) throws IOException, URISyntaxException{
+	public HTML5Template load_template(String uri) throws IOException, URISyntaxException{
 		URI u = resolvePath(uri);
 		if(resolver.exist(u.toString())){
 			HTML5OM om = deck.compile(u);
