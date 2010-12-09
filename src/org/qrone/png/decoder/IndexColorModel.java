@@ -16,10 +16,6 @@ public class IndexColorModel extends ColorModel {
     private static int[] opaqueBits = {8, 8, 8};
     private static int[] alphaBits = {8, 8, 8, 8};
 
-    static private native void initIDs();
-
-    
-
     protected int pixel_bits;
     int nBits[];
     int transparency = TRANSLUCENT;

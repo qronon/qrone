@@ -60,9 +60,7 @@ public class HTML5Element implements HTML5Node{
 	}
 	
 	public void appendTo(final HTML5Template t, Object o, int index, String html){
-		if(o instanceof HTML5OM){
-			t.out((HTML5OM)o);
-		}else if(o instanceof HTML5Template){
+		if(o instanceof HTML5Template){
 			HTML5Template tt = (HTML5Template)o;
 			tt.out(tt.getBody());
 			t.append(tt);
@@ -211,11 +209,6 @@ public class HTML5Element implements HTML5Node{
 		HTML5Template tt = t.newTemplate();
 		tt.out(this);
 		return tt.toString();
-	}
-	
-	public HTML5Node html(HTML5OM html) {
-		this.content = html;
-		return this;
 	}
 
 	public HTML5Node html(HTML5Template html) {

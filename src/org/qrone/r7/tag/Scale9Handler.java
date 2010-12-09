@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.qrone.img.ImageBuffer;
+import org.qrone.img.ImageSize;
 import org.qrone.r7.Extension;
 import org.qrone.r7.parser.CSS3Value;
 import org.qrone.r7.parser.HTML5Deck;
@@ -149,9 +149,9 @@ public class Scale9Handler implements HTML5TagHandler {
 	}
 
 	public String startScale3(URI file, int left, int right, String color, String w) throws IOException{
-		ImageBuffer image = deck.getSpriter().getImage(file);
+		ImageSize image = deck.getSpriter().getImageSize(file);
 		//int width = image.getWidth();
-		int height = image.getHeight();
+		int height = image.h;
 		
 		StringBuffer b = new StringBuffer();
 
@@ -171,9 +171,9 @@ public class Scale9Handler implements HTML5TagHandler {
 	}
 	
 	public String endScale3(URI file, int left, int right) throws IOException{
-		ImageBuffer image = deck.getSpriter().getImage(file);
-		int width = image.getWidth();
-		int height = image.getHeight();
+		ImageSize image = deck.getSpriter().getImageSize(file);
+		int width = image.w;
+		int height = image.h;
 		
 		StringBuffer b = new StringBuffer();
 		//b.append("</div>");
@@ -184,9 +184,8 @@ public class Scale9Handler implements HTML5TagHandler {
 	}
 
 	public String startScale9(URI file, int left, int right, int top, int bottom, String color, String w) throws IOException{
-		
-		ImageBuffer image = deck.getSpriter().getImage(file);
-		int width = image.getWidth();
+		ImageSize image = deck.getSpriter().getImageSize(file);
+		int width = image.w;
 		//int height = image.getHeight();
 		
 		StringBuffer b = new StringBuffer();
@@ -206,9 +205,9 @@ public class Scale9Handler implements HTML5TagHandler {
 	}
 
 	public String endScale9(URI file, int left, int right, int top, int bottom) throws IOException{
-		ImageBuffer image = deck.getSpriter().getImage(file);
-		int width = image.getWidth();
-		int height = image.getHeight();
+		ImageSize image = deck.getSpriter().getImageSize(file);
+		int width = image.w;
+		int height = image.h;
 		
 		StringBuffer b = new StringBuffer();
 		//b.append("</div>");

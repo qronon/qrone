@@ -134,8 +134,16 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				b.append(n.getNodeName());
 				b.append('=');
 				b.append('"');
-				b.append("id",id);
-				write(n.getNodeValue());
+				
+				String rawid = n.getNodeValue();
+				if(rawid.startsWith("qrone.")){
+					write("qrone.");
+					b.append("id",id);
+					write(".");
+					write(rawid.substring("qrone.".length()));
+				}else{
+					write(rawid);
+				}
 				b.append('"');
 			}else{
 				write((Attr)map.item(i));

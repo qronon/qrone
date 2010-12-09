@@ -264,6 +264,7 @@ public class HTML5OM {
 			public void visit(Document e) {
 				out("<!DOCTYPE html>");
 				super.visit(e);
+				
 			}
 			
 			@Override

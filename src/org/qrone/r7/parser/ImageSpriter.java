@@ -12,6 +12,7 @@ import java.util.Map;
 import org.qrone.img.ImageBuffer;
 import org.qrone.img.ImageBufferService;
 import org.qrone.img.ImageRect;
+import org.qrone.img.ImageSize;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
 
@@ -33,7 +34,7 @@ public class ImageSpriter {
 	private boolean useTransparentDot = false;
 	private boolean outTransparentDot = false;
 	
-	private Map<URI, ImageBuffer> map = new Hashtable<URI, ImageBuffer>();
+	private Map<URI, ImageSize> smap = new Hashtable<URI, ImageSize>();
 
 	private URI basedir;
 	private URIResolver resolver;
@@ -67,19 +68,26 @@ public class ImageSpriter {
 			pack = new ImagePack();
 		return pack;
 	}
-	
-	public ImageBuffer getImage(URI file) throws IOException{
-		if(map.containsKey(file)){
-			return map.get(file);
+
+	public ImageSize getImageSize(URI file) throws IOException{
+		if(smap.containsKey(file)){
+			return smap.get(file);
 		}else{
-			InputStream in = resolver.getInputStream(file);
-			try{
-				ImageBuffer i = service.createImage(in);
-				map.put(file, i);
-				return i;
-			}finally{
-				in.close();
-			}
+			ImageBuffer buf = getImage(file);
+			ImageSize size = new ImageSize(buf.getWidth(), buf.getHeight());
+			smap.put(file, size);
+			return size;
+		}
+	}
+	public ImageBuffer getImage(URI file) throws IOException{
+		InputStream in = resolver.getInputStream(file);
+		try{
+			ImageBuffer i = service.createImage(in);
+			ImageSize size = new ImageSize(i.getWidth(), i.getHeight());
+			smap.put(file, size);
+			return i;
+		}finally{
+			in.close();
 		}
 	}
 	

@@ -52,16 +52,22 @@ public class GitHubResolver implements URIResolver, URIHandler {
 				Map map = (Map)Yaml.load(fetcher.fetch("http://github.com/api/v2/yaml/blob/all/" 
 						+ user + "/" + repo + "/" + treesha));
 				blobs = (Map<String,String>)map.get("blobs");
-			} catch (IOException e) {}
+			} catch (Exception e) {}
 		}
 		return blobs;
+	}
+	
+	public boolean exist() {
+		return getFiles() != null;
 	}
 	
 	@Override
 	public boolean exist(String path) {
 		getFiles();
 		if(cacheresolver.exist(path)) return true;
-		return blobs.containsKey(path.substring(1));
+		if(blobs != null)
+			return blobs.containsKey(path.substring(1));
+		return false;
 	}
 
 	@Override
@@ -75,18 +81,21 @@ public class GitHubResolver implements URIResolver, URIHandler {
 		if(in != null) return in;
 		
 		updatedSet.remove(uri.toString());
-		String sha = getFiles().get(uri.toString().substring(1));
-		if(sha != null){
-			InputStream fin =  fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
-					+ user + "/" + repo + "/" + sha);
-			byte[] bytes = QrONEUtils.read(fin);
-			
-			OutputStream out = cacheresolver.getOutputStream(uri);
-			out.write(bytes);
-			out.flush();
-			out.close();
-			
-			return new ByteArrayInputStream(bytes);
+		Map<String,String> map = getFiles();
+		if(map != null){
+			String sha = map.get(uri.toString().substring(1));
+			if(sha != null){
+				InputStream fin =  fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
+						+ user + "/" + repo + "/" + sha);
+				byte[] bytes = QrONEUtils.read(fin);
+				
+				OutputStream out = cacheresolver.getOutputStream(uri);
+				out.write(bytes);
+				out.flush();
+				out.close();
+				
+				return new ByteArrayInputStream(bytes);
+			}
 		}
 		return null;
 	}
@@ -105,73 +114,33 @@ public class GitHubResolver implements URIResolver, URIHandler {
 				log.config("Github post-receive hooks.");
 				blobs = null;
 				Map map = (Map)JSON.decode(request.getParameter("payload"));
-				List<Map> list = (List)map.get("commits");
+				Map repository = (Map)map.get("repository");
+				if(repository.get("name").equals(repo) 
+						&& ((Map)repository.get("owner")).get("name").equals(user)){
 				
-				for (Map m : list) {
-					List<String> removed = (List)m.get("removed");
-					for (String p : removed) {
-						try {
-							log.config("removed: /" + p);
-							cacheresolver.remove(new URI("/" + p));
-							updatedSet.add("/" + p);
-						} catch (URISyntaxException e) {}
-					}
-					List<String> modified = (List)m.get("modified");
-					for (String p : modified) {
-						try {
-							log.config("modified: /" + p);
-							cacheresolver.remove(new URI("/" + p));
-							updatedSet.add("/" + p);
-						} catch (URISyntaxException e) {}
-					}
-				}
-				
-				/*
-				Map<String,String> oldblobs = blobs;
-				getFiles();
-				
-				if(oldblobs != null){
-					for (Entry<String,String> e : oldblobs.entrySet()) {
-						String sha = blobs.get(e.getKey());
-						if(sha == null || !sha.equals(e.getValue())){
+					List<Map> list = (List)map.get("commits");
+					
+					for (Map m : list) {
+						List<String> removed = (List)m.get("removed");
+						for (String p : removed) {
 							try {
-								cacheresolver.remove(new URI("/" + e.getKey()));
-								updatedSet.add("/" + e.getKey());
-							} catch (URISyntaxException e1) {}
+								log.config("removed: /" + p);
+								cacheresolver.remove(new URI("/" + p));
+								updatedSet.add("/" + p);
+							} catch (URISyntaxException e) {}
+						}
+						List<String> modified = (List)m.get("modified");
+						for (String p : modified) {
+							try {
+								log.config("modified: /" + p);
+								cacheresolver.remove(new URI("/" + p));
+								updatedSet.add("/" + p);
+							} catch (URISyntaxException e) {}
 						}
 					}
+					return true;
 				}
-				*/
 				
-				/*
-				
-				Map body = (Map)JSON.decode(request.getInputStream());
-				List<Map> commits = (List)body.get("commits");
-				
-				for (Map map : commits) {
-					String id = (String)map.get("id");
-					InputStream in = fetcher.fetch("http://github.com/api/v2/json/commits/show/" + user + "/" + repo + "/" + id);
-					Map commit = (Map)((Map)JSON.decode(in)).get("commit");
-					
-					List<String> added = (List)commit.get("added");
-					for (String file : added) {
-						clearCache(file);
-					}
-					
-					List<String> removed = (List)commit.get("removed");
-					for (String file : removed) {
-						clearCache(file);
-					}
-					
-					List<Map> modified = (List)commit.get("modified");
-					for (Map m : modified) {
-						String file = (String)m.get("filename");
-						clearCache(file);
-					}
-				}
-				*/
-				
-				return true;
 			} catch (ClassCastException e) {
 			}
 		}

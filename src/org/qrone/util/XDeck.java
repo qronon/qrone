@@ -5,12 +5,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.qrone.r7.resolver.URIResolver;
 
 
 public abstract class XDeck<T> {
-	private Map<URI, T> map = new Hashtable<URI, T>();
+	private Map<URI, T> map = new WeakHashMap<URI, T>();
 	protected URIResolver resolver;
 	
 	public XDeck(URIResolver resolver) {

@@ -28,6 +28,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	protected Set<HTML5OM> xomlist;
 	protected URI uri;
 	protected boolean loaded = false;
+	protected String id;
 	
 	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
 		this.uri = uri;
@@ -39,6 +40,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 
 	public HTML5Template(HTML5OM om, URI uri){
 		this(om, new HashSet<HTML5OM>(), uri);
+		id = QrONEUtils.uniqueid();
 	}
 	
 	public HTML5Template(HTML5OM om){
@@ -289,10 +291,11 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	*/
 
 	public void out(HTML5Element e) {
-		final String uniqueid = QrONEUtils.uniqueid();
-		om.process(this, this, e.get(), uniqueid, xomlist);
+		//final String uniqueid = QrONEUtils.uniqueid();
+		om.process(this, this, e.get(), null, xomlist);
 	}
 
+	/*
 	public void out(HTML5OM om, NodeProcessor p) {
 		final String uniqueid = QrONEUtils.uniqueid();
 		om.process(this, p, om.getBody(), uniqueid, xomlist);
@@ -301,6 +304,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	public void out(HTML5OM om) {
 		out(om, this);
 	}
+	*/
 	
 	public void out() {
 		om.process(this, this, om.getDocument(), null, xomlist);
@@ -328,6 +332,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
 	public HTML5Template newTemplate() {
 		HTML5Template t =  new HTML5Template(om, xomlist, uri);
+		//t.id = id;
 		t.node5map = node5map;
 		return t;
 	}
