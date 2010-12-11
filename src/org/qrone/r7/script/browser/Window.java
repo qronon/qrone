@@ -31,14 +31,17 @@ import org.mozilla.javascript.json.JsonParser;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 import org.qrone.database.DatabaseService;
-import org.qrone.deck.PropertiesDeck;
-import org.qrone.deck.TextileDeck;
-import org.qrone.deck.YamlDeck;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.RepositoryService;
+import org.qrone.r7.fetcher.HTTPFetcher;
+import org.qrone.r7.format.JSON;
+import org.qrone.r7.format.JavaProperties;
+import org.qrone.r7.format.Textile;
+import org.qrone.r7.format.YAML;
 import org.qrone.r7.parser.HTML5Deck;
+import org.qrone.r7.parser.HTML5Node;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSDeck;
@@ -46,6 +49,8 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.util.QrONEUtils;
+
+import com.ibm.icu.text.CharsetDetector;
 
 
 public class Window{
@@ -57,18 +62,24 @@ public class Window{
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
+	private URIResolver resolver;
 	
 	public PrintStream in = System.out;
 	public PrintStream out = System.out;
 	public Document document;
 	public Location location;
 	public Navigator navigator;
-	public JSON JSON;
+	
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
 	public SecurityService security;
-	public URIResolver resolver;
+	public HTTPFetcher http;
+
+	public JSON JSON;
+	public YAML YAML;
+	public Textile Textile;
+	public JavaProperties JavaProperties;
 	
 	public Window(ServletScope ss, Scriptable scope, HttpServletRequest request, HttpServletResponse response,
 			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
@@ -84,11 +95,16 @@ public class Window{
 		repository = service.getRepositoryService();
 		security = service.getSecurityService();
 		resolver = service.getURIResolver();
+		http = service.getURLFetcher();
 
 		document = new Document(request, response, deck, ss.uri.toString().replaceAll("\\.server\\.js$", ".html"));
 		location = new Location(request);
 		navigator = new Navigator(request);
-		JSON = new JSON(scope);
+		
+		JSON = new JSON(resolver, scope);
+		YAML = new YAML(resolver);
+		Textile = new Textile(resolver);
+		JavaProperties = new JavaProperties(resolver);
 	}
 	
 	private Scriptable newScriptable(){
@@ -127,6 +143,10 @@ public class Window{
 	
 	public Object $(String selector){
 		return document.select(selector);
+	}
+
+	public Object $(String selector, HTML5Node node){
+		return node.select(selector);
 	}
 	
 	public void require(String path) throws IOException, URISyntaxException{
@@ -173,28 +193,28 @@ public class Window{
 		header("Location: " + url);
 	}
 	
-	
-	
-	private PropertiesDeck propDeck;
+	/*
+	private JavaProperties propDeck;
 	public Object load_properties(String path) throws IOException, URISyntaxException{
 		if(propDeck == null)
-			propDeck = new PropertiesDeck(resolver);
+			propDeck = new JavaProperties(resolver);
 		return propDeck.compile(resolvePath(path));
 	}
 
-	private YamlDeck yamlDeck;
+	private YAML yamlDeck;
 	public Object load_yaml(String path) throws IOException, URISyntaxException{
 		if(yamlDeck == null)
-			yamlDeck = new YamlDeck(resolver);
+			yamlDeck = new YAML(resolver);
 		return yamlDeck.compile(resolvePath(path));
 	}
 	
-	private TextileDeck textileDeck;
+	private Textile textileDeck;
 	public String load_textile(String path) throws IOException, URISyntaxException{
 		if(textileDeck == null)
-			textileDeck = new TextileDeck(resolver);
+			textileDeck = new Textile(resolver);
 		return textileDeck.compile(resolvePath(path));
 	}
+	*/
 	
 	public byte[] base64_decode(String base64String){
 		return Base64.decodeBase64(base64String);

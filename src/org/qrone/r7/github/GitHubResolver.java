@@ -18,14 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 import net.arnx.jsonic.JSON;
 
 import org.ho.yaml.Yaml;
-import org.qrone.r7.fetcher.URLFetcher;
+import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
 
 public class GitHubResolver implements URIResolver, URIHandler {
 	private static final Logger log = Logger.getLogger(GitHubResolver.class.getName());
-	private URLFetcher fetcher;
+	private HTTPFetcher fetcher;
 	private URIResolver cacheresolver;
 	private String user;
 	private String repo;
@@ -34,7 +34,7 @@ public class GitHubResolver implements URIResolver, URIHandler {
 	private Map<String,String> blobs;
 	private Set<String> updatedSet = new HashSet<String>();
 	
-	public GitHubResolver(URLFetcher fetcher, URIResolver cacheresolver, String user, String repo, String treesha){
+	public GitHubResolver(HTTPFetcher fetcher, URIResolver cacheresolver, String user, String repo, String treesha){
 		this.fetcher = fetcher;
 		this.cacheresolver = cacheresolver;
 		this.user = QrONEUtils.escape(user);

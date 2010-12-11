@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,6 +19,9 @@ import org.qrone.r7.script.browser.Function;
 import org.qrone.util.QrONEUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import se.fishtank.css.selectors.NodeSelectorException;
+import se.fishtank.css.selectors.dom.DOMNodeSelector;
 
 public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
@@ -114,6 +118,27 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		return new HTML5NodeSet(this, om.select(selector));
 	}
 
+	public HTML5NodeSet select(String selector, HTML5Node node){
+		try{
+			Object o = node.get();
+			if(o instanceof Element){
+				DOMNodeSelector ns = new DOMNodeSelector((Element)o);
+				return new HTML5NodeSet(this, ns.querySelectorAll(selector));
+			}else if(o instanceof Set){
+				DOMNodeSelector ns;
+				LinkedHashSet<Node> lhs = new LinkedHashSet<Node>();
+				LinkedHashSet<Node> l = (LinkedHashSet<Node>)o;
+				for (Iterator<Node> i = l.iterator(); i.hasNext();) {
+					Node n = i.next();
+					ns = new DOMNodeSelector(n);
+					lhs.addAll(ns.querySelectorAll(selector));
+				}
+				return new HTML5NodeSet(this, lhs);
+			}
+		} catch (NodeSelectorException e) {}
+		return null;
+	}
+
 	private Map<Element, HTML5Element> node5map = new Hashtable<Element, HTML5Element>();
 	public HTML5Element override(Element node){
 		HTML5Element e = node5map.get(node);
@@ -131,6 +156,18 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			e = new HTML5Element(om, this, node);
 		}
 		return e;
+	}
+
+	public HTML5Node getElementsByTagName(String tagName){
+		return select(tagName);
+	}
+	
+	public HTML5Node getElementsByClassName(String clsName){
+		return select("." + clsName);
+	}
+	
+	public HTML5Node getElementById(String id){
+		return select("#" + id);
 	}
 	
 	/*

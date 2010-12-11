@@ -1,4 +1,4 @@
-package org.qrone.deck;
+package org.qrone.r7.format;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -8,9 +8,9 @@ import java.util.Properties;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.XDeck;
 
-public class PropertiesDeck extends XDeck<Map<Object, Object>>{
+public class JavaProperties extends XDeck<Map<Object, Object>>{
 	
-	public PropertiesDeck(URIResolver resolver) {
+	public JavaProperties(URIResolver resolver) {
 		super(resolver);
 	}
 

@@ -1,4 +1,4 @@
-package org.qrone.deck;
+package org.qrone.r7.format;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,28 +13,10 @@ import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.XDeck;
 
-public class TextileDeck extends XDeck<String>{
+public class Textile extends XFormat<String>{
 	private static MarkupParser parser;
-	public TextileDeck(URIResolver resolver) {
+	public Textile(URIResolver resolver) {
 		super(resolver);
-	}
-
-	public String compile(URI uri, InputStream in, String encoding) throws IOException{
-		StringWriter writer = new StringWriter();
-		getParser(writer).parse(new InputStreamReader(in, encoding));
-		return writer.toString();
-	}
-
-	public String compile(URI uri, String textile){
-		StringWriter writer = new StringWriter();
-		getParser(writer).parse(textile);
-		return writer.toString();
-	}
-
-	public static String parse(String textile) {
-		StringWriter writer = new StringWriter();
-		getParser(writer).parse(textile);
-		return writer.toString();
 	}
 	
 	public static MarkupParser getParser(Writer writer) {
@@ -46,5 +28,17 @@ public class TextileDeck extends XDeck<String>{
 			parser.setBuilder(builder);
 		}
 		return parser;
+	}
+
+	@Override
+	public String decode(String data) {
+		StringWriter writer = new StringWriter();
+		getParser(writer).parse(data);
+		return writer.toString();
+	}
+
+	@Override
+	public String encode(String data) {
+		throw new UnsupportedOperationException();
 	}
 }

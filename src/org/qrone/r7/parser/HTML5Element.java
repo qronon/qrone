@@ -319,4 +319,9 @@ public class HTML5Element implements HTML5Node{
 		func.call(this);
 		return this;
 	}
+
+	@Override
+	public HTML5Node select(String o) {
+		return t.select(o, this);
+	}
 }

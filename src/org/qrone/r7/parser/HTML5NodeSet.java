@@ -1,5 +1,6 @@
 package org.qrone.r7.parser;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.qrone.r7.script.browser.Function;
@@ -183,4 +184,13 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 
+
+	@Override
+	public HTML5Node select(String o) {
+		return template.select(o, this);
+	}
+
+	public Set<Node> get(){
+		return set;
+	}
 }

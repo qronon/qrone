@@ -4,7 +4,7 @@ import org.qrone.r7.parser.HTML5NodeSet.Delegate;
 import org.qrone.r7.script.browser.Function;
 
 public interface HTML5Node {
-
+	public Object get();
 	public HTML5Node addClass(String cls);
 	public HTML5Node removeClass(String cls);
 	public HTML5Node attr(String prop);
@@ -23,5 +23,6 @@ public interface HTML5Node {
 	public HTML5Node prepend(HTML5Node html);
 	public HTML5Node prepend(Function o);
 	public HTML5Node prepend(String o);
+	public HTML5Node select(String o);
 	public Object clone();
 }

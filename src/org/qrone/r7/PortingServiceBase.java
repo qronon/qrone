@@ -5,13 +5,13 @@ import org.qrone.img.ImageBufferService;
 import org.qrone.login.LoginService;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
-import org.qrone.r7.fetcher.URLFetcher;
+import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.resolver.URIResolver;
 
 public class PortingServiceBase  implements PortingService{
 	private ImageBufferService imagebuffer;
 	private LoginService login;
-	private URLFetcher fetcher;
+	private HTTPFetcher fetcher;
 	private URIResolver resolver;
 	private DatabaseService database;
 	private MemcachedService memcached;
@@ -19,7 +19,7 @@ public class PortingServiceBase  implements PortingService{
 	private SecurityService security;
 	
 	public PortingServiceBase(
-			URLFetcher fetcher,
+			HTTPFetcher fetcher,
 			URIResolver resolver,
 			DatabaseService database,
 			MemcachedService memcached,
@@ -49,7 +49,7 @@ public class PortingServiceBase  implements PortingService{
 	}
 
 	@Override
-	public URLFetcher getURLFetcher() {
+	public HTTPFetcher getURLFetcher() {
 		return fetcher;
 	}
 

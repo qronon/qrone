@@ -12,7 +12,10 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -109,13 +112,21 @@ public class QrONEUtils{
 		in = new FileInputStream("src/org/qrone/r7/resource/" + name);
 		return convertStreamToString(in);
 	}
-	
+
 	public static byte[] read(InputStream in) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		copy(in, out);
 		in.close();
 		out.close();
 		return out.toByteArray();
+	}
+	
+	public static String read(Reader r) throws IOException {
+		StringWriter w = new StringWriter();
+		copy(r, w);
+		r.close();
+		w.close();
+		return w.toString();
 	}
 	
 	public static byte[] base64_decode(String base64String){
@@ -166,6 +177,14 @@ public class QrONEUtils{
 		return b.toString();
 	}
 
+	public static void copy(Reader r, Writer w) throws IOException {
+		if(r == null || w == null) throw new IOException();
+		int buf;
+		while ((buf = r.read()) != -1) {
+			w.write(buf);
+		}
+	}
+	
 	public static void copy(InputStream in, OutputStream out) throws IOException {
 		if(in == null || out == null) throw new IOException();
 		int buf;

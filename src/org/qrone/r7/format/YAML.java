@@ -1,4 +1,4 @@
-package org.qrone.deck;
+package org.qrone.r7.format;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +9,9 @@ import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.Tab2WhiteInputStream;
 import org.qrone.util.XDeck;
 
-public class YamlDeck extends XDeck<Object>{
+public class YAML extends XFormat<Object>{
 
-	public YamlDeck(URIResolver resolver) {
+	public YAML(URIResolver resolver) {
 		super(resolver);
 	}
 
@@ -20,8 +20,16 @@ public class YamlDeck extends XDeck<Object>{
 		return Yaml.load(new Tab2WhiteInputStream(in));
 	}
 
-	public Object compile(URI uri, String str) throws IOException {
-		return Yaml.load(str);
+	@Override
+	public Object decode(String data) {
+		return Yaml.load(data.replaceAll("\\t", " "));
 	}
+
+	@Override
+	public String encode(Object data) {
+		throw new UnsupportedOperationException();
+	}
+	
+	
 
 }
