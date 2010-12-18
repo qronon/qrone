@@ -136,7 +136,7 @@ public class Window{
 				o.put(e.getKey(), o, l);
 			}
 		}
-		if(!o.has(".path", o))
+		if(!o.has(".path", o) && ss.pathArg.length() > 0)
 			o.put(".path", o, ss.pathArg);
 		return o;
 	}

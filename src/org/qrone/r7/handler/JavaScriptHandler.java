@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.WrappedException;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
@@ -43,23 +45,22 @@ public class JavaScriptHandler implements URIHandler{
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
 			String uri, String path, String pathArg) {
+		Scriptable globalscope = null;
 		try {
 			if(resolver.exist(uri)){
 				URI urio = urio = new URI(uri);
 				JSOM om = vm.compile(urio);
 				if(om != null){
-					Scriptable scope = vm.createScope();
+					globalscope = vm.createScope();
 					ServletScope ss = new ServletScope(urio,path,pathArg);
-					Window window = new Window(ss,scope,request,response,deck,vm,services);
-					scope.put("query", scope, window.getQueryMap());
-					
+					Window window = new Window(ss,globalscope,request,response,deck,vm,services);
+					globalscope.put("query", globalscope, window.getQueryMap());
+
+					Scriptable subscope = vm.createScope();
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
-					defaultom.run(scope);
+					defaultom.run(subscope);
 					
-					Object result = om.run(scope, window);
-					
-					window.document.flush();
-					window.document.close();
+					Object result = om.run(globalscope, subscope, window);
 					
 					String done = request.getParameter(".done");
 					if(done != null && services.getSecurityService().isSecured(request)){
@@ -73,11 +74,20 @@ public class JavaScriptHandler implements URIHandler{
 						} catch (IOException e) {
 						}
 					}
+
+					window.document.flush();
+					window.document.close();
+					
 					return true;
 				}
 			}
 		} catch (RhinoException e) {
-			e.printStackTrace();
+			if(e instanceof WrappedException){
+				((WrappedException)e).getWrappedException().printStackTrace();
+			}else{
+				e.printStackTrace();
+			}
+			
 			try{
 				response.setStatus(500);
 				
@@ -86,6 +96,8 @@ public class JavaScriptHandler implements URIHandler{
 				map.put("file", e.sourceName());
 				map.put("message", e.getMessage());
 				map.put("stacktrace", e.getScriptStackTrace());
+				map.put("scope", JSON.encode(Scriptables.asMap(globalscope)));
+				
 				InputStream in = resolver.getInputStream(new URI(e.sourceName()));
 				if(in != null){
 					map.put("source", new String(QrONEUtils.read(in)));
@@ -95,7 +107,7 @@ public class JavaScriptHandler implements URIHandler{
 				Scriptable scope = vm.createScope();
 				ServletScope ss = new ServletScope(urio,path,pathArg);
 				scope.put("exception", scope, map);
-
+				
 				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 				defaultom.run(scope);
 				

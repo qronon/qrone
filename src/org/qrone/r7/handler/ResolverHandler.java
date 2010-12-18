@@ -12,9 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.MimeTypeParser;
 import org.qrone.util.QrONEUtils;
 
 public class ResolverHandler implements URIHandler{
+	private MimeTypeParser parser;
 	private URIResolver resolver;
 	
 	public ResolverHandler(URIResolver resolver) {
@@ -28,6 +30,24 @@ public class ResolverHandler implements URIHandler{
 		try{
 			URI urio = new URI(uri);
 			if(resolver.exist(uri)){
+				URI mimetype = new URI("/system/resource/mime.types");
+				if(parser == null){
+					parser = new MimeTypeParser();
+					parser.parse(resolver.getInputStream(mimetype));
+				}else{
+					if(resolver.updated(mimetype)){
+						parser.parse(resolver.getInputStream(mimetype));
+					}
+				}
+				
+				int eidx = uri.lastIndexOf('.');
+				if(eidx >= 0){
+					String mime = parser.getMimeType(uri.substring(eidx+1));
+					if(mime != null){
+						response.setHeader("Content-Type", mime);
+					}
+				}
+				
 				byte[] buf = QrONEUtils.read(resolver.getInputStream(urio));
 				String str = QrONEUtils.base64_encode(MessageDigest.getInstance("SHA-1").digest(buf));
 				String etag = request.getHeader("If-None-Match");

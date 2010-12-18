@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrapFactory;
@@ -114,6 +115,15 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
     	
 		try {
 			NativeJavaObject wrapper = null;
+			if(javaObject instanceof List){
+				List list = (List)javaObject;
+				Scriptable array = cx.newArray(scope, list.size());
+				for (int i = 0; i < list.size(); i++) {
+					array.put(i, scope, list.get(i));
+				}
+				return array;
+			}
+			
 			Entry<Class,Class> types = findWrapperClass(javaObject);
 			if(types != null){
 				ScriptableWrapper sjo = null;

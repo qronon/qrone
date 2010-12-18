@@ -76,7 +76,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				e5.accept(t);
 				getWriter().append(t);
 			}else{
-				accept(e);
+				e5.accept(this);
 			}
 			
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
@@ -96,7 +96,7 @@ public abstract class HTML5Selializer extends HTML5Visitor{
 				e5.accept(t);
 				getWriter().append(t);
 			}else{
-				accept(e);
+				e5.accept(this);
 			}
 			if(!noendtaglist.contains(e.getNodeName()))
 				end(e);

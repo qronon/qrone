@@ -2,14 +2,17 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.qrone.r7.parser.HTML5NodeSet.Delegate;
 import org.qrone.r7.script.browser.Function;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
@@ -24,7 +27,7 @@ public class HTML5Element implements HTML5Node{
 	
 	private List append;
 	private List prepend;
-	
+	private Set<Element> remove;
 	
 	public HTML5Element(HTML5OM om, HTML5Template t, Element e){
 		this.om = om;
@@ -272,6 +275,39 @@ public class HTML5Element implements HTML5Node{
 		return this;
 	}
 
+	public HTML5Node removeChild(HTML5Node o){
+		if(remove == null)
+			remove = new HashSet<Element>();
+		
+		Object s = o.get();
+		if(s instanceof Set){
+			remove.addAll((Set<Element>)s);
+		}else if(s instanceof Element){
+			remove.add((Element)s);
+		}
+		return this;
+	}
+	
+	public HTML5Node remove(){
+		Object s = get();
+		if(s instanceof Set){
+			for (Element e : remove) {
+				remove((Element)s);
+			}
+		}else if(s instanceof Element){
+			remove((Element)s);
+		}
+		return this;
+	}
+	
+	private void remove(Element e){
+		Node parent = e.getParentNode();
+		if(parent instanceof Element){
+			HTML5Element e5 = t.override((Element)parent);
+			e5.removeChild(this);
+		}
+	}
+	
 	public HTML5Node append(String o){
 		if(append == null)
 			append = new ArrayList();
@@ -279,6 +315,10 @@ public class HTML5Element implements HTML5Node{
 		return this;
 	}
 
+	public HTML5Node appendChild(HTML5Node o){
+		return append(o);
+	}
+	
 	public HTML5Node append(HTML5Node o){
 		if(append == null)
 			append = new ArrayList();
@@ -323,5 +363,16 @@ public class HTML5Element implements HTML5Node{
 	@Override
 	public HTML5Node select(String o) {
 		return t.select(o, this);
+	}
+
+	public void accept(HTML5Visitor v) {
+		Element e = get();
+		NodeList l = e.getChildNodes();
+		for (int i = 0; i < l.getLength(); i++) {
+			Node n = l.item(i);
+			if(remove == null || !remove.contains(n)){
+				v.dispatch(n);
+			}
+		}
 	}
 }

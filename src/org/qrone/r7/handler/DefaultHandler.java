@@ -34,7 +34,7 @@ public class DefaultHandler implements URIHandler, Extendable{
 	public DefaultHandler(PortingService services) {
 		this.services = services;
 		this.resolver = services.getURIResolver();
-		deck = new HTML5Deck(resolver, services.getImageBufferService());
+		deck = new HTML5Deck(services);
 		vm = new JSDeck(resolver, deck);
 		
 		html5Handler = new HTML5Handler(services, deck);
@@ -63,16 +63,6 @@ public class DefaultHandler implements URIHandler, Extendable{
 			deck.update(new URI(path));
 			response.setCharacterEncoding("utf8");
 			
-
-			if(uri.endsWith(".action.js") && 
-					jsHandler.handle(request, response, uri, path, pathArg)){
-				return true;
-			}
-			
-			if(jsHandler.handle(request, response, uri + ".action.js", path, pathArg)){
-				return true;
-			}
-			
 			if(uri.endsWith(".server.js") && 
 					jsHandler.handle(request, response, uri, path, pathArg)){
 				return true;
@@ -94,7 +84,7 @@ public class DefaultHandler implements URIHandler, Extendable{
 			e.printStackTrace();
 		}
 		
-		if(!uri.endsWith(".server.js") && !uri.endsWith(".action.js") && 
+		if(!uri.endsWith(".server.js") && 
 				resolverHandler.handle(request, response, uri, path, pathArg)){
 			return true;
 		}

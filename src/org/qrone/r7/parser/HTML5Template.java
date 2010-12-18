@@ -352,7 +352,8 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	*/
 	
 	public void out() {
-		om.process(this, this, om.getDocument(), null, xomlist);
+		if(om != null)
+			om.process(this, this, om.getDocument(), null, xomlist);
 	}
 
 	public HTML5Element getBody() {

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
+import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
@@ -26,14 +27,18 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 	private CSS3Deck cssdeck;
 	private ImageSpriter spriter;
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
+	private PortingService services;
 	
-	public HTML5Deck(File file, ImageBufferService service){
-		this(new FileResolver(file), service);
+	public HTML5Deck(URIResolver resolver, ImageBufferService service){
+		super(resolver);
+		spriter = new ImageSpriter(resolver, service);
+    	cssdeck = new CSS3Deck(resolver);
 	}
     
-    public HTML5Deck(URIResolver resolver, ImageBufferService service){
-    	super(resolver);
-    	spriter = new ImageSpriter(resolver, service);
+    public HTML5Deck(PortingService service){
+    	super(service.getURIResolver());
+    	this.services = service;
+    	spriter = new ImageSpriter(resolver, service.getImageBufferService());
     	cssdeck = new CSS3Deck(resolver);
     
     }
@@ -54,6 +59,10 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public PortingService getPortingService(){
+    	return services;
     }
     
     public ImageSpriter getSpriter(){

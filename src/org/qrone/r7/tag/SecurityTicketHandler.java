@@ -14,8 +14,8 @@ import org.w3c.dom.Element;
 @Extension
 public class SecurityTicketHandler implements HTML5TagHandler {
 	private SecurityService security;
-	public SecurityTicketHandler(SecurityService security) {
-		this.security = security;
+	public SecurityTicketHandler(HTML5Deck deck) {
+		this.security = deck.getPortingService().getSecurityService();
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public class SecurityTicketHandler implements HTML5TagHandler {
 				
 				@Override
 				public String preend() {
-					return "<input type=\"hidden\" value=\"" + security.getTicket() + "\"/>";
+					return "<input type=\"hidden\" name=\".ticket\" value=\"" + security.getTicket() + "\"/>";
 				}
 				
 				@Override

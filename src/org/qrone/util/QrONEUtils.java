@@ -151,6 +151,7 @@ public class QrONEUtils{
     }
 
 	public static String escape(String str){
+		if(str == null) return null;
 		StringBuffer b = new StringBuffer();
 		char[] ch = str.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
@@ -203,6 +204,7 @@ public class QrONEUtils{
 	}
 
 	public static String encodeQ64(byte[] bytes){
+		if(bytes == null) return null;
 		String base64String = Base64.encodeBase64String(bytes);
 		base64String = base64String.replace('+', '.');
 		base64String = base64String.replace('/', '_');
@@ -215,6 +217,7 @@ public class QrONEUtils{
 	}
 	
 	public static byte[] decodeQ64(String base64String){
+		if(base64String == null) return null;
 		base64String = base64String.replace('+', '.');
 		base64String = base64String.replace('/', '_');
 		
@@ -388,6 +391,7 @@ public class QrONEUtils{
 	
 
 	public static byte[] encrypt(byte[] data, byte[] key){
+		if(data == null) return null;
 		Cipher cipher;
 		try {
 			cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
@@ -403,6 +407,7 @@ public class QrONEUtils{
 	}
 
 	public static byte[] decrypt(byte[] data, byte[] key){
+		if(data == null) return null;
 		Cipher cipher;
 		try {
 			cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");

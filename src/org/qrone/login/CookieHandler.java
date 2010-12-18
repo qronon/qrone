@@ -42,15 +42,15 @@ public class CookieHandler implements URIHandler, SecurityService{
 				if(cookies[i].getName().equals("Q")){
 					q = cookies[i].getValue();
 					if(q != null)
-						qd = QrONEUtils.base64_decode(q);
+						qd = QrONEUtils.decodeQ64(q);
 				}else if(cookies[i].getName().equals("T")){
 					t = cookies[i].getValue();
 					if(t != null)
-						td = QrONEUtils.decrypt(QrONEUtils.base64_decode(t), key);
+						td = QrONEUtils.decrypt(QrONEUtils.decodeQ64(t), key);
 				}else if(cookies[i].getName().equals("B")){
 					b = cookies[i].getValue();
 					if(b != null)
-						bd = QrONEUtils.decrypt(QrONEUtils.base64_decode(b), key);
+						bd = QrONEUtils.decrypt(QrONEUtils.decodeQ64(b), key);
 				}
 			}
 		}
@@ -63,7 +63,7 @@ public class CookieHandler implements URIHandler, SecurityService{
 		if(bd == null){
 			bd = (String.valueOf(Calendar.getInstance(Locale.ENGLISH).getTimeInMillis())
 					+ String.valueOf(Math.random())).getBytes();
-			b = QrONEUtils.base64_encode(QrONEUtils.encrypt(bd, key));
+			b = QrONEUtils.encodeQ64(QrONEUtils.encrypt(bd, key));
 			Cookie c = new Cookie("B", b);
 			c.setMaxAge(0);
 			c.setPath("/");
@@ -76,11 +76,11 @@ public class CookieHandler implements URIHandler, SecurityService{
 	}
 	
 	public String getTicket(){
-		return QrONEUtils.base64_encode(QrONEUtils.encrypt(bd, key));
+		return QrONEUtils.encodeQ64(QrONEUtils.encrypt(bd, key));
 	}
 	
 	public boolean validateTicket(String ticket){
-		byte[] bdticket = QrONEUtils.decrypt(QrONEUtils.base64_decode(ticket),key);
+		byte[] bdticket = QrONEUtils.decrypt(QrONEUtils.decodeQ64(ticket),key);
 		if(bdticket != null && Arrays.equals(bd, bdticket)){
 			return true;
 		}

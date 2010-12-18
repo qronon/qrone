@@ -17,9 +17,12 @@ public interface HTML5Node {
 	public HTML5Node html(Function html);
 	public HTML5Node html(String html);
 	public HTML5Node each(Function func);
+	public HTML5Node appendChild(HTML5Node html);
 	public HTML5Node append(HTML5Node html);
 	public HTML5Node append(Function o);
 	public HTML5Node append(String o);
+	public HTML5Node removeChild(HTML5Node html);
+	public HTML5Node remove();
 	public HTML5Node prepend(HTML5Node html);
 	public HTML5Node prepend(Function o);
 	public HTML5Node prepend(String o);

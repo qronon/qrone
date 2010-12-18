@@ -2,28 +2,35 @@ package org.qrone.r7.script.ext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extension;
+import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.script.Indexer;
 import org.qrone.r7.script.ScriptableWrapper;
 
-@Extension
+@Deprecated
 public class ListWrapper extends ScriptableWrapper<List> implements Indexer, Serializable {
     private static final long serialVersionUID = -2221655313388687110L;
     private List list;
+    private Scriptable scope;
     
+    /*
     public ListWrapper() {
     }
     
     public ListWrapper(List list) {
         this.list = list;
     }
+    */
     
     public ListWrapper(Scriptable scope, List javaObject, Class staticType) {
         super(scope, javaObject, staticType);
         this.list = javaObject;
+        this.scope = scope;
     }
 
 	@Override
@@ -37,7 +44,11 @@ public class ListWrapper extends ScriptableWrapper<List> implements Indexer, Ser
 
 	@Override
 	public Object get(int index) {
-		return list.get(index);
+		Context cx = JSDeck.getContext();
+		Object o = list.get(index);
+		if(o instanceof Collection)
+			return cx.getWrapFactory().wrapAsJavaObject(cx, scope, o, null);
+		return o;
 	}
 
 	@Override

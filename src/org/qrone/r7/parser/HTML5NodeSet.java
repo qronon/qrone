@@ -129,6 +129,15 @@ public class HTML5NodeSet implements HTML5Node{
 	public static interface Delegate{
 		public void call(HTML5Element e);
 	}
+
+	@Override
+	public HTML5Node appendChild(final HTML5Node o) {
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.appendChild(o);
+			}
+		});
+	}
 	
 	@Override
 	public HTML5Node append(final HTML5Node o) {
@@ -184,6 +193,23 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 
+	@Override
+	public HTML5Node removeChild(final HTML5Node o) {
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.removeChild(o);
+			}
+		});
+	}
+	
+	@Override
+	public HTML5Node remove() {
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.remove();
+			}
+		});
+	}
 
 	@Override
 	public HTML5Node select(String o) {
