@@ -95,6 +95,10 @@ public class JavaScriptHandler implements URIHandler{
 				Scriptable scope = vm.createScope();
 				ServletScope ss = new ServletScope(urio,path,pathArg);
 				scope.put("exception", scope, map);
+
+				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
+				defaultom.run(scope);
+				
 				JSOM om = vm.compile(urio);
 				Window window = new Window(ss,scope,request,response,deck,vm,services);
 				om.run(scope, window);

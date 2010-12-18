@@ -12,9 +12,12 @@ public class HTTPRequest {
 	
 	public HTTPRequest(
 			URL url,
-			String method,byte[] payload,
-			Map<String,String> headers,boolean followRedirect) {
+			String method,
+			byte[] payload,
+			Map<String,String> headers,
+			boolean followRedirect) {
 		this.url = url;
+		this.method = method;
 		this.followRedirect = followRedirect;
 		this.payload = payload;
 		this.headers = headers;

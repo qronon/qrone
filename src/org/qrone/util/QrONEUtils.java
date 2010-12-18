@@ -89,13 +89,13 @@ public class QrONEUtils{
 	public static InputStream getResourceAsStream(String name, ServletContext c) throws IOException {
 		InputStream in;
 		if(c != null){
-			in = c.getResourceAsStream("../r7/resource/" + name);
+			in = QrONEUtils.class.getClassLoader().getResourceAsStream("org/qrone/r7/resource/" + name);
 			if(in != null){
 				return in;
 			}
 		}
 		
-		in = QrONEUtils.class.getResourceAsStream("../r7/resource/" + name);
+		in = QrONEUtils.class.getClassLoader().getResourceAsStream("../r7/resource/" + name);
 		if(in != null){
 			return in;
 		}

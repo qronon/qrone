@@ -1,9 +1,6 @@
 if(!window.$){
 	window.$ = function(s){
-		if(s instanceof String)
-			return document.select(s);
-		else if(s instanceof Function)
-			return s();
+		return document.select(s);
 	}
 }
 if(!window.XMLHttpRequest){

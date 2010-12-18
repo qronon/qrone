@@ -52,7 +52,9 @@ public class GitHubResolver implements URIResolver, URIHandler {
 				Map map = (Map)Yaml.load(fetcher.fetch("http://github.com/api/v2/yaml/blob/all/" 
 						+ user + "/" + repo + "/" + treesha));
 				blobs = (Map<String,String>)map.get("blobs");
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return blobs;
 	}
