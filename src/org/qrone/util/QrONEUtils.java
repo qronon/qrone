@@ -33,6 +33,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.codec.binary.Base64;
@@ -85,8 +86,16 @@ public class QrONEUtils{
 		return "qid" + (++uniquekey);
 	}
 
-	public static InputStream getResourceAsStream(String name) throws IOException {
-		InputStream in = QrONEUtils.class.getResourceAsStream("../r7/resource/" + name);
+	public static InputStream getResourceAsStream(String name, ServletContext c) throws IOException {
+		InputStream in;
+		if(c != null){
+			in = c.getResourceAsStream("../r7/resource/" + name);
+			if(in != null){
+				return in;
+			}
+		}
+		
+		in = QrONEUtils.class.getResourceAsStream("../r7/resource/" + name);
 		if(in != null){
 			return in;
 		}

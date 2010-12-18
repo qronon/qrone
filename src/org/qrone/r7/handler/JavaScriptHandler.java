@@ -53,6 +53,9 @@ public class JavaScriptHandler implements URIHandler{
 					Window window = new Window(ss,scope,request,response,deck,vm,services);
 					scope.put("query", scope, window.getQueryMap());
 					
+					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
+					defaultom.run(scope);
+					
 					Object result = om.run(scope, window);
 					
 					window.document.flush();

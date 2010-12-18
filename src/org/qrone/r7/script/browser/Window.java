@@ -141,14 +141,6 @@ public class Window{
 		return o;
 	}
 	
-	public Object $(String selector){
-		return document.select(selector);
-	}
-
-	public Object $(String selector, HTML5Node node){
-		return node.select(selector);
-	}
-	
 	public void require(String path) throws IOException, URISyntaxException{
 		JSOM om = vm.compile(resolvePath(path));
 		if(!required.contains(om)){

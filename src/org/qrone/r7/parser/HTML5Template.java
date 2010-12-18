@@ -114,6 +114,14 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		return b.toString();
 	}
 	
+	public Object $(String selector){
+		return select(selector);
+	}
+
+	public Object $(String selector, HTML5Node node){
+		return node.select(selector);
+	}
+	
 	public HTML5NodeSet select(String selector){
 		return new HTML5NodeSet(this, om.select(selector));
 	}

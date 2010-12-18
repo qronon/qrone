@@ -21,7 +21,7 @@
 	<property name="qrone.jar" value="qrone-0.1.0.jar"/>
 
 		    		
-    <target name="package" depends="clean,copy-lib,compile" >
+    <target name="package" depends="clean,copy-lib" >
     	<mkdir dir="${output.dir}"/>
 		<jar basedir="${bin}" destfile="${output.dir}${qrone.jar}">
 			<manifest>
@@ -64,23 +64,6 @@
     <target name="clean">
 		<delete dir="${javadoc}"/>
 		<delete dir="${bin}"/>
-    </target>
-
-    <!-- - - - - - - - - - - - - - - - - - 
-          target: compile                      
-         - - - - - - - - - - - - - - - - - -->
-    <target name="compile" depends="clean">
-    	<mkdir dir="${bin}"/>
-        <javac srcdir="${src}"
-         destdir="${bin}"
-         debug="on">
-            <classpath>
-                <pathelement path="${classpath}"/>
-                <fileset dir=".">
-                  <include name="**/*.jar"/>
-                </fileset>
-              </classpath>
-   		</javac>
     </target>
 </project>
 

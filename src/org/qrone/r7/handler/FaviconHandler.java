@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
 
+@Deprecated
 public class FaviconHandler implements URIHandler{
 	private URIResolver resolver;
 	public FaviconHandler(URIResolver resolver) {
@@ -32,16 +33,18 @@ public class FaviconHandler implements URIHandler{
 					in.close();
 					out.flush();
 					out.close();
-					
-				}else{
+					return true;
+				}else if(resolver.exist(path)){
+					/*
 					in = QrONEUtils.getResourceAsStream("/favicon.ico");
 					out = response.getOutputStream();
 					QrONEUtils.copy(in, out);
 					in.close();
 					out.flush();
 					out.close();
+					return true;
+					*/
 				}
-				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (URISyntaxException e) {
