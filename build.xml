@@ -21,7 +21,7 @@
 	<property name="qrone.jar" value="qrone-0.1.0.jar"/>
 
 		    		
-    <target name="package" depends="clean,copy-lib" >
+    <target name="package" depends="copy-lib" >
     	<mkdir dir="${output.dir}"/>
 		<jar basedir="${bin}" destfile="${output.dir}${qrone.jar}">
 			<manifest>
@@ -58,12 +58,5 @@
     	<copy file="${lib.dir}/scannotation-1.0.2/scannotation-1.0.2.jar" todir="${lib.output.dir}"/>    	  	
     </target>
 	
-    <!-- ================================= 
-          target: clean              
-         ================================= -->
-    <target name="clean">
-		<delete dir="${javadoc}"/>
-		<delete dir="${bin}"/>
-    </target>
 </project>
 
