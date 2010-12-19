@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.WrapFactory;
 import org.qrone.r7.Extension;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.script.Mapper;
 import org.qrone.r7.script.ScriptableWrapper;
-
-import org.mozilla.javascript.Context;
 
 @Extension
 public class MapWrapper extends ScriptableWrapper<Map> implements Mapper, Serializable {

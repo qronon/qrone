@@ -9,4 +9,5 @@ public interface RepositoryService {
 	public String add(Scriptable repo);
 	public void remove(String id);
 	public List<Map<String, Object>> list();
+	public void reset(String id);
 }

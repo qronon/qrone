@@ -6,10 +6,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.WrappedException;
 
 public class JSOM implements Comparable<JSOM>{
 	private URI uri;

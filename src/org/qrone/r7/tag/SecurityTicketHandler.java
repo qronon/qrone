@@ -1,15 +1,9 @@
 package org.qrone.r7.tag;
 
-import java.io.IOException;
-import java.net.URI;
-
 import org.qrone.login.SecurityService;
 import org.qrone.r7.Extension;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
-import org.qrone.util.QrONEUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
 
 @Extension
 public class SecurityTicketHandler implements HTML5TagHandler {

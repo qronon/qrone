@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.qrone.r7.parser.HTML5NodeSet.Delegate;
 import org.qrone.r7.script.browser.Function;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

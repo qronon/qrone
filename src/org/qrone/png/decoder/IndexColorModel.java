@@ -1,8 +1,5 @@
 package org.qrone.png.decoder;
 
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.DataBuffer;
 import java.math.BigInteger;
 
 public class IndexColorModel extends ColorModel {

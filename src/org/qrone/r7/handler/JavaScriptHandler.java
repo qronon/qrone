@@ -2,7 +2,6 @@ package org.qrone.r7.handler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -13,19 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
-import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
-import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.util.QrONEUtils;
 
@@ -44,7 +40,7 @@ public class JavaScriptHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg) {
+			String uri, String path, String leftpath) {
 		Scriptable globalscope = null;
 		try {
 			if(resolver.exist(uri)){
@@ -52,10 +48,10 @@ public class JavaScriptHandler implements URIHandler{
 				JSOM om = vm.compile(urio);
 				if(om != null){
 					globalscope = vm.createScope();
-					ServletScope ss = new ServletScope(urio,path,pathArg);
-					Window window = new Window(ss,globalscope,request,response,deck,vm,services);
-					globalscope.put("query", globalscope, window.getQueryMap());
-
+					ServletScope ss = new ServletScope(urio, path, leftpath);
+					Window window = new Window(ss,request,response,globalscope,deck,vm,services);
+					window.init(globalscope);
+					
 					Scriptable subscope = vm.createScope();
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 					defaultom.run(subscope);
@@ -105,14 +101,16 @@ public class JavaScriptHandler implements URIHandler{
 				
 				URI urio = new URI("/admin/error.server.js");
 				Scriptable scope = vm.createScope();
-				ServletScope ss = new ServletScope(urio,path,pathArg);
+				ServletScope ss = new ServletScope(urio, path, leftpath);
 				scope.put("exception", scope, map);
 				
 				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 				defaultom.run(scope);
 				
 				JSOM om = vm.compile(urio);
-				Window window = new Window(ss,scope,request,response,deck,vm,services);
+				Window window = new Window(ss,request,response,scope,deck,vm,services);
+				window.init(scope);
+				
 				om.run(scope, window);
 				window.document.flush();
 				window.document.close();

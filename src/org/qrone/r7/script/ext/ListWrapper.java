@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.Extension;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.script.Indexer;
 import org.qrone.r7.script.ScriptableWrapper;

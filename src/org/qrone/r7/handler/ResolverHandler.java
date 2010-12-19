@@ -25,7 +25,7 @@ public class ResolverHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg){
+			String uri, String path, String leftpath){
 		InputStream in = null;
 		try{
 			URI urio = new URI(uri);

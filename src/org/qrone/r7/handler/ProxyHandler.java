@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.mortbay.jetty.HttpURI;
 import org.mortbay.proxy.AsyncProxyServlet;
-import org.qrone.r7.script.ServletScope;
 
 public class ProxyHandler implements URIHandler{
 	private ServletConfig config;
@@ -36,7 +35,7 @@ public class ProxyHandler implements URIHandler{
 	}
 	@Override
 	public boolean handle(final HttpServletRequest request,
-			final HttpServletResponse response, final String uri, final String path, final String pathArg) {
+			final HttpServletResponse response, final String uri, final String path, final String leftpath) {
 		try {
 			AsyncProxyServlet serv = new AsyncProxyServlet(){
 				@Override
@@ -47,7 +46,7 @@ public class ProxyHandler implements URIHandler{
 					return new HttpURI("http://" + 
 							(host != null ? host : serverName) + 
 							(port > 0 && port != 80 ? ":" + port : "") + 
-							"/" + path + pathArg + 
+							"/" + path + leftpath + 
 							(query != null ? "?" + query : ""));
 				}
 			};

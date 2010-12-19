@@ -1,24 +1,15 @@
 package org.qrone.r7.handler;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.JSDeck;
-import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.browser.Window;
 
 public class DefaultHandler implements URIHandler, Extendable{
 	private PortingService services;
@@ -57,27 +48,27 @@ public class DefaultHandler implements URIHandler, Extendable{
 	}
 	
 	public boolean mainHandle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg) {
+			String uri, String path, String leftpath) {
 
 		try {
 			deck.update(new URI(path));
 			response.setCharacterEncoding("utf8");
 			
 			if(uri.endsWith(".server.js") && 
-					jsHandler.handle(request, response, uri, path, pathArg)){
+					jsHandler.handle(request, response, uri, path, leftpath)){
 				return true;
 			}
 			
-			if(jsHandler.handle(request, response, uri + ".server.js", path, pathArg)){
+			if(jsHandler.handle(request, response, uri + ".server.js", path, leftpath)){
 				return true;
 			}
 			
 			if(uri.endsWith(".html") && 
-					html5Handler.handle(request, response, uri, path, pathArg)){
+					html5Handler.handle(request, response, uri, path, leftpath)){
 				return true;
 			}
 
-			if(html5Handler.handle(request, response, uri + ".html", path, pathArg)){
+			if(html5Handler.handle(request, response, uri + ".html", path, leftpath)){
 				return true;
 			}
 		} catch (Exception e) {
@@ -85,7 +76,7 @@ public class DefaultHandler implements URIHandler, Extendable{
 		}
 		
 		if(!uri.endsWith(".server.js") && 
-				resolverHandler.handle(request, response, uri, path, pathArg)){
+				resolverHandler.handle(request, response, uri, path, leftpath)){
 			return true;
 		}
 		return false;

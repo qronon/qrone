@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import org.qrone.r7.parser.HTML5NodeSet.Delegate;
 import org.qrone.r7.script.browser.Function;
 
 public interface HTML5Node {

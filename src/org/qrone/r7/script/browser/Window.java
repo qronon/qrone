@@ -1,22 +1,17 @@
 package org.qrone.r7.script.browser;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,10 +21,8 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.json.JsonParser;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
-import org.mozilla.javascript.serialize.ScriptableOutputStream;
 import org.qrone.database.DatabaseService;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
@@ -41,7 +34,6 @@ import org.qrone.r7.format.JavaProperties;
 import org.qrone.r7.format.Textile;
 import org.qrone.r7.format.YAML;
 import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.HTML5Node;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSDeck;
@@ -49,27 +41,26 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.util.QrONEUtils;
-
-import com.ibm.icu.text.CharsetDetector;
+import org.qrone.util.QueryString;
 
 
 public class Window{
-	private ServletScope ss;
 	private Scriptable scope;
 	private PortingService service;
 	private HTML5Deck deck;
 	private JSDeck vm;
-	private HttpServletRequest request;
-	private HttpServletResponse response;
 	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
 	private URIResolver resolver;
 	
-	public PrintStream in = System.out;
-	public PrintStream out = System.out;
+	private ServletScope ss;
+	public HttpServletRequest request;
+	public HttpServletResponse response;
+	
 	public Document document;
 	public Location location;
 	public Navigator navigator;
-	
+	public Scriptable query;
+
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
@@ -81,12 +72,12 @@ public class Window{
 	public Textile Textile;
 	public JavaProperties JavaProperties;
 	
-	public Window(ServletScope ss, Scriptable scope, HttpServletRequest request, HttpServletResponse response,
+	public Window(ServletScope ss, HttpServletRequest request, HttpServletResponse response, Scriptable scope, 
 			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
 		this.ss = ss;
-		this.scope = scope;
 		this.request = request;
 		this.response = response;
+		this.scope = scope;
 		this.deck = deck;
 		this.vm = vm;
 		
@@ -107,39 +98,64 @@ public class Window{
 		JavaProperties = new JavaProperties(resolver);
 	}
 	
+	public void init(Scriptable scope){
+		Scriptable req = newScriptable();
+		scope.put("request", scope, req);
+		
+		req.setPrototype((Scriptable)Context.javaToJS(request,req));
+
+		req.put("url", req, request.getRequestURL().toString());
+		req.put("uri", req, ss.uri.toString());
+		req.put("path", req, ss.path.toString());
+		req.put("leftpath", req, ss.leftpath.toString());
+		
+		query = parseQueryString(request.getQueryString());
+		req.put("get", req, query);
+		
+		try {
+			InputStream in = request.getInputStream();
+			byte[] body = QrONEUtils.read(in);
+			req.put("body", req, body);
+			
+			String text = QrONEUtils.getString(body, request.getHeader("Content-Type"));
+			req.put("text", req, text);
+			
+			if(service.getSecurityService().isSecured(request)){
+				Scriptable post = parseQueryString(text);
+				req.put("post", req, post);
+			}
+		} catch (IOException e) {}
+	}
+
 	private Scriptable newScriptable(){
 		return JSDeck.getContext().newObject(scope);
 	}
 
-	private URI resolvePath(String path) throws URISyntaxException {
-		return ss.uri.resolve(new URI(path));
-	}
-	
-	public Object getQueryMap(){
-		if(request.getMethod().toUpperCase().equals("POST")
-				&& !security.isSecured(request)){
-			return newScriptable();
-		}
+	private Scriptable parseQueryString(String query){
+		QueryString qs = new QueryString(query);
 		
 		Scriptable o = newScriptable();
-		Map<String, String[]> map = request.getParameterMap();
-		for (Iterator<Entry<String, String[]>> i = map.entrySet().iterator(); i
+		Map<String, List<String>> map = qs.getParameterMap();
+		for (Iterator<Entry<String, List<String>>> i = map.entrySet().iterator(); i
 				.hasNext();) {
-			Entry<String, String[]> e = i.next();
-			if(e.getValue().length == 1){
-				o.put(e.getKey(), o, e.getValue()[0]);
-			}else if(e.getValue().length > 1){
-				Scriptable l = newScriptable();
-				for (int j = 0; j < e.getValue().length; j++) {
-					l.put(j, l, e.getValue()[j]);
+			Entry<String, List<String>> e = i.next();
+			if(e.getValue().size() == 1){
+				o.put(e.getKey(), o, e.getValue().get(0));
+			}else if(e.getValue().size() > 1){
+				Scriptable l = JSDeck.getContext().newArray(scope, e.getValue().size());
+				for (int j = 0; j < e.getValue().size(); j++) {
+					l.put(j, l, e.getValue().get(j));
 				}
 				o.put(e.getKey(), o, l);
 			}
 		}
-		if(!o.has(".path", o) && ss.pathArg.length() > 0)
-			o.put(".path", o, ss.pathArg);
 		return o;
 	}
+	
+	private URI resolvePath(String path) throws URISyntaxException {
+		return ss.uri.resolve(new URI(path));
+	}
+	
 	
 	public void require(String path) throws IOException, URISyntaxException{
 		JSOM om = vm.compile(resolvePath(path));

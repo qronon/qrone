@@ -7,7 +7,6 @@ import java.net.URI;
 import org.ho.yaml.Yaml;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.Tab2WhiteInputStream;
-import org.qrone.util.XDeck;
 
 public class YAML extends XFormat<Object>{
 

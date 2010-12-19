@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.qrone.r7.script.browser.Function;

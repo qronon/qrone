@@ -2,13 +2,10 @@ package org.qrone.r7.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.util.Map;
 
 import org.qrone.util.QrONEUtils;
-
-import com.ibm.icu.text.CharsetDetector;
 
 public abstract class HTTPFetcher {
 
@@ -42,30 +39,11 @@ public abstract class HTTPFetcher {
 
 	public String get(String url) throws IOException{
 		HTTPResponse res = request(url,"GET",null,null,true);
-		String contentType = res.getHeaders().get("Content-Type");
-		String encoding = null;
-		int idx = contentType.indexOf("charset=");
-		if(idx >= 0){
-			encoding = contentType.substring(idx);
-		}
-		
-		CharsetDetector cd = new CharsetDetector();
-		Reader reader = cd.getReader(res.getInputStream(), encoding);
-		return QrONEUtils.read(reader);
-		
+		return QrONEUtils.getString(res.getInputStream(), res.getHeaders().get("Content-Type"));
 	}
 	
 	public String post(String url, String body) throws IOException{
 		HTTPResponse res = request(url,"POST",body.getBytes(),null,true);
-		String contentType = res.getHeaders().get("Content-Type");
-		String encoding = null;
-		int idx = contentType.indexOf("charset=");
-		if(idx >= 0){
-			encoding = contentType.substring(idx);
-		}
-		
-		CharsetDetector cd = new CharsetDetector();
-		Reader reader = cd.getReader(res.getInputStream(), encoding);
-		return QrONEUtils.read(reader);
+		return QrONEUtils.getString(res.getInputStream(), res.getHeaders().get("Content-Type"));
 	}
 }

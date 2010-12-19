@@ -10,7 +10,9 @@ package org.qrone.png.decoder;
 // Permission to use, reproduce, modify and/or (re)distribute this software is
 // hereby granted.
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MeteredInputStream extends FilterInputStream
 {

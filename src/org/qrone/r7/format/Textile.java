@@ -1,17 +1,12 @@
 package org.qrone.r7.format;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URI;
 
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.util.XDeck;
 
 public class Textile extends XFormat<String>{
 	private static MarkupParser parser;

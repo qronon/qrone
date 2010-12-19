@@ -14,7 +14,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -31,12 +30,13 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.codec.binary.Base64;
+
+import com.ibm.icu.text.CharsetDetector;
 
 public class QrONEUtils{
     
@@ -79,6 +79,24 @@ public class QrONEUtils{
 		    targetPath.append("./");
 
         return targetPath.toString();
+    }
+
+    public static String getString(InputStream in, String contentType) throws IOException{
+    	return getString(QrONEUtils.read(in), contentType);
+    }
+    
+    public static String getString(byte[] bytes, String contentType){
+    	String encoding = null;
+    	if(contentType != null){
+    		int idx = contentType.indexOf("charset=");
+			if(idx >= 0){
+				encoding = contentType.substring(idx + "charset=".length());
+				
+			}
+    	}
+    	
+    	CharsetDetector cd = new CharsetDetector();
+		return cd.getString(bytes, encoding);
     }
     
 	private static int uniquekey = 0;

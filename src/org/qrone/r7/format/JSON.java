@@ -1,8 +1,6 @@
 package org.qrone.r7.format;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.json.JsonParser;

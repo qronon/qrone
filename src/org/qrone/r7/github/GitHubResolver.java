@@ -20,13 +20,14 @@ import net.arnx.jsonic.JSON;
 import org.ho.yaml.Yaml;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.handler.URIHandler;
+import org.qrone.r7.resolver.SHAResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
 
 public class GitHubResolver implements URIResolver, URIHandler {
 	private static final Logger log = Logger.getLogger(GitHubResolver.class.getName());
 	private HTTPFetcher fetcher;
-	private URIResolver cacheresolver;
+	private SHAResolver cacheresolver;
 	private String user;
 	private String repo;
 	private String treesha;
@@ -34,7 +35,7 @@ public class GitHubResolver implements URIResolver, URIHandler {
 	private Map<String,String> blobs;
 	private Set<String> updatedSet = new HashSet<String>();
 	
-	public GitHubResolver(HTTPFetcher fetcher, URIResolver cacheresolver, String user, String repo, String treesha){
+	public GitHubResolver(HTTPFetcher fetcher, SHAResolver cacheresolver, String user, String repo, String treesha){
 		this.fetcher = fetcher;
 		this.cacheresolver = cacheresolver;
 		this.user = QrONEUtils.escape(user);
@@ -74,24 +75,28 @@ public class GitHubResolver implements URIResolver, URIHandler {
 
 	@Override
 	public boolean updated(URI uri) {
-		return updatedSet.contains(uri.toString());
+		Map<String,String> map = getFiles();
+		String path = uri.toString();
+		String sha = map.get(path.substring(1));
+		if(cacheresolver.updated(uri,sha)) return true;
+		return updatedSet.contains(path);
 	}
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
-		InputStream in = cacheresolver.getInputStream(uri);
+		Map<String,String> map = getFiles();
+		String sha = map.get(uri.toString().substring(1));
+		InputStream in = cacheresolver.getInputStream(uri, sha);
 		if(in != null) return in;
 		
 		updatedSet.remove(uri.toString());
-		Map<String,String> map = getFiles();
 		if(map != null){
-			String sha = map.get(uri.toString().substring(1));
 			if(sha != null){
 				InputStream fin =  fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
 						+ user + "/" + repo + "/" + sha);
 				byte[] bytes = QrONEUtils.read(fin);
 				
-				OutputStream out = cacheresolver.getOutputStream(uri);
+				OutputStream out = cacheresolver.getOutputStream(uri,sha);
 				out.write(bytes);
 				out.flush();
 				out.close();
@@ -104,8 +109,7 @@ public class GitHubResolver implements URIResolver, URIHandler {
 
 	@Override
 	public OutputStream getOutputStream(URI uri) throws IOException {
-		OutputStream out = cacheresolver.getOutputStream(uri);
-		return out;
+		return null;
 	}
 
 	@Override
@@ -149,19 +153,12 @@ public class GitHubResolver implements URIResolver, URIHandler {
 		return false;
 	}
 	
-	/*
-	private void clearCache(String path){
-		updatedSet.add(path);
-		blobs.remove(path);
-		try {
-			cacheresolver.remove(new URI(path));
-		} catch (URISyntaxException e) {
-		}
-	}
-	*/
-	
 	@Override
 	public boolean remove(URI uri) {
 		return false;
+	}
+
+	public void reset() {
+		blobs = null;
 	}
 }

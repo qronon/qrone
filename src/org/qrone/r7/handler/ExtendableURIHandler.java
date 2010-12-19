@@ -1,7 +1,6 @@
 package org.qrone.r7.handler;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,8 +20,8 @@ public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg) {
-		return handler.handle(request, response, uri, path, pathArg);
+			String uri, String path, String leftpath) {
+		return handler.handle(request, response, uri, path, leftpath);
 	}
 	
 	public void addExtension(Class c){

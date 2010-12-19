@@ -14,11 +14,16 @@ package org.qrone.png.decoder;
  * @(#)PNGImageProducer.java	0.88 97/4/14 Jason Marshall
  **/
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Enumeration;
-import java.util.zip.*;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 
 
 // TODO:  Need an ImageFormatException or somesuch..  instead of throwing

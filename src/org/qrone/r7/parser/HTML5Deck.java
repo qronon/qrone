@@ -1,6 +1,5 @@
 package org.qrone.r7.parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -15,7 +14,6 @@ import java.util.Set;
 import org.qrone.img.ImageBufferService;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
-import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
 import org.qrone.util.QrONEUtils;

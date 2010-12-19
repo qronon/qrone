@@ -7,7 +7,6 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 import org.qrone.png.PNGMemoryImage;
-import org.qrone.png.encoder.PixelGrabber;
 
 
 /**
