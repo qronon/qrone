@@ -71,7 +71,7 @@ public class Scale9Handler implements HTML5TagHandler {
 				return new HTML5TagResult() {
 					
 					@Override
-					public String prestart() {
+					public String prestart(String ticket) {
 						try {
 							return startScale9(f.resolve(u),
 									l.get(0), l.get(1), l.get(2), l.get(3), c, w);
@@ -81,17 +81,17 @@ public class Scale9Handler implements HTML5TagHandler {
 					}
 
 					@Override
-					public String poststart() {
+					public String poststart(String ticket) {
 						return null;
 					}
 					@Override
-					public String preend() {
+					public String preend(String ticket) {
 						return null;
 					}
 					
 					
 					@Override
-					public String postend() {
+					public String postend(String ticket) {
 						try {
 							return endScale9(f.resolve(u),
 									l.get(0), l.get(1), l.get(2), l.get(3));
@@ -101,7 +101,7 @@ public class Scale9Handler implements HTML5TagHandler {
 					}
 
 					@Override
-					public void process(HTML5Element e) {
+					public void process(HTML5Element e, String ticket) {
 						
 					}
 				};
@@ -109,7 +109,7 @@ public class Scale9Handler implements HTML5TagHandler {
 				return new HTML5TagResult() {
 					
 					@Override
-					public String prestart() {
+					public String prestart(String ticket) {
 						try {
 							return startScale3(f.resolve(u),
 									l.get(0), l.get(1), c, w);
@@ -119,17 +119,17 @@ public class Scale9Handler implements HTML5TagHandler {
 					}
 					
 					@Override
-					public String preend() {
+					public String preend(String ticket) {
 						return null;
 					}
 					
 					@Override
-					public String poststart() {
+					public String poststart(String ticket) {
 						return null;
 					}
 					
 					@Override
-					public String postend() {
+					public String postend(String ticket) {
 						try {
 							return endScale3(f.resolve(u),
 									l.get(0), l.get(1));
@@ -139,7 +139,7 @@ public class Scale9Handler implements HTML5TagHandler {
 					}
 
 					@Override
-					public void process(HTML5Element e) {
+					public void process(HTML5Element e, String ticket) {
 						
 					}
 				};

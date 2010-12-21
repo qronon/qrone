@@ -15,8 +15,8 @@ public class Document extends HTML5Template{
 	private HttpServletRequest request;
 	private PrintWriter writer;
 	
-	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri) throws IOException{
-		super(deck, uri);
+	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri, String ticket) throws IOException{
+		super(deck, uri, ticket);
 		this.request = request;
 		this.writer = response.getWriter();
 	}

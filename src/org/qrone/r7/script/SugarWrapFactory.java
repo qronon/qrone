@@ -44,20 +44,6 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
     public SugarWrapFactory() {
         super();
     }
-
-	private static Class getSuperGenericType(Class cls) {
-		Type type = cls.getGenericSuperclass();
-		if(type instanceof ParameterizedType){
-			ParameterizedType ty = (ParameterizedType) type;
-			if(ty.getRawType().equals(ScriptableWrapper.class)){
-				Type[] actualType = ty.getActualTypeArguments();
-				if (actualType.length > 0 && actualType[0] instanceof Class) {
-					return (Class) actualType[0];
-				}
-			}
-		}
-		return null;
-	}
 	
 	private static Class getInterfaceGenericType(Class cls) {
 		Type[] types = cls.getGenericInterfaces();
@@ -79,9 +65,6 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
 		if(ScriptablePrototype.class.isAssignableFrom(wrapper)){
 			Class cls = getInterfaceGenericType(wrapper);
 			addPrototypeClass(cls, wrapper);
-		}else if(ScriptableWrapper.class.isAssignableFrom(wrapper)){
-			Class cls = getSuperGenericType(wrapper);
-			setWrapperClass(cls, wrapper);
 		}
 	}
 	
@@ -98,49 +81,12 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
     	l.add(wrapper);
     }
     
-    private Entry<Class,Class> findWrapperClass(Object javaObject){
-    	 for (Iterator<Entry<Class,Class>> i = wmap.entrySet().iterator(); i
-				.hasNext();) {
-			Entry<Class,Class> e = i.next();
-			if(e.getKey().isInstance(javaObject)){
-				return e;
-			}
-		}
-    	return null;
-    }
-    
     public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
     		Object javaObject, Class staticType) {
     	
 		try {
-			NativeJavaObject wrapper = null;
-			if(javaObject instanceof List){
-				List list = (List)javaObject;
-				Scriptable array = cx.newArray(scope, list.size());
-				for (int i = 0; i < list.size(); i++) {
-					array.put(i, scope, list.get(i));
-				}
-				return array;
-			}
 			
-			Entry<Class,Class> types = findWrapperClass(javaObject);
-			if(types != null){
-				ScriptableWrapper sjo = null;
-				try{
-					Constructor<? extends ScriptableWrapper> cr = 
-						types.getValue().getConstructor(Scriptable.class, types.getKey(), Class.class);
-					sjo = cr.newInstance(scope, javaObject, staticType);
-				}catch(Exception e1){
-					Constructor<? extends ScriptableWrapper> cr = 
-						types.getValue().getConstructor();
-					sjo = cr.newInstance();
-				}
-				
-				wrapper = sjo;
-			}else{
-				wrapper = new NativeJavaObject(scope, javaObject, staticType);
-			}
-			
+			NativeJavaObject wrapper = new NativeJavaObject(scope, javaObject, staticType);
 			for (Iterator<Class> i = map.keySet().iterator(); i.hasNext();) {
 				Class type = i.next();
 				if (type.isInstance(javaObject)) {
@@ -152,13 +98,23 @@ public class SugarWrapFactory extends WrapFactory implements Extendable {
 						
 						ScriptablePrototype sjo = null;
 						try{
-							Constructor<? extends ScriptablePrototype> cr = 
-								cls.getConstructor(type);
-							sjo = cr.newInstance(javaObject);
+							try{
+								Constructor<? extends ScriptablePrototype> cr = 
+									cls.getConstructor(Scriptable.class, type);
+								sjo = cr.newInstance(scope, javaObject);
+							}catch(Exception e1){
+								Constructor<? extends ScriptablePrototype> cr = 
+									cls.getConstructor(type);
+								sjo = cr.newInstance(javaObject);
+							}
 						}catch(Exception e1){
 							Constructor<? extends ScriptablePrototype> cr = 
 								cls.getConstructor();
 							sjo = cr.newInstance();
+						}
+						
+						if(sjo instanceof Scriptable){
+							return (Scriptable)sjo;
 						}
 						
 						NativeJavaObject wsjo = new NativeJavaObject(scope, sjo, null);

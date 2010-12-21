@@ -45,8 +45,8 @@ import org.qrone.util.QueryString;
 
 
 public class Window{
-	private Scriptable scope;
 	private PortingService service;
+	private Scriptable scope;
 	private HTML5Deck deck;
 	private JSDeck vm;
 	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
@@ -72,15 +72,16 @@ public class Window{
 	public Textile Textile;
 	public JavaProperties JavaProperties;
 	
-	public Window(ServletScope ss, HttpServletRequest request, HttpServletResponse response, Scriptable scope, 
+	public Window(ServletScope ss, Scriptable scope, 
 			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
 		this.ss = ss;
-		this.request = request;
-		this.response = response;
+		this.request = ss.request;
+		this.response = ss.response;
 		this.scope = scope;
 		this.deck = deck;
 		this.vm = vm;
 		
+		this.service = service;
 		db = service.getKVSService();
 		memcached = service.getMemcachedService();
 		repository = service.getRepositoryService();
@@ -88,7 +89,9 @@ public class Window{
 		resolver = service.getURIResolver();
 		http = service.getURLFetcher();
 
-		document = new Document(request, response, deck, ss.uri.toString().replaceAll("\\.server\\.js$", ".html"));
+		document = new Document(request, response, deck, 
+				ss.uri.toString().replaceAll("\\.server\\.js$", ".html"),
+				security.getTicket(request));
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
@@ -107,35 +110,30 @@ public class Window{
 		req.put("url", req, request.getRequestURL().toString());
 		req.put("uri", req, ss.uri.toString());
 		req.put("path", req, ss.path.toString());
-		req.put("leftpath", req, ss.leftpath.toString());
+		if(ss.leftpath.length() > 0)
+			req.put("leftpath", req, ss.leftpath.toString());
 		
-		query = parseQueryString(request.getQueryString());
+		query = toScriptable(ss.get);
 		req.put("get", req, query);
 		
-		try {
-			InputStream in = request.getInputStream();
-			byte[] body = QrONEUtils.read(in);
-			req.put("body", req, body);
-			
-			String text = QrONEUtils.getString(body, request.getHeader("Content-Type"));
-			req.put("text", req, text);
-			
-			if(service.getSecurityService().isSecured(request)){
-				Scriptable post = parseQueryString(text);
-				req.put("post", req, post);
-			}
-		} catch (IOException e) {}
+		req.put("body", req, ss.body);
+		req.put("text", req, ss.text);
+		
+		if(security == null || security.validateTicket(request,ss.getParameter(".ticket"))){
+			Scriptable post = toScriptable(ss.post);
+			req.put("post", req, post);
+			req.put("secure", req, true);
+		}else{
+			req.put("secure", req, false);
+		}
 	}
 
 	private Scriptable newScriptable(){
 		return JSDeck.getContext().newObject(scope);
 	}
 
-	private Scriptable parseQueryString(String query){
-		QueryString qs = new QueryString(query);
-		
+	public Scriptable toScriptable(Map<String, List<String>> map){
 		Scriptable o = newScriptable();
-		Map<String, List<String>> map = qs.getParameterMap();
 		for (Iterator<Entry<String, List<String>>> i = map.entrySet().iterator(); i
 				.hasNext();) {
 			Entry<String, List<String>> e = i.next();
@@ -178,7 +176,7 @@ public class Window{
 		if(resolver.exist(u.toString())){
 			HTML5OM om = deck.compile(u);
 			if(om != null){
-				return new HTML5Template(om, u);
+				return new HTML5Template(om, u, security.getTicket(request));
 			}
 		}
 		return null;

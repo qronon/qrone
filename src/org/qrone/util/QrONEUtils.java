@@ -226,6 +226,7 @@ public class QrONEUtils{
 		String base64String = Base64.encodeBase64String(bytes);
 		base64String = base64String.replace('+', '.');
 		base64String = base64String.replace('/', '_');
+		base64String = base64String.replaceAll("\r", "");
 		base64String = base64String.replaceAll("\n", "");
 		
 		int i = base64String.indexOf('=');
@@ -236,8 +237,8 @@ public class QrONEUtils{
 	
 	public static byte[] decodeQ64(String base64String){
 		if(base64String == null) return null;
-		base64String = base64String.replace('+', '.');
-		base64String = base64String.replace('/', '_');
+		base64String = base64String.replace('.', '+');
+		base64String = base64String.replace('_', '/');
 		
 		int eq = 4 - base64String.length() % 4;
 		switch(eq){

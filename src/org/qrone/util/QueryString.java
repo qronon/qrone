@@ -14,6 +14,7 @@ public class QueryString {
 
 	public QueryString(String qs) {
 		parameters = new TreeMap<String, List<String>>();
+		if(qs == null) return;
 
 		// Parse query string
 		String pairs[] = qs.split("&");

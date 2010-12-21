@@ -33,29 +33,32 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	protected URI uri;
 	protected boolean loaded = false;
 	protected String id;
+	protected String ticket;
 	
-	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
+	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri, String ticket){
 		this.uri = uri;
 		this.om = om;
 		this.xomlist = xomlist;
+		this.ticket = ticket;
 		list.add(b);
 		loaded = true;
 	}
 
-	public HTML5Template(HTML5OM om, URI uri){
-		this(om, new HashSet<HTML5OM>(), uri);
+	public HTML5Template(HTML5OM om, URI uri, String ticket){
+		this(om, new HashSet<HTML5OM>(), uri, ticket);
 		id = QrONEUtils.uniqueid();
 	}
 	
 	public HTML5Template(HTML5OM om){
-		this(om, new HashSet<HTML5OM>(), null);
+		this(om, new HashSet<HTML5OM>(), null, null);
 	}
 	
-	public HTML5Template(HTML5Deck deck, String path){
-		this(null, new HashSet<HTML5OM>(), null);
+	public HTML5Template(HTML5Deck deck, String path, String ticket) throws IOException{
+		this(null, new HashSet<HTML5OM>(), null, ticket);
 		if(deck.getResolver().exist(path)){
 			try {
-				om = deck.compile(new URI(path));
+				uri = new URI(path);
+				om = deck.compile(uri);
 				loaded = true;
 			} catch (URISyntaxException e) {
 			}
@@ -74,7 +77,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 
 	public HTML5Template append(){
-		HTML5Template t = new HTML5Template(om, xomlist, uri);
+		HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
 		list.add(t);
 		b = new StringBuilder();
 		list.add(b);
@@ -224,10 +227,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 					e.html(new Function() {
 						@Override
 						public Object call(Object... args) {
-							HTML5Template t = new HTML5Template(om, xomlist, uri);
+							HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
 							Set<Entry> entryset = ((Map)o).entrySet();
 							for (Entry el : entryset) {
-								HTML5Template tt = new HTML5Template(om, xomlist, uri);
+								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
 								tt.set(selector + ".key", el.getKey());
 								tt.set(selector + ".value", el.getValue());
 								tt.visit(e);
@@ -245,10 +248,10 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 
 						@Override
 						public Object call(Object... args) {
-							HTML5Template t = new HTML5Template(om, xomlist, uri);
+							HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
 							for (Iterator iterator = ((List)o).iterator(); iterator
 							.hasNext();) {
-								HTML5Template tt = new HTML5Template(om, xomlist, uri);
+								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
 								tt.set(iterator.next());
 								tt.visit(e);
 								t.append(tt);
@@ -295,7 +298,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 
 	
 	public void visit(HTML5Element e){
-		e.getOM().process(this, this, e.get(), null, xomlist);
+		e.getOM().process(this, this, e.get(), null, xomlist, ticket);
 	}
 	
 	private Map<String, Iterator<Node>> selecting
@@ -306,14 +309,14 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			if(iter != null){
 				if(!iter.hasNext())
 					iter = om.select(selector).iterator();
-				om.process(this, this, iter.next(), null, xomlist);
+				om.process(this, this, iter.next(), null, xomlist, ticket);
 			}
 		}else{
 			Set<Node> nodes = om.select(selector);
 			if(nodes != null && !nodes.isEmpty()){
 				Iterator<Node> iter = nodes.iterator();
 				selecting.put(selector, iter);
-				om.process(this, this, iter.next(), null, xomlist);
+				om.process(this, this, iter.next(), null, xomlist, ticket);
 			}else{
 				selecting.put(selector, null);
 			}
@@ -337,7 +340,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 
 	public void out(HTML5Element e) {
 		//final String uniqueid = QrONEUtils.uniqueid();
-		om.process(this, this, e.get(), null, xomlist);
+		om.process(this, this, e.get(), null, xomlist, ticket);
 	}
 
 	/*
@@ -353,7 +356,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	
 	public void out() {
 		if(om != null)
-			om.process(this, this, om.getDocument(), null, xomlist);
+			om.process(this, this, om.getDocument(), null, xomlist, ticket);
 	}
 
 	public HTML5Element getBody() {
@@ -377,7 +380,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 	
 	public HTML5Template newTemplate() {
-		HTML5Template t =  new HTML5Template(om, xomlist, uri);
+		HTML5Template t =  new HTML5Template(om, xomlist, uri, ticket);
 		//t.id = id;
 		t.node5map = node5map;
 		return t;

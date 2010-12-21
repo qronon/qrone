@@ -3,15 +3,19 @@ package org.qrone.r7.script;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.r7.parser.JSDeck;
 
 public class Scriptables {
+	
 
     public static Map asMap(Scriptable s){
     	Map m = null;
@@ -36,7 +40,7 @@ public class Scriptables {
     	Object[] ids = s.getIds();
     	for (int i = 0; i < ids.length; i++) {
     		Object k = ids[i];
-    		if(k instanceof String && !k.equals("prototype")){
+    		if(k instanceof String && !k.equals("prototype") && !k.equals("parentScope")){
     			Object v = s.get(((String)k), s);
     			m.put(k, asJava(v, r));
     		}else if (k instanceof Number){
@@ -61,15 +65,16 @@ public class Scriptables {
     		return null;
     	}
     	r.add(o);
-    	if(o instanceof ScriptableWrapper){
-    		return asMap((Scriptable)o, r);
-    	}else if(o instanceof NativeArray){
+    	if(o instanceof NativeArray){
     		return asList((NativeArray)o, r);
     	}else if(o instanceof NativeJavaObject){
-    		return ((NativeJavaObject)o).unwrap().toString();
+    		return asJava(((NativeJavaObject)o).unwrap(),r);
     	}else if(o instanceof Scriptable){
     		return asMap((Scriptable)o, r);
     	}else{
+    		if(o.getClass().getName().startsWith("org.qrone")){
+    			return o.getClass().getName();
+    		}
     		return o;
     	}
     }

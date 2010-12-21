@@ -18,27 +18,29 @@ public class SecurityTicketHandler implements HTML5TagHandler {
 			return new HTML5TagResult() {
 				
 				@Override
-				public String prestart() {
+				public String prestart(String ticket) {
 					return null;
 				}
 				
 				@Override
-				public String preend() {
-					return "<input type=\"hidden\" name=\".ticket\" value=\"" + security.getTicket() + "\"/>";
-				}
-				
-				@Override
-				public String poststart() {
+				public String preend(String ticket) {
+					if(ticket != null)
+						return "<input type=\"hidden\" name=\".ticket\" value=\"" + ticket + "\"/>";
 					return null;
 				}
 				
 				@Override
-				public String postend() {
+				public String poststart(String ticket) {
+					return null;
+				}
+				
+				@Override
+				public String postend(String ticket) {
 					return null;
 				}
 
 				@Override
-				public void process(HTML5Element e) {
+				public void process(HTML5Element e, String ticket) {
 					
 				}
 			};

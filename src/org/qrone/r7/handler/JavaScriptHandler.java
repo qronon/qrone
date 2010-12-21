@@ -23,7 +23,10 @@ import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.browser.Window;
+import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.QrONEUtils;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
@@ -44,12 +47,12 @@ public class JavaScriptHandler implements URIHandler{
 		Scriptable globalscope = null;
 		try {
 			if(resolver.exist(uri)){
-				URI urio = urio = new URI(uri);
+				URI urio = new URI(uri);
 				JSOM om = vm.compile(urio);
 				if(om != null){
 					globalscope = vm.createScope();
-					ServletScope ss = new ServletScope(urio, path, leftpath);
-					Window window = new Window(ss,request,response,globalscope,deck,vm,services);
+					ServletScope ss = new ServletScope(request, response, urio, path, leftpath);
+					Window window = new Window(ss,globalscope,deck,vm,services);
 					window.init(globalscope);
 					
 					Scriptable subscope = vm.createScope();
@@ -58,8 +61,10 @@ public class JavaScriptHandler implements URIHandler{
 					
 					Object result = om.run(globalscope, subscope, window);
 					
-					String done = request.getParameter(".done");
-					if(done != null && services.getSecurityService().isSecured(request)){
+					
+					
+					String done = ss.getParameter(".done");
+					if(done != null && services.getSecurityService().validateTicket(request,ss.getParameter(".ticket"))){
 						String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){
@@ -101,14 +106,14 @@ public class JavaScriptHandler implements URIHandler{
 				
 				URI urio = new URI("/admin/error.server.js");
 				Scriptable scope = vm.createScope();
-				ServletScope ss = new ServletScope(urio, path, leftpath);
-				scope.put("exception", scope, map);
+				ServletScope ss = new ServletScope(request,response,urio, path, leftpath);
+				scope.put("exception", scope, new ScriptableMap(scope, map));
 				
 				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 				defaultom.run(scope);
 				
 				JSOM om = vm.compile(urio);
-				Window window = new Window(ss,request,response,scope,deck,vm,services);
+				Window window = new Window(ss,scope,deck,vm,services);
 				window.init(scope);
 				
 				om.run(scope, window);

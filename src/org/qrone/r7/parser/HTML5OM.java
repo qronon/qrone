@@ -241,14 +241,14 @@ public class HTML5OM {
 	}
 	
 	public void process(final HTML5Writer t, final NodeProcessor p,
-			final Node node, String id, final Set<HTML5OM> xomlist){
+			final Node node, String id, final Set<HTML5OM> xomlist, final String ticket){
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
 		}
 		
 		final HTML5Set set;
 		if(node == document){
-			set = getRecurseHeader(getURI(), xomlist);
+			set = getRecurseHeader(getURI(), xomlist, ticket);
 		}else{
 			set = null;
 		}
@@ -344,7 +344,7 @@ public class HTML5OM {
 					e = p.get(e4);
 				else
 					e = new HTML5Element(om, null, e4);
-				super.out(e, p);
+				super.out(e, p, ticket);
 			}
 		};
 		s.visit(this, node, id, t);
@@ -392,7 +392,7 @@ public class HTML5OM {
 
 	private String scriptCache = null;
 	private String scriptCacheNoHTML = null;
-	private String getScripts(boolean html){
+	private String getScripts(boolean html, String ticket){
 		if(html){
 			if(scriptCache != null){
 				return scriptCache;
@@ -428,7 +428,7 @@ public class HTML5OM {
 			public void append(HTML5Template t) {
 			}
 		};
-		process(t, null, body, null, null);
+		process(t, null, body, null, null, ticket);
 		
 		StringBuilder b = new StringBuilder();
 		if(!html){
@@ -455,18 +455,18 @@ public class HTML5OM {
 		return b.toString();
 	}
 	
-	private HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist){
-		return getRecursive(file, xomlist);
+	private HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist, String ticket){
+		return getRecursive(file, xomlist, ticket);
 	}
 	
-	private HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist){
+	private HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist, String ticket){
 		HTML5Set set = new HTML5Set();
 		Set<URI> s = new HashSet<URI>();
-		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true);
+		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true,ticket);
 		if(xomlist != null){
 			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
 				HTML5OM xom = i.next();
-				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true);
+				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true,ticket);
 			}
 		}
 		return set;
@@ -475,7 +475,7 @@ public class HTML5OM {
 	private void getRecursive(URI file, 
 			StringBuffer js, List<CSS3OM> css, 
 			List<Element> jslibs, List<Element> csslibs, 
-			Set<URI> clses, boolean first){
+			Set<URI> clses, boolean first, String ticket){
 		if(file == null || clses.contains(file)) return;
 		clses.add(file);
 		
@@ -483,18 +483,18 @@ public class HTML5OM {
 		if(c != null){
 			String extend = metamap.get("extends");
 			if(extend != null)
-				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false);
+				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false,ticket);
 			
 			if(first)
 				js.append("if(!window.qrone)window.qrone=function(){};");
-			js.append(c.getScripts(!first));
+			js.append(c.getScripts(!first,ticket));
 			css.addAll(stylesheets);
 			
 			jslibs.addAll(this.jslibs);
 			csslibs.addAll(this.csslibs);
 	
 			for (Iterator<String> iter = requires.iterator(); iter.hasNext();) {
-				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false);
+				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false,ticket);
 			}
 		}
 	}
