@@ -51,7 +51,6 @@ public class DefaultHandler implements URIHandler, Extendable{
 			String uri, String path, String leftpath) {
 
 		try {
-			deck.update(new URI(path));
 			response.setCharacterEncoding("utf8");
 			
 			if(uri.endsWith(".server.js") && 

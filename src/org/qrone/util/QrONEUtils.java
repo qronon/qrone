@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -439,5 +440,39 @@ public class QrONEUtils{
 		} catch (BadPaddingException e) {
 		}
 		return null;
+	}
+	
+	public static String sha1(byte[] data){
+		try {
+			return digest64("SHA-1", data);
+		} catch (NoSuchAlgorithmException e) {
+		}
+		return null;
+	}
+
+	public static String digest64(String type, byte[] data) throws NoSuchAlgorithmException{
+		byte[] digest = digest(type, data);
+		StringBuffer b = new StringBuffer();
+		for (int i = 0; i < digest.length; i++) {
+			int d = digest[i];
+			if (d < 0) {
+				d += 256;
+			}
+			if (d < 16) {
+				b.append('0');
+			}
+			b.append(Integer.toString(d, 16));
+		}
+		return b.toString();
+	}
+	public static String digest(String type, String data) throws NoSuchAlgorithmException{
+		return digest64(type, data.getBytes());
+	}
+	
+	public static byte[] digest(String type, byte[] data) throws NoSuchAlgorithmException{
+		MessageDigest md = MessageDigest.getInstance(type);
+		md.update(data);
+		return md.digest();
+		
 	}
 }

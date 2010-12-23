@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.qrone.img.ImageBufferService;
+import org.qrone.img.ImageSpriteService;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
@@ -23,20 +24,17 @@ import org.w3c.dom.css.CSSRuleList;
 
 public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 	private CSS3Deck cssdeck;
-	private ImageSpriter spriter;
 	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	private PortingService services;
 	
-	public HTML5Deck(URIResolver resolver, ImageBufferService service){
+	public HTML5Deck(URIResolver resolver){
 		super(resolver);
-		spriter = new ImageSpriter(resolver, service);
     	cssdeck = new CSS3Deck(resolver);
 	}
     
     public HTML5Deck(PortingService service){
     	super(service.getURIResolver());
     	this.services = service;
-    	spriter = new ImageSpriter(resolver, service.getImageBufferService());
     	cssdeck = new CSS3Deck(resolver);
     
     }
@@ -51,20 +49,8 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
     	return super.updated(t, uri);
     }
     
-    public void update(URI uri){
-    	try {
-			spriter.update(uri);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-    
     public PortingService getPortingService(){
     	return services;
-    }
-    
-    public ImageSpriter getSpriter(){
-    	return spriter;
     }
 	
 	public void addExtension(Class c){

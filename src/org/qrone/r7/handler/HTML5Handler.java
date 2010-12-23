@@ -31,7 +31,6 @@ public class HTML5Handler implements URIHandler{
 				HTML5OM om = deck.compile(urio);
 				if(om != null){
 					response.setContentType("text/html; charset=utf8");
-					deck.getSpriter().create();
 
 					Writer out = response.getWriter();
 					out.append(om.serialize());

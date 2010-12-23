@@ -1,10 +1,18 @@
-package org.qrone.r7.parser;
+package org.qrone.img;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 
 
 public class ImagePart implements Serializable{
+	
+	public static enum TYPE{
+		REPEAT_X,
+		REPEAT_Y,
+		SINGLE
+	}
+	
 	private static final long serialVersionUID = -2816750802010010337L;
 	
 	public URI file;
@@ -12,13 +20,28 @@ public class ImagePart implements Serializable{
 	public int y;
 	public int w;
 	public int h;
+	public TYPE type;
+
+	public ImagePart(URI f, ImageSpriteService service){
+		this.file = f;
+		type = TYPE.SINGLE;
+		
+		try {
+			ImageSize size = service.getImageSize(f);
+			x = 0;
+			y = 0;
+			w = size.w;
+			h = size.h;
+		} catch (IOException e) {}
+	}
 	
-	public ImagePart(URI f, int x, int y, int w, int h) {
+	public ImagePart(URI f, int x, int y, int w, int h, TYPE type) {
 		this.file = f;
 		this.x = x;
 		this.y = y;
 		this.w = w;
 		this.h = h;
+		this.type = type;
 	}
 	
 	@Override

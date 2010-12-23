@@ -353,9 +353,6 @@ public class HTML5OM {
 	public String serialize(){
 		HTML5Template t = new HTML5Template(this);
 		t.out();
-		try {
-			deck.getSpriter().create();
-		} catch (IOException e) {}
 		return t.toString();
 	}
 	

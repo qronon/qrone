@@ -1,4 +1,4 @@
-package org.qrone.r7.parser;
+package org.qrone.img;
 
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
+@Deprecated
 public class ImagePack implements Serializable{
 	private static final long serialVersionUID = -4273808957427639232L;
 	

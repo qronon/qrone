@@ -2,6 +2,7 @@ package org.qrone.r7;
 
 import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageBufferService;
+import org.qrone.img.ImageSpriteService;
 import org.qrone.login.LoginService;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
@@ -10,6 +11,7 @@ import org.qrone.r7.resolver.URIResolver;
 
 public class PortingServiceBase  implements PortingService{
 	private ImageBufferService imagebuffer;
+	private ImageSpriteService sprite;
 	private LoginService login;
 	private HTTPFetcher fetcher;
 	private URIResolver resolver;
@@ -25,10 +27,12 @@ public class PortingServiceBase  implements PortingService{
 			MemcachedService memcached,
 			LoginService login,
 			ImageBufferService imagebuffer,
+			ImageSpriteService sprite,
 			RepositoryService repository,
 			SecurityService security
 			){
 		this.imagebuffer = imagebuffer;
+		this.sprite = sprite;
 		this.login = login;
 		this.fetcher = fetcher;
 		this.resolver = resolver;
@@ -76,6 +80,11 @@ public class PortingServiceBase  implements PortingService{
 	@Override
 	public SecurityService getSecurityService() {
 		return security;
+	}
+
+	@Override
+	public ImageSpriteService getImageSpriteService() {
+		return sprite;
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.qrone.r7.parser;
+package org.qrone.img;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,13 +9,11 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.qrone.img.ImageBuffer;
-import org.qrone.img.ImageBufferService;
-import org.qrone.img.ImageRect;
-import org.qrone.img.ImageSize;
+import org.qrone.img.ImagePart.TYPE;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
 
+@Deprecated
 public class ImageSpriter {
 	private String isprite = "/sprite-i.png";
 	private String vsprite = "/sprite-v.png";
@@ -79,7 +77,7 @@ public class ImageSpriter {
 			return size;
 		}
 	}
-	public ImageBuffer getImage(URI file) throws IOException{
+	private ImageBuffer getImage(URI file) throws IOException{
 		InputStream in = resolver.getInputStream(file);
 		try{
 			ImageBuffer i = service.createImage(in);
@@ -146,7 +144,7 @@ public class ImageSpriter {
 		}
 	}
 	
-	public void createv() throws IOException {
+	private void createv() throws IOException {
 		int currentY = 0;
 		int currentX = 0;
 		if(pack.vsprites.size() > 0 && pack.vlastsize != pack.vsprites.size()){
@@ -188,7 +186,7 @@ public class ImageSpriter {
 		}
 	}
 	
-	public void createh() throws IOException {
+	private void createh() throws IOException {
 		int currentY = 0;
 		int currentX = 0;
 		
@@ -231,7 +229,7 @@ public class ImageSpriter {
 		}
 	}
 	
-	public void createt() throws IOException {
+	private void createt() throws IOException {
 		if(useTransparentDot && !outTransparentDot){
 			outTransparentDot = true;
 			//InputStream in = QrONEUtils.getResourceAsStream("1dot.png");
@@ -249,7 +247,7 @@ public class ImageSpriter {
 	
 	public String addISprite(URI file) throws IOException{
 		ImageBuffer b = getImage(file);
-		ImagePart part = new ImagePart(file, 0, 0, b.getWidth(), b.getHeight());
+		ImagePart part = new ImagePart(file, 0, 0, b.getWidth(), b.getHeight(), TYPE.SINGLE);
 		/*
 		if(iresults.containsKey(part)){
 			return iresults.get(part);

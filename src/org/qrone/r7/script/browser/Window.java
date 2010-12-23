@@ -292,22 +292,7 @@ public class Window{
 	}
 
 	public String digest(String type, String data) throws NoSuchAlgorithmException{
-		MessageDigest md = MessageDigest.getInstance(type);
-		byte[] digest = data.getBytes();
-		md.update(digest);
-
-		StringBuffer b = new StringBuffer();
-		for (int i = 0; i < digest.length; i++) {
-			int d = digest[i];
-			if (d < 0) {
-				d += 256;
-			}
-			if (d < 16) {
-				b.append('0');
-			}
-			b.append(Integer.toString(d, 16));
-		}
-		return b.toString();
+		return QrONEUtils.digest(type, data);
 	}
 
 	public void header(String header, String value){
