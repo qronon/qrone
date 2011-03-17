@@ -69,7 +69,7 @@ public class GitHubResolver implements URIResolver, URIHandler {
 		getFiles();
 		if(cacheresolver.exist(path)) return true;
 		if(blobs != null)
-			return blobs.containsKey(path.substring(1));
+			return blobs.containsKey("htdocs" + path);
 		return false;
 	}
 
@@ -85,7 +85,7 @@ public class GitHubResolver implements URIResolver, URIHandler {
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		Map<String,String> map = getFiles();
-		String sha = map.get(uri.toString().substring(1));
+		String sha = map.get("htdocs" + uri.toString());
 		InputStream in = cacheresolver.getInputStream(uri, sha);
 		if(in != null) return in;
 		

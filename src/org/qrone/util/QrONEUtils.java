@@ -51,6 +51,10 @@ public class QrONEUtils{
     }
     
     public static String relativize(String basePath, String targetPathString) {
+    	if(targetPathString.startsWith("/")){
+    		return targetPathString;
+    	}
+    	
         // We modify targetPath to become the result.
 		StringBuilder targetPath = new StringBuilder(targetPathString);
 	

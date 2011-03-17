@@ -1,4 +1,4 @@
-package org.qrone.database;
+package org.qrone.r7.script.database;
 
 import java.util.Map;
 
@@ -9,7 +9,6 @@ public interface DatabaseCursor {
 	public DatabaseCursor skip(Number o);
 	public DatabaseCursor limit(Number o);
 	public DatabaseCursor sort(Scriptable o);
-	public DatabaseCursor sort(Map o);
 	
 	public boolean hasNext();
 	public Map next();

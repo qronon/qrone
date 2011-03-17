@@ -19,4 +19,5 @@ public interface PortingService {
 	public MemcachedService getMemcachedService();
 	public RepositoryService getRepositoryService();
 	public SecurityService getSecurityService();
+	public TaskManagerService getTaskManagerService();
 }

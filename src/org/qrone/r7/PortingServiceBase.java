@@ -19,6 +19,7 @@ public class PortingServiceBase  implements PortingService{
 	private MemcachedService memcached;
 	private RepositoryService repository;
 	private SecurityService security;
+	private TaskManagerService tasks;
 	
 	public PortingServiceBase(
 			HTTPFetcher fetcher,
@@ -29,7 +30,8 @@ public class PortingServiceBase  implements PortingService{
 			ImageBufferService imagebuffer,
 			ImageSpriteService sprite,
 			RepositoryService repository,
-			SecurityService security
+			SecurityService security,
+			TaskManagerService tasks
 			){
 		this.imagebuffer = imagebuffer;
 		this.sprite = sprite;
@@ -40,6 +42,7 @@ public class PortingServiceBase  implements PortingService{
 		this.memcached = memcached;
 		this.repository = repository;
 		this.security = security;
+		this.tasks = tasks;
 	}
 
 	@Override
@@ -85,6 +88,11 @@ public class PortingServiceBase  implements PortingService{
 	@Override
 	public ImageSpriteService getImageSpriteService() {
 		return sprite;
+	}
+
+	@Override
+	public TaskManagerService getTaskManagerService() {
+		return tasks;
 	}
 
 }

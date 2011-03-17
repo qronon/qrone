@@ -8,6 +8,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ext.ClassPrototype;
+import org.qrone.r7.script.ext.ScriptableList;
+import org.qrone.r7.script.ext.ScriptableMap;
+import org.qrone.r7.tag.ImageHandler;
+import org.qrone.r7.tag.Scale9Handler;
+import org.qrone.r7.tag.SecurityTicketHandler;
 
 public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 	protected CascadeResolver resolver;
@@ -40,4 +46,13 @@ public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 		}
 	}
 
+	protected void rawextend(Extendable e){
+		e.addExtension(ClassPrototype.class);
+		e.addExtension(ScriptableMap.class);
+		e.addExtension(ScriptableList.class);
+		e.addExtension(ClassPrototype.class);
+		e.addExtension(ImageHandler.class);
+		e.addExtension(Scale9Handler.class);
+		e.addExtension(SecurityTicketHandler.class);
+	}
 }
