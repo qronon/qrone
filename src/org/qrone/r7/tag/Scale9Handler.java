@@ -10,13 +10,11 @@ import java.util.regex.Pattern;
 import org.qrone.img.ImagePart;
 import org.qrone.img.ImageSize;
 import org.qrone.img.ImageSpriteService;
-import org.qrone.r7.Extension;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.CSS3Value;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 
-@Extension
 public class Scale9Handler implements HTML5TagHandler {
 	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
 	public static Pattern numberRegex = Pattern.compile("([0-9]+)px");

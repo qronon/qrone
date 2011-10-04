@@ -2,10 +2,8 @@ package org.qrone.r7.script.ext;
 
 import java.lang.reflect.Array;
 
-import org.qrone.r7.Extension;
 import org.qrone.r7.script.ScriptablePrototype;
 
-@Extension
 public class ClassPrototype implements ScriptablePrototype<Class>{
 	private Class parent;
 	public ClassPrototype(Class parent) {

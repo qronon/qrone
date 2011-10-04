@@ -1,5 +1,7 @@
 package org.qrone.r7;
 
-public interface TaskManagerService {
+import org.qrone.r7.handler.URIHandler;
 
+public interface TaskManagerService extends URIHandler{
+	
 }

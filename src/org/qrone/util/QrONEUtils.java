@@ -73,6 +73,8 @@ public class QrONEUtils{
 		// their trailing slashes.
 		targetPath.delete(0, diff);
 	
+		
+		
 		// Count remaining complete path elements in the base,
 		// prefixing the target with "../" for each one.
 		for (int slash = basePath.indexOf('/', diff); slash > -1;

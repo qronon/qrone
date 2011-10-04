@@ -5,7 +5,6 @@ import java.net.URI;
 
 import org.qrone.img.ImagePart;
 import org.qrone.img.ImageSpriteService;
-import org.qrone.r7.Extension;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
@@ -13,7 +12,6 @@ import org.qrone.util.QrONEUtils;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
-@Extension
 public class ImageHandler implements HTML5TagHandler {
 	private ImageSpriteService service;
 	private HTML5Deck deck;

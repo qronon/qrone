@@ -1,11 +1,15 @@
 package org.qrone.r7.github;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -125,5 +129,17 @@ public class GitHubRepositoryService implements URIHandler, RepositoryService{
 		}
 	}
 	
-
+	public Map<String, InputStream> getFiles(URI uri){
+		Map<String, InputStream> map = new Hashtable<String, InputStream>();
+		for (Iterator<Entry<String, GitHubResolver>> iter = idToResolverMap.entrySet().iterator(); iter
+				.hasNext();) {
+			Entry<String, GitHubResolver> entry = iter.next();
+			try {
+				map.put(entry.getKey(), entry.getValue().getInputStream(uri));
+			} catch (IOException e) {
+				map.put(entry.getKey(), null);
+			}
+		}
+		return map;
+	}
 }

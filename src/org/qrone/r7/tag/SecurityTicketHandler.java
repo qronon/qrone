@@ -1,11 +1,9 @@
 package org.qrone.r7.tag;
 
 import org.qrone.login.SecurityService;
-import org.qrone.r7.Extension;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
 
-@Extension
 public class SecurityTicketHandler implements HTML5TagHandler {
 	private SecurityService security;
 	public SecurityTicketHandler(HTML5Deck deck) {
