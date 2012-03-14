@@ -8,8 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.HttpURI;
-import org.mortbay.proxy.AsyncProxyServlet;
+import org.eclipse.jetty.http.HttpURI;
+import org.eclipse.jetty.servlets.ProxyServlet;
 
 public class ProxyHandler implements URIHandler{
 	private ServletConfig config;
@@ -37,7 +37,7 @@ public class ProxyHandler implements URIHandler{
 	public boolean handle(final HttpServletRequest request,
 			final HttpServletResponse response, final String uri, final String path, final String leftpath) {
 		try {
-			AsyncProxyServlet serv = new AsyncProxyServlet(){
+			ProxyServlet serv = new ProxyServlet(){
 				@Override
 				protected HttpURI proxyHttpURI(String scheme,
 						String serverName, int serverPort, String uri)
@@ -62,7 +62,7 @@ public class ProxyHandler implements URIHandler{
 	public static void proxy(final HttpServletRequest request, final HttpServletResponse response, 
 			final String path, final String pathArg, final String host, final int port, final String altPath) 
 				throws ServletException, IOException {
-		new AsyncProxyServlet(){
+		new ProxyServlet(){
 			@Override
 			protected HttpURI proxyHttpURI(String scheme,
 					String serverName, int serverPort, String uri)
