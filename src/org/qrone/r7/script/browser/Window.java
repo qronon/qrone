@@ -82,7 +82,7 @@ public class Window{
 		this.vm = vm;
 		
 		this.service = service;
-		db = service.getKVSService();
+		db = service.getDatabaseService();
 		memcached = service.getMemcachedService();
 		repository = service.getRepositoryService();
 		security = service.getSecurityService();
