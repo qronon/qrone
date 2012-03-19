@@ -14,15 +14,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
 public class LocalHTTPFetcher extends HTTPFetcher{
 	private HttpClient c;
 	public LocalHTTPFetcher(){
-		c = new DefaultHttpClient();
+		ClientConnectionManager cm = new ThreadSafeClientConnManager();
+		c = new DefaultHttpClient(cm);
 	}
 	
 	@Override
