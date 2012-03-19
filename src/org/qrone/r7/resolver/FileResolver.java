@@ -7,14 +7,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Hashtable;
-import java.util.Map;
 
 import org.qrone.util.UnicodeInputStream;
 
-public class FileResolver implements URIResolver {
+public class FileResolver extends AbstractURIResolver{
 	private File root;
-	private Map<String, Long> lastModifiedMap = new Hashtable<String, Long>();
 	
 	public FileResolver(File basedir) {
 		root = basedir;
@@ -28,21 +25,12 @@ public class FileResolver implements URIResolver {
 	@Override
 	public InputStream getInputStream(URI uri) throws FileNotFoundException {
 		File f = new File(root, uri.getPath());
-		lastModifiedMap.put(uri.getPath(), f.lastModified());
 		return new UnicodeInputStream(new FileInputStream(f));
 	}
 
 	@Override
-	public boolean updated(URI uri) {
-		File f = new File(root, uri.getPath());
-		Long l = lastModifiedMap.get(uri.getPath());
-		if(l == null){
-			return false;
-		}
-		return l < f.lastModified();
-	}
-	@Override
 	public OutputStream getOutputStream(URI uri) throws FileNotFoundException {
+		fireUpdate(uri);
 		return new FileOutputStream(new File(root, uri.getPath()));
 	}
 
@@ -50,5 +38,5 @@ public class FileResolver implements URIResolver {
 	public boolean remove(URI uri) {
 		return new File(root, uri.getPath()).delete();
 	}
-
+	
 }

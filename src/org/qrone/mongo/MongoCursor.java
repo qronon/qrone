@@ -1,7 +1,6 @@
 package org.qrone.mongo;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;

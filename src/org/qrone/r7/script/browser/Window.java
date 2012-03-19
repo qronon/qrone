@@ -1,10 +1,8 @@
 package org.qrone.r7.script.browser;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,7 +39,6 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.util.QrONEUtils;
-import org.qrone.util.QueryString;
 
 
 public class Window{

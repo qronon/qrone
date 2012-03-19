@@ -1,34 +1,32 @@
-package org.qrone.r7;
+package org.qrone.r7.app;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageSpriteService;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.login.CookieHandler;
 import org.qrone.png.PNGMemoryImageService;
+import org.qrone.r7.PortingService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.github.GitHubRepositoryService;
 import org.qrone.r7.github.GitHubResolver;
 import org.qrone.r7.handler.DefaultHandler;
 import org.qrone.r7.handler.ExtendableURIHandler;
-import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
-import org.qrone.r7.resolver.SHAResolver;
+import org.qrone.r7.resolver.URIResolver;
 
-public class PortingURIHandler extends ExtendableURIHandler {
+public class QrONEURIHandler extends ExtendableURIHandler {
 	private PortingService service;
 	private GitHubResolver github;
 	private GitHubRepositoryService repository;
 	
-	public PortingURIHandler( ServletContext cx, PortingService service ){
+	public QrONEURIHandler( ServletContext cx, PortingService service ){
 		this.service = service;
 		KeyValueStoreService kvs = service.getKeyValueStoreService();
 		HTTPFetcher fetcher = service.getURLFetcher();
-		SHAResolver cache  = service.getFileSystemService();
+		URIResolver cache  = service.getFileSystemService();
 		DatabaseService db = service.getDatabaseService();
 		service.setURIResolver(resolver);
 
@@ -56,6 +54,7 @@ public class PortingURIHandler extends ExtendableURIHandler {
 		resolver.add(repository.getResolver());
 		resolver.add(new FilteredResolver("/system/resource/", new InternalResourceResolver(cx)));
 		resolver.add(cache);
+		
 		
 		handler.add(github);
 		handler.add(repository);

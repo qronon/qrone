@@ -3,17 +3,12 @@ package org.qrone.r7.script;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.parser.JSDeck;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
 

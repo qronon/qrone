@@ -13,7 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-public class ZipResolver implements URIResolver{
+public class ZipResolver extends AbstractURIResolver{
 	private Map<String, ZipFile> map = new Hashtable<String, ZipFile>();
 	private Set<ZipFile> set = new HashSet<ZipFile>();
 	
@@ -57,11 +57,6 @@ public class ZipResolver implements URIResolver{
 	@Override
 	public boolean exist(String path) {
 		return get(path) != null;
-	}
-
-	@Override
-	public boolean updated(URI uri) {
-		return false;
 	}
 
 	@Override

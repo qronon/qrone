@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import org.qrone.kvs.LocalKeyValueStoreService;
 import org.qrone.memcached.LocalMemcachedService;
 import org.qrone.mongo.MongoDatabaseService;
+import org.qrone.mongo.MongoResolver;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.PortingServlet;
 import org.qrone.r7.fetcher.LocalHTTPFetcher;
@@ -21,6 +22,20 @@ public class QrONEServlet extends PortingServlet {
 		try {
 			MongoDatabaseService mongo = new MongoDatabaseService(new Mongo().getDB("qrone"));
 			services.setDatabaseService(mongo);
+
+			String[] memcachedServer = {"localhost"};
+			services.setMemcachedService(new LocalMemcachedService(memcachedServer));
+			
+	
+			services.setKeyValueStoreService(
+					new LocalKeyValueStoreService(services.getDatabaseService(), 
+							services.getMemcachedService()));
+			
+			services.setLoginService(null); // TODO OpenIDHandler Çì¸ÇÍÇÈÅB
+			services.setTaskManagerService(null); // TODO TaskManager unimplemented!
+			
+			services.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), "qrone.filesystem"));
+
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -28,20 +43,6 @@ public class QrONEServlet extends PortingServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		String[] memcachedServer = {"localhost"};
-		services.setMemcachedService(new LocalMemcachedService(memcachedServer));
-		
-
-		services.setKeyValueStoreService(
-				new LocalKeyValueStoreService(services.getDatabaseService(), 
-						services.getMemcachedService()));
-		
-		services.setLoginService(null); // TODO OpenIDHandler Çì¸ÇÍÇÈÅB
-		services.setTaskManagerService(null); // TODO TaskManager unimplemented!
-		
-		services.setFileSystemService(fileSystemService)
-		
 		setPortingService(services);
 	}
 

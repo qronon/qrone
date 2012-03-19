@@ -1,7 +1,5 @@
 package org.qrone.r7.handler;
 
-import java.net.URI;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

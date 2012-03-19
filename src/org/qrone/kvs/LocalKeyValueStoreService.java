@@ -9,10 +9,6 @@ import org.qrone.database.DatabaseService;
 import org.qrone.database.DatabaseTable;
 import org.qrone.memcached.MemcachedService;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-
 public class LocalKeyValueStoreService implements KeyValueStoreService{
 
 	private DatabaseService db;

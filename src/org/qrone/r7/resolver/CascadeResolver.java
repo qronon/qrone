@@ -47,32 +47,27 @@ public class CascadeResolver implements URIResolver{
 
 	@Override
 	public OutputStream getOutputStream(URI uri) throws IOException {
-		for (Iterator<URIResolver> i = list.iterator(); i
-				.hasNext();) {
+		for (Iterator<URIResolver> i = list.iterator(); i.hasNext();) {
 			URIResolver r = i.next();
 			OutputStream out = r.getOutputStream(uri);
 			if(out != null) return out;
 		}
 		return null;
 	}
-
-	@Override
-	public boolean updated(URI uri) {
-		for (Iterator<URIResolver> i = list.iterator(); i
-				.hasNext();) {
-			URIResolver r = i.next();
-			if(r.updated(uri)) return true;
-		}
-		return false;
-	}
 	
 	@Override
 	public boolean remove(URI uri) {
-		for (Iterator<URIResolver> i = list.iterator(); i
-				.hasNext();) {
+		for (Iterator<URIResolver> i = list.iterator(); i.hasNext();) {
 			URIResolver r = i.next();
 			if(r.remove(uri)) return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void addUpdateListener(Listener l) {
+		for (Iterator<URIResolver> i = list.iterator(); i.hasNext();) {
+			i.next().addUpdateListener(l);
+		}
 	}
 }

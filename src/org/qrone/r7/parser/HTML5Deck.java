@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.qrone.img.ImageBufferService;
-import org.qrone.img.ImageSpriteService;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
@@ -38,7 +36,7 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
     	cssdeck = new CSS3Deck(resolver);
     
     }
-
+/*
     protected boolean updated(HTML5OM t, URI uri){
     	for (Iterator<CSS3OM> i = t.getStyleSheets().iterator(); i
 				.hasNext();) {
@@ -48,6 +46,7 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 		}
     	return super.updated(t, uri);
     }
+    */
     
     public PortingService getPortingService(){
     	return services;

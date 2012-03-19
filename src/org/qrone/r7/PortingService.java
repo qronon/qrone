@@ -8,7 +8,6 @@ import org.qrone.login.LoginService;
 import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.fetcher.HTTPFetcher;
-import org.qrone.r7.resolver.SHAResolver;
 import org.qrone.r7.resolver.URIResolver;
 
 public class PortingService {
@@ -89,11 +88,11 @@ public class PortingService {
 	private SecurityService securityService;
 	private TaskManagerService taskManagerService;
 	private KeyValueStoreService keyValueStoreService;
-	private SHAResolver fileSystemService;
-	public SHAResolver getFileSystemService() {
+	private URIResolver fileSystemService;
+	public URIResolver getFileSystemService() {
 		return fileSystemService;
 	}
-	public void setFileSystemService(SHAResolver fileSystemService) {
+	public void setFileSystemService(URIResolver fileSystemService) {
 		this.fileSystemService = fileSystemService;
 	}
 	

@@ -20,13 +20,11 @@ import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.Scriptables;
+import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.QrONEUtils;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;

@@ -11,7 +11,6 @@ package org.qrone.r7.app;
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -20,7 +19,6 @@ import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.util.QrONEUtils;
 
 public class QrONECompressor {
 	

@@ -32,8 +32,9 @@ public class ResolverHandler implements URIHandler{
 			if(resolver.exist(uri)){
 				URI mimetype = new URI("/system/resource/mime.types");
 				if(parser == null){
-					parser = new MimeTypeParser();
-					parser.parse(resolver.getInputStream(mimetype));
+					MimeTypeParser p = new MimeTypeParser();
+					p.parse(resolver.getInputStream(mimetype));
+					parser = p;
 				}
 				
 				int eidx = uri.lastIndexOf('.');

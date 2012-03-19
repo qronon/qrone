@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.qrone.r7.app.QrONEURIHandler;
 import org.qrone.r7.handler.URIHandler;
 
 public class PortingServlet extends HttpServlet {
@@ -25,7 +26,7 @@ public class PortingServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(h == null)
-			h = new PortingURIHandler(getServletContext(), s);
+			h = new QrONEURIHandler(getServletContext(), s);
 		h.handle(request, response, request.getPathInfo(), "", "");
 	}
 
@@ -34,7 +35,7 @@ public class PortingServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(h == null)
-			h = new PortingURIHandler(getServletContext(), s);
+			h = new QrONEURIHandler(getServletContext(), s);
 		doGet(request, response);
 	}
 

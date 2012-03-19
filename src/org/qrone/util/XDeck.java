@@ -15,20 +15,28 @@ public abstract class XDeck<T> {
 	
 	public XDeck(URIResolver resolver) {
 		this.resolver = resolver;
+		resolver.addUpdateListener(new URIResolver.Listener() {
+			@Override
+			public void update(URI uri) {
+				map.remove(uri);
+			}
+		});
 	}
 
     
     public URIResolver getResolver(){
     	return resolver;
     }
-    
+   
+    /*
     protected boolean updated(T t, URI uri){
     	return resolver.updated(uri);
-    }
+    }*/
+    
 	
 	public T compile(URI uri){
 		T t = map.get(uri);
-		if(t == null || updated(t, uri)){
+		if(t == null){
 			InputStream in = null;
 			try {
 				in = resolver.getInputStream(uri);
