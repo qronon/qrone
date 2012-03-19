@@ -11,8 +11,6 @@ import org.qrone.r7.script.AbstractScriptable;
 import com.mongodb.DB;
 
 public class MongoDatabaseService extends AbstractScriptable implements DatabaseService{
-	private static final long serialVersionUID = -2832247783317655621L;
-	
 	private DB db;
 	private Map<String, MongoTable> map = new Hashtable<String, MongoTable>();
 

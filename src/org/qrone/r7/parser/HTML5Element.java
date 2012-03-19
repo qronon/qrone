@@ -291,7 +291,7 @@ public class HTML5Element implements HTML5Node{
 		Object s = get();
 		if(s instanceof Set){
 			for (Element e : remove) {
-				remove((Element)s);
+				remove((Element)e);
 			}
 		}else if(s instanceof Element){
 			remove((Element)s);

@@ -57,13 +57,14 @@ public class JavaScriptHandler implements URIHandler{
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 					defaultom.run(subscope);
 					
-					Object result = om.run(globalscope, subscope, window);
+					//Object result = 
+						om.run(globalscope, subscope, window);
 					
 					
 					
 					String done = ss.getParameter(".done");
 					if(done != null && services.getSecurityService().validateTicket(request,ss.getParameter(".ticket"))){
-						String r = QrONEUtils.escape(JSON.encode(result));
+						//String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){
 								response.sendRedirect(done);

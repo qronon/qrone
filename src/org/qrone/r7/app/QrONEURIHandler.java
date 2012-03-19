@@ -18,12 +18,10 @@ import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.URIResolver;
 
 public class QrONEURIHandler extends ExtendableURIHandler {
-	private PortingService service;
 	private GitHubResolver github;
 	private GitHubRepositoryService repository;
 	
 	public QrONEURIHandler( ServletContext cx, PortingService service ){
-		this.service = service;
 		KeyValueStoreService kvs = service.getKeyValueStoreService();
 		HTTPFetcher fetcher = service.getURLFetcher();
 		URIResolver cache  = service.getFileSystemService();

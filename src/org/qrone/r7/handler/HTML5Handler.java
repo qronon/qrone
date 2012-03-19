@@ -12,12 +12,10 @@ import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.resolver.URIResolver;
 
 public class HTML5Handler implements URIHandler{
-	private PortingService services;
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	
 	public HTML5Handler(PortingService services, HTML5Deck deck) {
-		this.services = services;
 		this.resolver = services.getURIResolver();
 		this.deck = deck;
 	}

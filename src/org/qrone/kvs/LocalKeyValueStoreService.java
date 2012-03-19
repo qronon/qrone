@@ -29,10 +29,8 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 	}
 	
 	public class LocalKeyValueStore implements KeyValueStore {
-		private String collection;
 		private DatabaseTable table;
 		public LocalKeyValueStore(String collection){
-			this.collection = collection;
 			table = db.getCollection(collection);
 		}
 		

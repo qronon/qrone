@@ -21,11 +21,8 @@ public class Scale9Handler implements HTML5TagHandler {
 	public static Pattern colorRegex = Pattern.compile("(#[a-fA-F0-9]+|rgb\\s*\\(\\s*[^()]+\\s*\\))");
 
 	private ImageSpriteService service;
-	private HTML5Deck deck;
 	
 	public Scale9Handler(HTML5Deck deck) {
-		this.deck = deck;
-
 		PortingService port = deck.getPortingService();
 		if(port != null){
 			service = port.getImageSpriteService();

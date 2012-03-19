@@ -27,11 +27,9 @@ import org.qrone.r7.script.Scriptables;
 public class GitHubRepositoryService implements URIHandler, RepositoryService{
 	private Map<String, GitHubResolver> idToResolverMap = new Hashtable<String, GitHubResolver>();
 	private CascadeResolver cascade = new CascadeResolver();
-	private DatabaseService service;
 	private DatabaseTable table;
 	
 	private static final String KIND = "qrone.repository";
-	private static final String ID = "id";
 	private static final String OWNER = "owner";
 	private static final String NAME = "name";
 	private static final String TREE_SHA = "tree_sha";
@@ -42,7 +40,6 @@ public class GitHubRepositoryService implements URIHandler, RepositoryService{
 	public GitHubRepositoryService(HTTPFetcher fetcher, URIResolver cacher, DatabaseService service){
 		this.fetcher = fetcher;
 		this.cacher = cacher;
-		this.service = service;
 		this.table = service.getCollection(KIND);
 		
 		DatabaseCursor cursor = table.find();

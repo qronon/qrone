@@ -18,7 +18,6 @@ public class ImageSpriteService implements URIResolver{
 	private Map<String, ImageSprite> map = new Hashtable<String, ImageSprite>();
 	private Map<URI, ImageSize> smap = new Hashtable<URI, ImageSize>();
 	private Map<URI, ImageBuffer> imap = new WeakHashMap<URI, ImageBuffer>();
-	private URI dot;
 	
 	public ImageSpriteService(URIResolver resolver, URIResolver cache, ImageBufferService service) {
 		this.resolver = resolver;
