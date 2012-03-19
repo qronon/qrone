@@ -122,6 +122,7 @@ public class QrONECompressor {
             System.err.println("[INFO] Pack extension classes.");
         }
 		
+		/*
         try {
 	    	//if(imgdir != null){
 	    	//	deck.setBaseURI(QrONEUtils.relativize(new URI(fileArgs[0]),new URI(imgdir)));
@@ -130,6 +131,7 @@ public class QrONECompressor {
 			e.printStackTrace();
             System.exit(0);
 		}
+		*/
         
         compile(deck, target, path, lang, recurse);
         
@@ -138,12 +140,14 @@ public class QrONECompressor {
 	            System.err.println("[INFO] Writing sprite images.");
 	        }
 			
+			/*
 			try {
 				//deck.getSpriter().create();
 			} catch (IOException e) {
 	            System.err.println("[ERROR] Creating sprite images.");
 	            System.exit(0);
 			}
+			*/
 			
 			if (verbose) {
 	            System.err.println("[INFO] Writing sprite images done.");
