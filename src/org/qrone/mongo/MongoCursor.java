@@ -1,6 +1,7 @@
 package org.qrone.mongo;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;
@@ -34,7 +35,9 @@ public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCurso
 	}
 	@Override
 	public Map next() {
-		return c.next().toMap();
+		if(c.hasNext())
+			return c.next().toMap();
+		return null;
 	}
 	@Override
 	public DatabaseCursor skip(Number o) {

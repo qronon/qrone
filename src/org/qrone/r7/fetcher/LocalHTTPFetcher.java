@@ -44,9 +44,11 @@ public class LocalHTTPFetcher extends HTTPFetcher{
 		}
 		
 		Map<String,String> map = request.getHeaders();
-		for (Iterator<Map.Entry<String, String>> iter = map.entrySet().iterator(); iter.hasNext();) {
-			Map.Entry<String, String> entry = iter.next();
-			r.setHeader(entry.getKey(), entry.getValue());
+		if(map != null){
+			for (Iterator<Map.Entry<String, String>> iter = map.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry<String, String> entry = iter.next();
+				r.setHeader(entry.getKey(), entry.getValue());
+			}
 		}
 		
 		HttpParams params = new BasicHttpParams();

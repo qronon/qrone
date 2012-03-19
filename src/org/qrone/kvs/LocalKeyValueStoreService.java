@@ -52,6 +52,7 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 			map.put("id", key);
 			DatabaseCursor cursor = table.find(map);
 			Map result = cursor.next();
+			if(result == null) return null;
 			v = result.get(key);
 			if(v != null & v instanceof byte[]){
 				return (byte[])v;

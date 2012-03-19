@@ -15,7 +15,9 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 
 public class QrONEApp {
@@ -27,13 +29,13 @@ public class QrONEApp {
 		connector.setPort(9601);
 		server.addConnector(connector);
 
-		ServletHandler handler = new ServletHandler();
-		FilterHolder gzip = handler.addFilterWithMapping(GzipFilter.class,"/*",0);
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		//FilterHolder gzip = handler.addFilterWithMapping(GzipFilter.class,"/*",0);
         //gzip.setAsyncSupported(true);
-        gzip.setInitParameter("minGzipSize","256");
+        //gzip.setInitParameter("minGzipSize","256");
         
-		handler.addServletWithMapping(QrONEServlet.class, "/*");
-		server.setHandler(handler);
+		context.addServlet(new ServletHolder(new QrONEServlet()), "/*");
+		server.setHandler(context);
 
 		Runnable runnable = new Runnable() {
 			@Override

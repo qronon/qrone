@@ -42,5 +42,10 @@
 	<classpathentry kind="lib" path="lib/mongo-2.7.3.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt_3.7.2.v3740f.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.cocoa.macosx.x86_64_3.7.2.v3740f.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-simple-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/jcl-over-slf4j-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-pool-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-security-7.1.6.v20100715.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
