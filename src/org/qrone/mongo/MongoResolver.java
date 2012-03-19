@@ -58,8 +58,9 @@ public class MongoResolver extends AbstractURIResolver{
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
-		if(weakmap.containsKey(uri.toString())){
-			return new ByteArrayInputStream(weakmap.get(uri));
+		byte[] cache = weakmap.get(uri.toString());
+		if(cache != null){
+			return new ByteArrayInputStream(cache);
 		}
 		try{
 			BasicDBObject obj = new BasicDBObject();
