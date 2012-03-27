@@ -96,14 +96,84 @@
   		<version>8.1.2.v20120308</version>
   	</dependency>
   	<dependency>
-  		<groupId>swt</groupId>
-  		<artifactId>swt-win32</artifactId>
-  		<version>3.0m8</version>
-  	</dependency>
-  	<dependency>
   		<groupId>org.eclipse.mylyn.wikitext</groupId>
   		<artifactId>wikitext.textile</artifactId>
   		<version>0.9.4.I20090220-1600-e3x</version>
   	</dependency>
+  	
+  	<dependency>
+  		<groupId>org.qrone</groupId>
+  		<artifactId>css-selectors</artifactId>
+  		<version>1.0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.qrone</groupId>
+  		<artifactId>java_memcached</artifactId>
+  		<version>2.6.3</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.openid4java</groupId>
+  		<artifactId>openid4java-consumer</artifactId>
+  		<version>0.9.6</version>
+  		<type>pom</type>
+  	</dependency>
   </dependencies>
+  
+  <repositories>
+     <repository>
+        <id>qrone-github</id>
+        <url>https://github.com/qronon/maven-repo/raw/master/release</url>
+    </repository>
+     <repository>
+        <id>qrone-github-snapshot</id>
+        <url>https://github.com/qronon/maven-repo/raw/master/snapshots</url>
+    </repository>
+  </repositories>
+  
+  <build>
+    <sourceDirectory>/Users/qronon/git/qrone/src/</sourceDirectory>
+    <scriptSourceDirectory>/Users/qronon/git/qrone/scripts</scriptSourceDirectory>
+    <testSourceDirectory>/Users/qronon/git/qrone/test/</testSourceDirectory>
+    <outputDirectory>/Users/qronon/git/qrone/bin</outputDirectory>
+    <testOutputDirectory>/Users/qronon/git/qrone/bin-test</testOutputDirectory>
+    
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+  
+  <plugins>
+    <plugin>
+    <artifactId>maven-assembly-plugin</artifactId>
+         <version>2.3</version>
+    <configuration>
+      <descriptorRefs>
+            <!-- ここはこのままでOK -->
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+      </descriptorRefs>
+        <archive>
+          <manifest>
+            <!-- ここにmain関数のあるクラスを指定。これがManifest.ｍｆに設定されます -->
+            <mainClass>org.qrone.r7.app.QrONEApp</mainClass>
+          </manifest>
+        </archive>
+ 
+    </configuration>
+        <executions>
+          <!-- ここでpackageのPhaseで実行されるように設定している-->
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- append to the packaging phase. -->
+            <goals>
+              <goal>single</goal> <!-- goals == mojos -->
+            </goals>
+          </execution>
+        </executions>
+ 
+    </plugin>
+</plugins>
+  </build>
 </project>

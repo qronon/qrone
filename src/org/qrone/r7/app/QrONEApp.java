@@ -63,7 +63,7 @@ public class QrONEApp {
 		
 
         Boolean help = (Boolean) parser.getOptionValue(cliOpt);
-        if(help == null && !help.booleanValue()){
+        if(help == null || !help.booleanValue()){
 
     		Runnable runnable = new Runnable() {
     			@Override
@@ -126,7 +126,6 @@ public class QrONEApp {
 				e.printStackTrace();
 			}
         }else{
-
 			try {
 				server.start();
 				server.join();
