@@ -2,6 +2,7 @@ package org.qrone.r7.tag;
 
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
+import org.w3c.dom.Element;
 
 public class SecurityTicketHandler implements HTML5TagHandler {
 	public SecurityTicketHandler(HTML5Deck deck) {
@@ -32,11 +33,6 @@ public class SecurityTicketHandler implements HTML5TagHandler {
 				@Override
 				public String postend(String ticket) {
 					return null;
-				}
-
-				@Override
-				public void process(HTML5Element e, String ticket) {
-					
 				}
 			};
 		}

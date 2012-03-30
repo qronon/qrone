@@ -1,255 +1,213 @@
 package org.qrone.r7.parser;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.qrone.r7.parser.HTML5Deck.HTML5Set;
+import org.qrone.r7.script.browser.Function;
 import org.qrone.r7.tag.HTML5TagResult;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
-public abstract class HTML5Selializer extends HTML5Visitor{
-	public static final String[] noendtags = {"br", "img", "hr", "meta", "input", "embed", "area", "base", "col", "keygen", "link", "param", "source"};
-	public static final String[] nnendtags = {"li", "dt", "dd", "p", "tr", "td", "th", "rt", "rp", "optgroup", "option", "thread", "tfoot"};
-	public static final Set<String> noendtaglist = new HashSet<String>();
+public class HTML5Selializer extends HTML5TagWriter{
 	static{
 		noendtaglist.addAll(Arrays.asList(noendtags));
 		noendtaglist.addAll(Arrays.asList(nnendtags));
 	}
-	protected HTML5OM om;
-	protected HTML5Writer b;
-	protected String id;
-
-	public void visit(HTML5OM om, Document e, String id, HTML5Writer w){
+	
+	int formatting = 0;
+	boolean inScript;
+	boolean inHead;
+	
+	public HTML5Selializer(
+			Element body, 
+			HTML5Set set, HTML5Deck deck, 
+			Node node, URI uri, 
+			HTML5Template t, HTML5OM om, String id, String ticket){
+		this.body = body;
+		this.set = set;
+		this.node = node;
+		this.deck = deck;
+		this.uri = uri;
+		this.b = this.t = t;
 		this.om = om;
-		this.b = w;
 		this.id = id;
-		visit(e);
-	}
-
-	public void visit(HTML5OM om, Node e, String id, HTML5Writer w){
-		this.om = om;
-		this.b = w;
-		this.id = id;
-		visit(e);
+		this.ticket = ticket;
 	}
 	
-	public HTML5Writer getWriter(){
-		return b;
+	private Element body;
+	private HTML5Set set;
+	private Node node;
+	private HTML5Deck deck;
+	private URI uri;
+	@Override
+	public void visit(Document e) {
+		writec("<!DOCTYPE html>");
+		super.visit(e);
+		
 	}
 	
-	protected void out(String str){
-		if(str == null) return;
-		b.append(str);
-	}
-	
-	protected void out(HTML5Element e5, NodeProcessor template, String ticket){
-		Element e = e5.get();
-		List<HTML5TagResult> r = om.getTagResult(e);
-		if(r != null){
-			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
-			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
-					.hasNext();) {
-				iterator.next().process(e5, ticket);
+	@Override
+	public void visit(Element e) {
+		List<HTML5TagResult> r = getTagResult(e);
+		if(e.getNodeName().equals("head")){
+			start(e,r);
+			inHead = true;
+			accept(e);
+			inHead = false;
+			deck.outputStyles(b, set, uri);
+			end(e,r);
+		}else if(e.getNodeName().equals("body")){
+			if(node != body){
+				start(e,r);
 			}
 			
-			Collections.reverse(rr);
-			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
-					.hasNext();) {
-				out(iterator.next().prestart(ticket));
+			accept(e);
+			
+			if(node != body){
+				deck.outputScripts(b, set, uri);
+				end(e,r);
 			}
-			start(e);
-			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
-					.hasNext();) {
-				out(iterator.next().poststart(ticket));
+		}else if(e.getNodeName().equals("script")){
+			if(!inHead){
+				start(e,r);
+				inScript = true;
+				accept(e);
+				inScript = false;
+				end(e,r);
 			}
-
-			if(e5.hasContent()){
-				HTML5Template t = template.newTemplate();
-				e5.accept(t);
-				getWriter().append(t);
+		}else if(e.getNodeName().equals("style")){
+		}else if(e.getNodeName().equals("link")){
+		}else if(e.getNodeName().equals("meta")){
+			if(e.getAttribute("name").equals("extends")){
 			}else{
-				e5.accept(this);
+				start(e,r);
+				accept(e);
+				end(e,r);
 			}
-			
-			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
-					.hasNext();) {
-				out(iterator.next().preend(ticket));
-			}
-			if(!noendtaglist.contains(e.getNodeName()))
-				end(e);
-			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
-					.hasNext();) {
-				out(iterator.next().postend(ticket));
+		}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code") || e.getNodeName().equals("textarea")){
+			formatting++;
+			start(e,r);
+			accept(e);
+			end(e,r);
+			formatting--;
+		}else if(e.getNodeName().equals("meta")){
+			if(e.getAttribute("name").equals("extends")){
+			}else{
+				start(e,r);
+				accept(e);
+				end(e,r);
 			}
 		}else{
-			start(e);
-			if(e5.hasContent()){
-				HTML5Template t = template.newTemplate();
-				e5.accept(t);
-				getWriter().append(t);
-			}else{
-				e5.accept(this);
-			}
-			if(!noendtaglist.contains(e.getNodeName()))
-				end(e);
+			start(e,r);
+			accept(e);
+			end(e,r);
 		}
 	}
-	
-	protected void writejs(String attr, String js){
-		b.append(' ');
-		b.append(attr);
-		b.append('=');
-		b.append('"');
-		String[] jslist = js.split("__QRONE_ID__");
-		for (int j = 0; j < jslist.length; j++) {
-			if(j != 0){
-				b.append("id",id);
-			}
-			b.append(jslist[j]);
+
+	@Override
+	public void visit(Text n) {
+		if(inScript){
+			write(JSParser.compress(n.getNodeValue(), true)
+					.replace("__QRONE_PREFIX_NAME__", 
+							"qrone[\"" + uri.toString() + "\"]"));
+		}else if(formatting>0){
+			writeraw(n.getNodeValue());
+		}else{
+			write(n.getNodeValue());
 		}
-		b.append('"');
 	}
-	
-	protected void start(Element e){
-		b.append('<');
-		if(e.hasAttribute("tag"))
-			b.append(e.getAttribute("tag"));
-		else
-			b.append(e.getNodeName());
 
-		NamedNodeMap map = e.getAttributes();
-		for (int i = 0; i < map.getLength(); i++) {
-			Node n = map.item(i);
-			if(n.getNodeName().equals("id")){
-
-				b.append(' ');
-				b.append(n.getNodeName());
-				b.append('=');
-				b.append('"');
-				
-				String rawid = n.getNodeValue();
-				if(rawid.startsWith("qrone.")){
-					write("qrone.");
-					b.append("id",id);
-					write(".");
-					write(rawid.substring("qrone.".length()));
-				}else{
-					write(rawid);
-				}
-				b.append('"');
-			}else{
-				write((Attr)map.item(i));
-			}
-		}
+	private List<HTML5TagResult> getTagResult(Element e) {
+		List<HTML5TagResult> l = om.getTagResult(e);
+		if(t == null) return l;
 		
-		b.append('>');
-	}
-	
-	protected void end(Element e){
-		if(!noendtaglist.contains(e.getNodeName())){
-			b.append('<');
-			b.append('/');
-			if(e.hasAttribute("tag"))
-				b.append(e.getAttribute("tag"));
-			else
-				b.append(e.getNodeName());
-			b.append('>');
+		final HTML5Element n = t.get(e);
+		if(n != null){
+			if(l == null){
+				l = new ArrayList<HTML5TagResult>();
+			}
+			l.add(new HTML5TagResult() {
+				@Override
+				public String prestart(String ticket) {
+					accept(n.before);
+					return null;
+				}
+				
+				@Override
+				public String preend(String ticket) {
+					accept(n.append);
+					return null;
+				}
+				
+				@Override
+				public String poststart(String ticket) {
+					accept(n.prepend);
+					return null;
+				}
+				
+				@Override
+				public String postend(String ticket) {
+					accept(n.after);
+					return null;
+				}
+			});
 		}
-	}
-	
-	protected void write(String attr, String value){
-		b.append(' ');
-		b.append(attr);
-		b.append('=');
-		b.append('"');
-		write(value);
-		b.append('"');
-	}
-	
-	protected void write(Attr attr){
-		b.append(' ');
-		b.append(attr.getNodeName());
-		b.append('=');
-		b.append('"');
-		write(attr.getNodeValue());
-		b.append('"');
+		return l;
 	}
 
-	protected void writeraw(String str){
-		char[] ch = str.toCharArray();
-		for (int i = 0; i < ch.length; i++) {
-			switch (ch[i]) {
-			case '<':
-				b.append("&lt;");
-				break;
-			case '>':
-				b.append("&gt;");
-				break;
-			case '"':
-				b.append("&quot;");
-				break;
-			case '&':
-				b.append("&amp;");
-				break;
-			case ' ':
-			case '\u00A0':
-				b.append("&nbsp;");
-				break;
-			case '\0':
-				break;
-			default:
-				b.append(ch[i]);
-				break;
+	protected void accept(Element e) {
+		if(t != null){
+			HTML5Element node = t.get(e);
+			if(node == null){
+				super.accept(e);
+			}else{
+				accept(node);
+			}
+		}
+	}
+
+	private void accept(List nodes){
+		if(nodes != null){
+			for (Iterator iter = nodes.iterator(); iter.hasNext();) {
+				dispatch(iter.next());
 			}
 		}
 	}
 	
-	protected void write(String str){
-		StringBuilder b = new StringBuilder();
-		boolean white = false;
-		char[] ch = str.toCharArray();
-		for (int i = 0; i < ch.length; i++) {
-			switch (ch[i]) {
-			case '\t':
-			case '\r':
-			case '\n':
-			case ' ':
-				if (!white) {
-					b.append(' ');
-					white = true;
-				}
-				break;
-			case '<':
-				b.append("&lt;");
-				break;
-			case '>':
-				b.append("&gt;");
-				break;
-			case '"':
-				b.append("&quot;");
-				break;
-			case '&':
-				b.append("&amp;");
-				break;
-			case '\u00A0':
-				b.append("&nbsp;");
-				break;
-			case '\0':
-				break;
-			default:
-				b.append(ch[i]);
-				white = false;
-				break;
-			}
+	private void accept(HTML5Element e){
+		if(e.content == null){
+			accept(e.get());
+		}else{
+			dispatch(e.content);
 		}
-		this.b.append(b.toString());
+	}
+	
+	private void dispatch(Object o) {
+		if(o instanceof Set){
+			Set<Node> set = (Set<Node>)o;
+			for (Iterator iter2 = set.iterator(); iter2.hasNext();) {
+				Node node = (Node) iter2.next();
+				dispatch(node);
+			}
+		}else if(o instanceof Element){
+			accept((Element)o);
+		}else if(o instanceof HTML5Template){
+			writec(((HTML5Template)o).toString());
+		}else if(o instanceof HTML5Element){
+			accept((HTML5Element)o);
+		}else if(o instanceof HTML5NodeSet){
+			HTML5NodeSet set = (HTML5NodeSet)o;
+			dispatch(set.get());
+		}else{
+			writec(o.toString());
+		}
 	}
 }

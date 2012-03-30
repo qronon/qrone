@@ -14,6 +14,7 @@ import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.CSS3Value;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5Element;
+import org.w3c.dom.Element;
 
 public class Scale9Handler implements HTML5TagHandler {
 	//public static Pattern urlRegex = Pattern.compile("url\\s*\\(\\s*[\"']?(.*?)[\"']?\\s*\\)");
@@ -103,11 +104,6 @@ public class Scale9Handler implements HTML5TagHandler {
 							return null;
 						}
 					}
-
-					@Override
-					public void process(HTML5Element e, String ticket) {
-						
-					}
 				};
 			}else if(l.size() == 2){
 				return new HTML5TagResult() {
@@ -140,11 +136,6 @@ public class Scale9Handler implements HTML5TagHandler {
 						} catch (IOException e) {
 							return null;
 						}
-					}
-
-					@Override
-					public void process(HTML5Element e, String ticket) {
-						
 					}
 				};
 			}

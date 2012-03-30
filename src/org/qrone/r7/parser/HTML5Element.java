@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.qrone.r7.script.browser.Function;
+import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
@@ -22,11 +23,13 @@ public class HTML5Element implements HTML5Node{
 	private Element oe;
 	private Map<Node, List<CSS3Rule>> map;
 	
-	private Object content;
+	public Object content;
+	public List before;
+	public List prepend;
+	public List append;
+	public List after;
 	
-	private List append;
-	private List prepend;
-	private Set<Element> remove;
+	private Set<Node> remove;
 	
 	public HTML5Element(HTML5OM om, HTML5Template t, Element e){
 		this.om = om;
@@ -43,38 +46,41 @@ public class HTML5Element implements HTML5Node{
 		return new HTML5Element(om, t.newTemplate(), (Element)e.cloneNode(false));
 	}
 	
-	public void accept(HTML5Template t) {
+	/*
+	public void accept(HTML5Selializer t) {
 		int index = 0;
 		if(prepend != null){
 			for (Object o : prepend) {
-				appendTo(t,o,index++,null);
+				appendTo(t,o,index++);
 			}
 		}
 		
-		appendTo(t,content,-1,null);
+		appendTo(t,content,-1);
 
 		index = 0;
 		if(append != null){
 			for (Object o : append) {
-				appendTo(t,o,index++,null);
+				appendTo(t,o,index++);
 			}
 		}
 	}
 	
-	public void appendTo(final HTML5Template t, Object o, int index, String html){
+	private void appendTo(final HTML5Selializer t, Object o, int index){
 		if(o instanceof HTML5Template){
-			HTML5Template tt = (HTML5Template)o;
-			tt.out(tt.getBody());
-			t.append(tt);
+			t.getWriter().append((HTML5Template)o);
 		}else if(o instanceof HTML5Node){
-			HTML5Node e = (HTML5Node)o;
-			t.append(e.html());
+			t.out((HTML5Node)o);
+		}else if(o instanceof List){
+			for (Iterator iter = ((List)o).iterator(); iter.hasNext();) {
+				appendTo(t, iter.next(), index);
+			}
 		}else if(o instanceof Function){
-			appendTo(t, ((Function)o).call(index, html), index, html);
+			appendTo(t, ((Function)o).call(index, html()), index);
 		}else{
-			t.append(o.toString());
+			t.write(o.toString());
 		}
 	}
+	*/
 	
 	public Element get(boolean override){
 		if(override){
@@ -82,6 +88,12 @@ public class HTML5Element implements HTML5Node{
 			return oe;
 		}
 		return get();
+	}
+
+	public Set<Node> getNodeSet(){
+		Set<Node> set = new HashSet<Node>();
+		set.add(get());
+		return set;
 	}
 	
 	public Element get(){
@@ -205,6 +217,10 @@ public class HTML5Element implements HTML5Node{
 	public boolean hasContent(){
 		return content != null;
 	}
+	
+	public HTML5Template getDocument(){
+		return t;
+	}
 
 	public String html() {
 		if(t == null) return null;
@@ -224,7 +240,7 @@ public class HTML5Element implements HTML5Node{
 	}
 
 	public HTML5Node html(Function html) {
-		this.content = html;
+		this.content = html.call(t);
 		return this;
 	}
 	
@@ -238,9 +254,8 @@ public class HTML5Element implements HTML5Node{
 		return this;
 	}
 
-	public HTML5Node css(String prop) {
-		getAttribute(prop);
-		return this;
+	public String css(String prop) {
+		return getAttribute(prop);
 	}
 
 	public HTML5Node attr(String prop, String value) {
@@ -248,9 +263,8 @@ public class HTML5Element implements HTML5Node{
 		return this;
 	}
 
-	public HTML5Node attr(String prop) {
-		getAttribute(prop);
-		return this;
+	public String attr(String prop) {
+		return getAttribute(prop);
 	}
 
 	public HTML5Node addClass(String cls) {
@@ -276,26 +290,24 @@ public class HTML5Element implements HTML5Node{
 
 	public HTML5Node removeChild(HTML5Node o){
 		if(remove == null)
-			remove = new HashSet<Element>();
+			remove = new HashSet<Node>();
 		
 		Object s = o.get();
 		if(s instanceof Set){
-			remove.addAll((Set<Element>)s);
+			remove.addAll((Set<Node>)s);
 		}else if(s instanceof Element){
 			remove.add((Element)s);
 		}
 		return this;
 	}
 	
+	public HTML5Node remove(HTML5Node node){
+		return removeChild(node);
+	}
+	
 	public HTML5Node remove(){
-		Object s = get();
-		if(s instanceof Set){
-			for (Element e : remove) {
-				remove((Element)e);
-			}
-		}else if(s instanceof Element){
-			remove((Element)s);
-		}
+		HTML5Node node = t.override((Element)this.get().getParentNode());
+		node.removeChild(this);
 		return this;
 	}
 	
@@ -364,14 +376,26 @@ public class HTML5Element implements HTML5Node{
 		return t.select(o, this);
 	}
 
-	public void accept(HTML5Visitor v) {
-		Element e = get();
-		NodeList l = e.getChildNodes();
-		for (int i = 0; i < l.getLength(); i++) {
-			Node n = l.item(i);
-			if(remove == null || !remove.contains(n)){
-				v.dispatch(n);
+	@Override
+	public HTML5Node repeat(List l){
+		return repeat(l, null);
+	}
+
+	@Override
+	public HTML5Node repeat(final List l, final Function f){
+		List c = new LinkedList();
+		for (Iterator iterator = l.iterator(); iterator.hasNext();) {
+			if(f != null){
+				HTML5Node cloneNode = HTML5Element.this.clone();
+				f.call(cloneNode.getDocument(), iterator.next());
+				c.add(cloneNode);
+			}else{
+				c.add(iterator.next());
 			}
 		}
+		content = c;
+		return this;
 	}
+	
+
 }

@@ -10,12 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.arnx.jsonic.JSON;
 
-import org.qrone.r7.script.browser.Function;
 import org.qrone.util.QrONEUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,7 +21,7 @@ import org.w3c.dom.Node;
 import se.fishtank.css.selectors.NodeSelectorException;
 import se.fishtank.css.selectors.dom.DOMNodeSelector;
 
-public class HTML5Template implements HTML5Writer, NodeProcessor{
+public class HTML5Template implements HTML5Writer{
 	
 	private List<Object> list = new ArrayList<Object>();
 	private StringBuilder b = new StringBuilder(10240);
@@ -138,7 +136,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 			}else if(o instanceof Set){
 				DOMNodeSelector ns;
 				LinkedHashSet<Node> lhs = new LinkedHashSet<Node>();
-				LinkedHashSet<Node> l = (LinkedHashSet<Node>)o;
+				Set<Node> l = (Set<Node>)o;
 				for (Iterator<Node> i = l.iterator(); i.hasNext();) {
 					Node n = i.next();
 					ns = new DOMNodeSelector(n);
@@ -159,14 +157,9 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}
 		return e;
 	}
-
-	@Override
+	
 	public HTML5Element get(Element node) {
-		HTML5Element e = node5map.get(node);
-		if(e == null){
-			e = new HTML5Element(om, this, node);
-		}
-		return e;
+		return node5map.get(node);
 	}
 
 	public HTML5Node getElementsByTagName(String tagName){
@@ -201,6 +194,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 	}
 	*/
 	
+/*
 	public void set(Object o){
 		if(o instanceof List){
 			for(Object i : (List)o){
@@ -216,13 +210,17 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 		}
 	}
 
-	public void set(final String selector, final Object o){
-		set(selector, o, false);
+	public void set(final String selector, final List o){
+		set(select(selector),o,null);
+	}
+
+	public void set(final HTML5Node node, final List o){
+		set(node, o, null);
 	}
 	
-	public void set(final String selector, final Object o, boolean raw){
+	public void set(final HTML5Node node, final List o, final Function f){
 		if(o instanceof Map){
-			select(selector).exec(new HTML5NodeSet.Delegate() {
+			node.exec(new HTML5NodeSet.Delegate() {
 				public void call(final HTML5Element e) {
 					e.html(new Function() {
 						@Override
@@ -231,8 +229,12 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 							Set<Entry> entryset = ((Map)o).entrySet();
 							for (Entry el : entryset) {
 								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
-								tt.set(selector + ".key", el.getKey());
-								tt.set(selector + ".value", el.getValue());
+								if(f != null){
+									((Function)o).call(tt);
+								}else{
+									tt.set(node.select(".key"), el.getKey());
+									tt.set(node.select(".value"), el.getValue());
+								}
 								tt.visit(e);
 								t.append(tt);
 							}
@@ -242,7 +244,7 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 				}
 			});
 		}else if(o instanceof List){
-			select(selector).exec(new HTML5NodeSet.Delegate() {
+			node.exec(new HTML5NodeSet.Delegate() {
 				public void call(final HTML5Element e) {
 					e.html(new Function() {
 
@@ -252,7 +254,11 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 							for (Iterator iterator = ((List)o).iterator(); iterator
 							.hasNext();) {
 								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
-								tt.set(iterator.next());
+								if(f != null){
+									((Function)o).call(tt);
+								}else{
+									tt.set(iterator.next());
+								}
 								tt.visit(e);
 								t.append(tt);
 							}
@@ -261,20 +267,17 @@ public class HTML5Template implements HTML5Writer, NodeProcessor{
 					});
 				}
 			});
-		//}else if(o instanceof NodeLister){
-		//	select(selector).listup((NodeLister)o);
 		}else{
 			String str = o.toString();
 			if(o instanceof Number && ((Number)o).doubleValue() == ((Number)o).intValue()){
 				str = String.valueOf(((Number)o).intValue());
 			}
 			
-			if(raw)
-				select(selector).html(str);
-			else
-				select(selector).html(str.replaceAll("\n", "<br>"));
+			node.html(str);
 		}
 	}
+	*/
+	
 /*
 	public void set(String selector, NodeLister lister){
 		select(selector).listup(lister);

@@ -213,6 +213,7 @@ public class HTML5OM {
 		};
 		visitor.visit(document);
 
+		/*
 		HTML5Visitor v = new HTML5Visitor() {
 			@Override
 			public void visit(Text n) {
@@ -224,6 +225,7 @@ public class HTML5OM {
 			}
 		};
 		v.visit(document);
+		*/
 	}
 
 
@@ -240,7 +242,7 @@ public class HTML5OM {
 		return extmap.get(e);
 	}
 	
-	public void process(final HTML5Writer t, final NodeProcessor p,
+	public void process(final HTML5Writer t, final HTML5Template p,
 			final Node node, String id, final Set<HTML5OM> xomlist, final String ticket){
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
@@ -253,101 +255,8 @@ public class HTML5OM {
 			set = null;
 		}
 		
-		HTML5Selializer s = new HTML5Selializer() {
-			int formatting = 0;
-			boolean inScript;
-			boolean inHead;
-
-			@Override
-			public void visit(Document e) {
-				out("<!DOCTYPE html>");
-				super.visit(e);
-				
-			}
-			
-			@Override
-			public void visit(Element e) {
-				if(e.getNodeName().equals("head")){
-					start(e);
-					inHead = true;
-					accept(e);
-					inHead = false;
-					deck.outputStyles(b, set, uri);
-					end(e);
-				}else if(e.getNodeName().equals("body")){
-					if(node != body){
-						start(e);
-					}
-					
-					final HTML5Element e5 = p != null ? p.get(e) : null;
-					if(e5 != null && e5.hasContent()){
-						HTML5Template t = p.newTemplate();
-						e5.accept(t);
-						getWriter().append(t);
-					}else{
-						accept(e);
-					}
-					
-					if(node != body){
-						deck.outputScripts(b, set, uri);
-						end(e);
-					}
-				}else if(e.getNodeName().equals("script")){
-					if(!inHead){
-						start(e);
-						inScript = true;
-						accept(e);
-						inScript = false;
-						end(e);
-					}
-				}else if(e.getNodeName().equals("style")){
-				}else if(e.getNodeName().equals("link")){
-				}else if(e.getNodeName().equals("meta")){
-					if(e.getAttribute("name").equals("extends")){
-					}else{
-						start(e);
-						accept(e);
-						end(e);
-					}
-				}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code") || e.getNodeName().equals("textarea")){
-					formatting++;
-					out(e);
-					formatting--;
-				}else if(e.getNodeName().equals("meta")){
-					if(e.getAttribute("name").equals("extends")){
-					}else{
-						start(e);
-						accept(e);
-						end(e);
-					}
-				}else{
-					out(e);
-				}
-			}
-
-			@Override
-			public void visit(Text n) {
-				if(inScript){
-					out(JSParser.compress(n.getNodeValue(), true)
-							.replace("__QRONE_PREFIX_NAME__", 
-									"qrone[\"" + getURI().toString() + "\"]"));
-				}else if(formatting>0){
-					writeraw(n.getNodeValue());
-				}else{
-					write(n.getNodeValue());
-				}
-			}
-			
-			protected void out(final Element e4) {
-				HTML5Element e = null;
-				if(p != null)
-					e = p.get(e4);
-				else
-					e = new HTML5Element(om, null, e4);
-				super.out(e, p, ticket);
-			}
-		};
-		s.visit(this, node, id, t);
+		HTML5TagWriter s = new HTML5Selializer(body,set,deck,node,uri,p, this, id, ticket);
+		s.visit(node);
 	}
 
 	public String serialize(){
