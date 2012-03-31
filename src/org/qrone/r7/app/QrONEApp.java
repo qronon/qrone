@@ -57,7 +57,8 @@ public class QrONEApp {
         //gzip.setAsyncSupported(true);
         //gzip.setInitParameter("minGzipSize","256");
         
-		context.addServlet(new ServletHolder(new QrONEServlet()), "/*");
+		final QrONEServlet servlet = new QrONEServlet();
+		context.addServlet(new ServletHolder(servlet), "/*");
 		server.setHandler(context);
 
 		
@@ -99,9 +100,12 @@ public class QrONEApp {
 			browser.addLocationListener(new LocationListener() {
 				@Override
 				public void changing(LocationEvent event) {
-					if(event.location.equals("http://qrone-server-home/")){
+					if(event.location.equals("qrone-server:home")){
 						Program.launch("file:///" + new File(".").getAbsoluteFile()
 								.getParentFile().getAbsolutePath());
+						event.doit = false;
+					}if(event.location.equals("qrone-server:clean")){
+						servlet.clean();
 						event.doit = false;
 					}else{
 						Program.launch(event.location);

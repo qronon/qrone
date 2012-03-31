@@ -200,7 +200,9 @@ public class HTML5Selializer extends HTML5TagWriter{
 		}else if(o instanceof Element){
 			accept((Element)o);
 		}else if(o instanceof HTML5Template){
-			writec(((HTML5Template)o).toString());
+			HTML5Template t = (HTML5Template)o;
+			t.out();
+			writec(t.toString());
 		}else if(o instanceof HTML5Element){
 			accept((HTML5Element)o);
 		}else if(o instanceof HTML5NodeSet){

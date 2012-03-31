@@ -12,7 +12,7 @@ import org.qrone.r7.handler.URIHandler;
 
 public class PortingServlet extends HttpServlet {
 	private PortingService s;
-	private URIHandler h;
+	private QrONEURIHandler h;
 
 	public void setPortingService(PortingService portingService) {
 		s = portingService;
@@ -37,6 +37,10 @@ public class PortingServlet extends HttpServlet {
 		if(h == null)
 			h = new QrONEURIHandler(getServletContext(), s);
 		doGet(request, response);
+	}
+	
+	public void clean(){
+		h.clean();
 	}
 
 }

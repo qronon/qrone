@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
@@ -57,10 +58,8 @@ public class JavaScriptHandler implements URIHandler{
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 					defaultom.run(subscope);
 					
-					//Object result = 
+					Object result = 
 						om.run(globalscope, subscope, window);
-					
-					
 					
 					String done = ss.getParameter(".done");
 					if(done != null && services.getSecurityService().validateTicket(request,ss.getParameter(".ticket"))){
@@ -73,6 +72,11 @@ public class JavaScriptHandler implements URIHandler{
 							}
 						} catch (IOException e) {
 						}
+					}
+					
+					if(ss.getParameter(".debug") != null){
+						JavaScriptException e =  new JavaScriptException(null, uri, 0);
+						throw e;
 					}
 
 					window.document.flush();

@@ -30,6 +30,10 @@ public class MongoResolver extends AbstractURIResolver{
 	public MongoResolver(DB db, String collection){
 		this.col = db.getCollection(collection);
 	}
+	
+	public void drop(){
+		col.drop();
+	}
 
 	@Override
 	public boolean exist(String path) {

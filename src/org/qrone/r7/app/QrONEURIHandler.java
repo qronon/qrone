@@ -1,5 +1,6 @@
 package org.qrone.r7.app;
 
+import java.io.File;
 import java.net.UnknownHostException;
 
 import javax.servlet.ServletContext;
@@ -16,6 +17,7 @@ import org.qrone.r7.github.GitHubRepositoryService;
 import org.qrone.r7.github.GitHubResolver;
 import org.qrone.r7.handler.DefaultHandler;
 import org.qrone.r7.handler.ExtendableURIHandler;
+import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.FilteredResolver;
 import org.qrone.r7.resolver.InternalResourceResolver;
 import org.qrone.r7.resolver.URIResolver;
@@ -26,16 +28,19 @@ import com.mongodb.MongoException;
 public class QrONEURIHandler extends ExtendableURIHandler {
 	private GitHubResolver github;
 	private GitHubRepositoryService repository;
+	private MongoResolver cache;
 	
 	public QrONEURIHandler( ServletContext cx, PortingService service ){
 		try {
 			KeyValueStoreService kvs = service.getKeyValueStoreService();
 			HTTPFetcher fetcher = service.getURLFetcher();
-			URIResolver cache;
 			cache = new MongoResolver(new Mongo().getDB("qrone"), "qrone.cache");
 			DatabaseService db = service.getDatabaseService();
 			service.setURIResolver(resolver);
 	
+			// Local Files overrides at anytime.
+			resolver.add(new FileResolver(new File("./htdocs/"), true));
+			
 			// Login/Crumb Service
 			CookieHandler cookie = new CookieHandler(kvs);
 			
@@ -77,5 +82,9 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void clean(){
+		cache.drop();
 	}
 }
