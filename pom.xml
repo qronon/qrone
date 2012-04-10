@@ -136,11 +136,11 @@
   </repositories>
   
   <build>
-    <sourceDirectory>/Users/qronon/git/qrone/src/</sourceDirectory>
-    <scriptSourceDirectory>/Users/qronon/git/qrone/scripts</scriptSourceDirectory>
-    <testSourceDirectory>/Users/qronon/git/qrone/test/</testSourceDirectory>
-    <outputDirectory>/Users/qronon/git/qrone/bin</outputDirectory>
-    <testOutputDirectory>/Users/qronon/git/qrone/bin-test</testOutputDirectory>
+    <sourceDirectory>src</sourceDirectory>
+    <scriptSourceDirectory>scripts</scriptSourceDirectory>
+    <testSourceDirectory>test/</testSourceDirectory>
+    <outputDirectory>bin</outputDirectory>
+    <testOutputDirectory>bin-test</testOutputDirectory>
     
     <extensions>
       <extension>
@@ -151,6 +151,14 @@
     </extensions>
   
   <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
     <plugin>
     <artifactId>maven-assembly-plugin</artifactId>
          <version>2.3</version>

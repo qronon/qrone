@@ -32,7 +32,7 @@ public class QrONEServlet extends PortingServlet {
 					new LocalKeyValueStoreService(services.getDatabaseService(), 
 							services.getMemcachedService()));
 			
-			services.setLoginService(null); // TODO OpenIDHandler Çì¸ÇÍÇÈÅB
+			services.setLoginService(null); // TODO OpenIDHandler
 			services.setTaskManagerService(null); // TODO TaskManager unimplemented!
 			
 			services.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), "qrone.filesystem"));
