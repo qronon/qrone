@@ -198,7 +198,7 @@
       </activation>
       <properties>
         <swt.groupId>qrone</swt.groupId>
-        <swt.artifactId>swt-macosx</swt.artifactId>
+        <swt.artifactId>swt-macosx-64</swt.artifactId>
       </properties>
     </profile>
     <profile>
