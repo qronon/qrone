@@ -5,7 +5,6 @@ import org.qrone.img.ImageBufferService;
 import org.qrone.img.ImageSpriteService;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.login.LoginService;
-import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.resolver.URIResolver;
@@ -59,12 +58,6 @@ public class PortingService {
 	public void setRepositoryService(RepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
-	public SecurityService getSecurityService() {
-		return securityService;
-	}
-	public void setSecurityService(SecurityService securityService) {
-		this.securityService = securityService;
-	}
 	public TaskManagerService getTaskManagerService() {
 		return taskManagerService;
 	}
@@ -85,7 +78,6 @@ public class PortingService {
 	private DatabaseService databaseService;
 	private MemcachedService memcachedService;
 	private RepositoryService repositoryService;
-	private SecurityService securityService;
 	private TaskManagerService taskManagerService;
 	private KeyValueStoreService keyValueStoreService;
 	private URIResolver fileSystemService;

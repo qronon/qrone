@@ -18,7 +18,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mozilla.javascript.Scriptable;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.VerificationResult;
@@ -35,73 +34,62 @@ import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.script.browser.User;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.QueryString;
 
-public class OpenIDHandler implements URIHandler, LoginService{
+public class LoginHandler implements URIHandler, LoginService{
 	private static ConsumerManager manager;
 	private KeyValueStore store;
-	private User user;
-	private static OpenIDHandler instance;
 	
-	public OpenIDHandler(KeyValueStoreService service) {
+	private static LoginHandler instance;
+	
+	public LoginHandler(KeyValueStoreService service) {
 		this.store = service.getKeyValueStore("qrone.openid");
 		instance = this;
 	}
 	
-	public static OpenIDHandler instance(){
+	public static LoginHandler instance(){
 		return instance;
 	}
 	
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
 			String uri, String path, String pathArg) {
-		Cookie ucookie = QrONEUtils.getCookie(request.getCookies(), "U");
-		String uuid = null;
-		if(ucookie == null){
-			uuid = UUID.randomUUID().toString();
-			ucookie = new Cookie("U", uuid);
-			ucookie.setPath("/");
-			response.addCookie(ucookie);
-		}else{
-			uuid = ucookie.getValue();
-		}
 		
-		if(path.equals("/openid/login")){
-			LoginPack pack = (LoginPack)QrONEUtils.unpackEQ64(LoginPack.class, request.getParameter("pack"));
-			handleLogin(uuid, request, response, pack.url, pack.attributes);
-		}else if(path.equals("/openid/verify")){
-			handleVerify(uuid, request, response);
-		}else if(path.equals("/openid/logout")){
-			handleLogout(uuid, request, response);
-		}
-		
-		Cookie qcookie = QrONEUtils.getCookie(request.getCookies(), "Q");
-		if(qcookie != null){
-			user = User.createUser(qcookie.getValue());
+		if(path.equals("/system/openid/login")){
+			handleOpenIDLogin(request, response);
+		}else if(path.equals("/system/openid/verify")){
+			handleOpenIDVerify(request, response);
+		}else if(path.equals("/system/logout")){
+			handleLogout(request, response);
 		}
 		
 		return false;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public String loginURL(String doneURL) {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("login", "http://axschema.org/contact/email");
-		return loginURL("https://www.google.com/accounts/o8/id",
-			map, doneURL);
-	}
-
-	public String loginURL(String url, Map<String, String> attrMap, String doneURL){
+	public String getOpenIDLoginURL(String url, Map attrMap, String doneURL){
 		LoginPack pack = new LoginPack();
 		pack.url = url;
 		pack.attributes = attrMap;
-		return "/openid/login?pack=" 
+		return "/system/openid/login?pack=" 
 			+ QrONEUtils.packEQ64(pack) + "&.done=" + QrONEUtils.escape(doneURL);
 	}
+
+	public String getLoginURL(String doneURL){
+		return "/system/login?.done=" + QrONEUtils.escape(doneURL);
+	}
 	
-	public String loginURL(String url, Scriptable attributes, String doneURL){
+	public String getLogoutURL(String doneURL){
+		return "/system/logout?.done=" + QrONEUtils.escape(doneURL);
+	}
+	
+	private boolean handleLogout(HttpServletRequest req, HttpServletResponse res){
+		User user = (User)req.getAttribute("User");
+		user.logout();
+		return false;
+	}
+	
+	/*
+	public String openid_login_url(String url, Scriptable attributes, String doneURL){
 		Map<String, String> attrMap = new HashMap<String, String>();
 		if(attributes != null){
 			Object[] ids = attributes.getIds();
@@ -116,10 +104,8 @@ public class OpenIDHandler implements URIHandler, LoginService{
 		}
 		return loginURL(url, attrMap, doneURL);
 	}
-
-	public String logoutURL(String doneURL){
-		return "/openid/logout?.done=" + QrONEUtils.escape(doneURL);
-	}
+	*/
+	
 	/*
 	private String getBaseURL(HttpServletRequest req){
 		int port = req.getServerPort();
@@ -129,15 +115,19 @@ public class OpenIDHandler implements URIHandler, LoginService{
 			return "http://" + req.getServerName() + ":" + port + "/openid";
 	}
 	*/
-	public boolean handleLogin(String uuid, HttpServletRequest req, HttpServletResponse res,
-			String url, Map<String, String> attributes){
-		try
-		{
+	private boolean handleOpenIDLogin(HttpServletRequest req, HttpServletResponse res){
+		try{
+			User user = (User)req.getAttribute("User");
+			
+			LoginPack pack = (LoginPack)QrONEUtils.unpackEQ64(LoginPack.class, req.getParameter("pack"));
+			String url = pack.url;
+			Map<String, String> attributes = pack.attributes;
+			
 			if(manager == null){
 				manager = new ConsumerManager();
 			}
 			
-			URI reqURL = new URI(req.getRequestURL().toString()).resolve("/openid");
+			URI reqURL = new URI(req.getRequestURL().toString()).resolve("/system/openid");
 			
 			List discoveries = manager.discover(url);
 			DiscoveryInformation discovered = manager.associate(discoveries);
@@ -145,7 +135,7 @@ public class OpenIDHandler implements URIHandler, LoginService{
 					reqURL.toString() + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
 			FetchRequest fetch = FetchRequest.createFetchRequest();
 			
-			store.set("openid-discover:" + uuid, QrONEUtils.serialize(discovered), true);
+			store.set("openid-discover:" + user.getDeviceID(), QrONEUtils.serialize(discovered), true);
 			
 			for (Iterator<Entry<String, String>> i = attributes.entrySet().iterator(); i
 					.hasNext();) {
@@ -165,27 +155,17 @@ public class OpenIDHandler implements URIHandler, LoginService{
 		}
 		return false;
 	}
-
-	public boolean handleLogout(String uuid, HttpServletRequest req, HttpServletResponse res){
-		Cookie c = new Cookie("Q", "");
-		c.setMaxAge(0);
-		c.setPath("/");
-		res.addCookie(c);
-		try {
-			res.sendRedirect(req.getParameter(".done"));
-			return true;
-		} catch (IOException e) {}
-		return false;
-	}
 	
     // --- processing the authentication response ---
-    public boolean handleVerify(String uuid, HttpServletRequest req, HttpServletResponse res)
+    private boolean handleOpenIDVerify(HttpServletRequest req, HttpServletResponse res)
     {
         try{
+			User user = (User)req.getAttribute("User");
+			
             ParameterList response =
                     new ParameterList(req.getParameterMap());
             DiscoveryInformation discovered = 
-            	(DiscoveryInformation)QrONEUtils.unserialize(store.get("openid-discover:" + uuid));
+            	(DiscoveryInformation)QrONEUtils.unserialize(store.get("openid-discover:" + user.getDeviceID()));
 
             StringBuffer receivingURL = req.getRequestURL();
             String queryString = req.getQueryString();
@@ -210,10 +190,8 @@ public class OpenIDHandler implements URIHandler, LoginService{
                     	name = fetchResp.getAttributeValue("login");
                 }
                 
-                User user = new User(name, verified.getIdentifier());
-                Cookie qcookie = new Cookie("Q", user.getQCookie());
-                qcookie.setPath("/");
-                res.addCookie(qcookie);
+                user.openidLogin(verified, authSuccess);
+                
                 res.sendRedirect(req.getParameter(".done"));
                 return true;
             }

@@ -80,7 +80,7 @@ public class QrONEApp {
     		Thread jettyThread = new Thread(runnable);
     		jettyThread.start();
     		
-			Display display = new Display();
+    		Display display = new Display();
 			Shell shell = new Shell(display);
 			shell.setLayout(new FillLayout());
 			shell.setText("QrONE JavaScript Server");

@@ -23,6 +23,7 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.browser.User;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.QrONEUtils;
@@ -61,8 +62,9 @@ public class JavaScriptHandler implements URIHandler{
 					Object result = 
 						om.run(globalscope, subscope, window);
 					
+					User user = (User)request.getAttribute("User");
 					String done = ss.getParameter(".done");
-					if(done != null && services.getSecurityService().validateTicket(request,ss.getParameter(".ticket"))){
+					if(done != null && user.validateTicket(ss.getParameter(".ticket"))){
 						//String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){

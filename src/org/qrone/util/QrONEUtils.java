@@ -170,6 +170,10 @@ public class QrONEUtils{
 	public static String base64_encode(byte[] binaryData){
 		return Base64.encodeBase64String(binaryData);
 	}
+
+	public static String base64_urlsafe_encode(byte[] binaryData){
+		return Base64.encodeBase64URLSafeString(binaryData);
+	}
 	
 	public static String convertStreamToString(InputStream in) throws IOException {
         return new String(read(in), "utf8");
@@ -228,58 +232,26 @@ public class QrONEUtils{
 		}
 	}
 
-	public static String encodeQ64(byte[] bytes){
-		if(bytes == null) return null;
-		String base64String = Base64.encodeBase64String(bytes);
-		base64String = base64String.replace('+', '.');
-		base64String = base64String.replace('/', '_');
-		base64String = base64String.replaceAll("\r", "");
-		base64String = base64String.replaceAll("\n", "");
-		
-		int i = base64String.indexOf('=');
-		if(i >= 0)
-			return base64String.substring(0, base64String.indexOf('='));
-		return base64String;
-	}
 	
-	public static byte[] decodeQ64(String base64String){
-		if(base64String == null) return null;
-		base64String = base64String.replace('.', '+');
-		base64String = base64String.replace('_', '/');
-		
-		int eq = 4 - base64String.length() % 4;
-		switch(eq){
-		case 1:
-			return Base64.decodeBase64(base64String + "===");
-		case 2:
-			return Base64.decodeBase64(base64String + "==");
-		case 3:
-			return Base64.decodeBase64(base64String + "=");
-		case 4:
-			return Base64.decodeBase64(base64String);
-		}
-		return Base64.decodeBase64(base64String);
-	}
-
 	public static String packEQ64(Externalizable object){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		extenalize(object,out);
-		return encodeQ64(out.toByteArray());
+		return base64_urlsafe_encode(out.toByteArray());
 	}
 
 	public static Object unpackEQ64(Class c, String packed){
-		ByteArrayInputStream in = new ByteArrayInputStream(decodeQ64(packed));
+		ByteArrayInputStream in = new ByteArrayInputStream(base64_decode(packed));
 		return unextenalize(c, in);
 	}
 	
 	public static String packQ64(Object object){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serialize(object,out);
-		return encodeQ64(out.toByteArray());
+		return base64_urlsafe_encode(out.toByteArray());
 	}
 	
 	public static Object unpackQ64(String packed){
-		ByteArrayInputStream in = new ByteArrayInputStream(decodeQ64(packed));
+		ByteArrayInputStream in = new ByteArrayInputStream(base64_decode(packed));
 		return unserialize(in);
 	}
 	
@@ -458,18 +430,7 @@ public class QrONEUtils{
 
 	public static String digest64(String type, byte[] data) throws NoSuchAlgorithmException{
 		byte[] digest = digest(type, data);
-		StringBuffer b = new StringBuffer();
-		for (int i = 0; i < digest.length; i++) {
-			int d = digest[i];
-			if (d < 0) {
-				d += 256;
-			}
-			if (d < 16) {
-				b.append('0');
-			}
-			b.append(Integer.toString(d, 16));
-		}
-		return b.toString();
+		return bytearray2hex(digest);
 	}
 	public static String digest(String type, String data) throws NoSuchAlgorithmException{
 		return digest64(type, data.getBytes());
@@ -480,5 +441,51 @@ public class QrONEUtils{
 		md.update(data);
 		return md.digest();
 		
+	}
+	
+
+	public static double hex2double(String hex){
+		return Double.longBitsToDouble(hex2long(hex));
+	}
+
+	public static String double2hex(double d) {
+		return long2hex(Double.doubleToRawLongBits(d));
+	}
+	
+	public static long hex2long(String hex){
+		return Long.parseLong(hex, 16);
+	}
+
+	public static String long2hex(long l) {
+		return Long.toHexString(l);
+	}
+	
+	public static String hex2str(String hex){
+		return new String(hex2bytearray(hex));
+	}
+
+	public static String str2hex(String l) {
+		return bytearray2hex(l.getBytes());
+	}
+	
+	public static String bytearray2hex(byte[] b) {
+		StringBuilder sb = new StringBuilder(b.length * 2);
+		for (int i = 0; i < b.length; i++) {
+			int v = b[i] & 0xff;
+			if (v < 16) {
+				sb.append('0');
+			}
+			sb.append(Integer.toHexString(v));
+		}
+		return sb.toString().toUpperCase();
+	}
+	
+	public static byte[] hex2bytearray(String hex){
+		byte[] bytes = new byte[hex.length() / 2];
+		for (int index = 0; index < bytes.length; index++) {
+			bytes[index] = (byte) Integer.parseInt(
+					hex.substring(index * 2, (index + 1) * 2), 16);
+		}
+		return bytes;
 	}
 }

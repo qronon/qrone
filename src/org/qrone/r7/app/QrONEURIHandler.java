@@ -43,8 +43,6 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			
 			// Login/Crumb Service
 			CookieHandler cookie = new CookieHandler(kvs);
-			
-			service.setSecurityService(new CookieHandler(service.getKeyValueStoreService()));
 			handler.add(cookie);
 			
 			// Scale9 Service

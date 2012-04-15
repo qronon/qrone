@@ -22,7 +22,6 @@ import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseService;
-import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.RepositoryService;
@@ -57,11 +56,11 @@ public class Window{
 	public Location location;
 	public Navigator navigator;
 	public Scriptable query;
+	public User user;
 
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
-	public SecurityService security;
 	public HTTPFetcher http;
 
 	public JSON JSON;
@@ -82,13 +81,14 @@ public class Window{
 		db = service.getDatabaseService();
 		memcached = service.getMemcachedService();
 		repository = service.getRepositoryService();
-		security = service.getSecurityService();
 		resolver = service.getURIResolver();
 		http = service.getURLFetcher();
 
+		user = (User)request.getAttribute("User");
+		
 		document = new Document(request, response, deck, 
 				ss.uri.toString().replaceAll("\\.server\\.js$", ".html"),
-				security.getTicket(request));
+				user.getTicket());
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
@@ -116,7 +116,7 @@ public class Window{
 		req.put("body", req, ss.body);
 		req.put("text", req, ss.text);
 		
-		if(security == null || security.validateTicket(request,ss.getParameter(".ticket"))){
+		if(user.validateTicket(ss.getParameter(".ticket"))){
 			Scriptable post = toScriptable(ss.post);
 			req.put("post", req, post);
 			req.put("secure", req, true);
@@ -173,7 +173,7 @@ public class Window{
 		if(resolver.exist(u.toString())){
 			HTML5OM om = deck.compile(u);
 			if(om != null){
-				return new HTML5Template(om, u, security.getTicket(request));
+				return new HTML5Template(om, u, user.getTicket());
 			}
 		}
 		return null;
@@ -225,6 +225,10 @@ public class Window{
 	
 	public String base64_encode(byte[] binaryData){
 		return Base64.encodeBase64String(binaryData);
+	}
+
+	public String base64_urlsafe_encode(byte[] binaryData){
+		return Base64.encodeBase64URLSafeString(binaryData);
 	}
 
 	public String unescape(String str) throws DecoderException{
@@ -305,9 +309,10 @@ public class Window{
 		return net.arnx.jsonic.JSON.encode(out);
 	}
 	
-	public String loginURL(String url, Scriptable attributes, String doneURL){
+	public String openid_login_url(String url, Map attributes, String doneURL){
+		
 		Map<String, String> attrMap = new HashMap<String, String>();
-		if(attributes != null){
+		/*if(attributes != null){
 			Object[] ids = attributes.getIds();
 			for (int i = 0; i < ids.length; i++) {
 				if(ids[i] instanceof String){
@@ -318,18 +323,21 @@ public class Window{
 				}
 			}
 		}
-		return service.getLoginService().loginURL(url, attrMap, doneURL);
+		*/
+		return service.getLoginService().getOpenIDLoginURL(url, attributes, doneURL);
 	}
 
-	public String loginURL(String doneURL) {
-		return service.getLoginService().loginURL(doneURL);
+	public String google_openid_login_url(String doneURL) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("login", "http://axschema.org/contact/email");
+		return openid_login_url("https://www.google.com/accounts/o8/id", map, doneURL);
 	}
 	
-	public String logoutURL(String doneURL){
-		return service.getLoginService().logoutURL(doneURL);
+	public String logout_url(String doneURL){
+		return service.getLoginService().getLogoutURL(doneURL);
 	}
 	
 	public User getUser(){
-		return service.getLoginService().getUser();
+		return (User)request.getAttribute("User");
 	}
 }
