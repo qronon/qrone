@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.eclipse.swt.internal.cocoa.id;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageException;
