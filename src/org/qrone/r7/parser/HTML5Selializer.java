@@ -115,7 +115,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 	@Override
 	public void visit(Text n) {
 		if(inScript){
-			write(JSParser.compress(n.getNodeValue(), true)
+			writec(JSParser.compress(n.getNodeValue(), true)
 					.replace("__QRONE_PREFIX_NAME__", 
 							"qrone[\"" + uri.toString() + "\"]"));
 		}else if(formatting>0){
@@ -184,7 +184,13 @@ public class HTML5Selializer extends HTML5TagWriter{
 	
 	private void accept(HTML5Element e){
 		if(e.content == null){
-			accept(e.get());
+			HTML5Template et = e.getDocument();
+			if(et == t){
+				super.accept(e.get());
+			}else{
+				et.out(e);
+				writec(et.serialize());
+			}
 		}else{
 			dispatch(e.content);
 		}
@@ -202,12 +208,18 @@ public class HTML5Selializer extends HTML5TagWriter{
 		}else if(o instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)o;
 			t.out();
-			writec(t.toString());
+			writec(t.serialize());
 		}else if(o instanceof HTML5Element){
 			accept((HTML5Element)o);
 		}else if(o instanceof HTML5NodeSet){
 			HTML5NodeSet set = (HTML5NodeSet)o;
-			dispatch(set.get());
+			HTML5Template et = set.getDocument();
+			if(et == t){
+				dispatch(set.get());
+			}else{
+				et.out(set);
+				writec(et.serialize());
+			}
 		}else{
 			writec(o.toString());
 		}

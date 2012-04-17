@@ -32,7 +32,7 @@ public class CookieHandler implements URIHandler{
 		if(key == null){
 			byte[] keybytes = kvs.get("secretkey");
 			if(keybytes == null){
-				key = Token.generate("M",null);
+				key = new Token(key, "M",null);
 				kvs.set("secretkey", key.getBytes());
 			}else{
 				key = new Token();

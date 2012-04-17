@@ -43,7 +43,7 @@ public class HTML5Element implements HTML5Node{
 	}
 	
 	public HTML5Node clone(){
-		return new HTML5Element(om, t.newTemplate(), (Element)e.cloneNode(false));
+		return new HTML5Element(om, t.newTemplate(), get());
 	}
 	
 	/*
@@ -226,7 +226,7 @@ public class HTML5Element implements HTML5Node{
 		if(t == null) return null;
 		HTML5Template tt = t.newTemplate();
 		tt.out(this);
-		return tt.toString();
+		return tt.serialize();
 	}
 
 	public HTML5Node html(HTML5Template html) {
@@ -248,7 +248,7 @@ public class HTML5Element implements HTML5Node{
 		this.content = html;
 		return this;
 	}
-
+	
 	public HTML5Node css(String prop, String value) {
 		setProperty(prop, value);
 		return this;
@@ -396,6 +396,5 @@ public class HTML5Element implements HTML5Node{
 		content = c;
 		return this;
 	}
-	
 
 }

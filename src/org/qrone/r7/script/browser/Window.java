@@ -92,7 +92,7 @@ public class Window{
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
-		JSON = new JSON(resolver, scope);
+		JSON = new JSON(resolver, scope, vm.getContext());
 		YAML = new YAML(resolver);
 		Textile = new Textile(resolver);
 		JavaProperties = new JavaProperties(resolver);
@@ -126,7 +126,7 @@ public class Window{
 	}
 
 	private Scriptable newScriptable(){
-		return JSDeck.getContext().newObject(scope);
+		return vm.getContext().newObject(scope);
 	}
 
 	public Scriptable toScriptable(Map<String, List<String>> map){
@@ -137,7 +137,7 @@ public class Window{
 			if(e.getValue().size() == 1){
 				o.put(e.getKey(), o, e.getValue().get(0));
 			}else if(e.getValue().size() > 1){
-				Scriptable l = JSDeck.getContext().newArray(scope, e.getValue().size());
+				Scriptable l = vm.getContext().newArray(scope, e.getValue().size());
 				for (int j = 0; j < e.getValue().size(); j++) {
 					l.put(j, l, e.getValue().get(j));
 				}

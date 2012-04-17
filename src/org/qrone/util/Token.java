@@ -42,7 +42,7 @@ public class Token {
 			t.type = QrONEUtils.hex2str(s[0]);
 			t.id = QrONEUtils.hex2str(s[1]);
 			t.timestamp = QrONEUtils.hex2long(s[2]);
-			t.rand = QrONEUtils.hex2long(s[3]);
+			t.rand = QrONEUtils.hex2double(s[3]);
 			if(s.length >= 4){
 				t.md5sign = QrONEUtils.hex2bytearray(s[4]);
 			}
@@ -75,7 +75,8 @@ public class Token {
 	}
 	
 	public boolean validate(String type, Token sign){
-		if(this.type.equals(type) && Arrays.equals(calcSign(sign), md5sign)){
+		byte[] b = calcSign(sign);
+		if(this.type.equals(type) && Arrays.equals(b, md5sign)){
 			return true;
 		}
 		return false;
@@ -109,6 +110,30 @@ public class Token {
 	
 	public static Token generate(String type, String id){
 		return new Token(null, type, id);
+	}
+	
+	public static void main(String[] args){
+		Token t1 = new Token(null, "TEST", null);
+		System.out.println(t1.toString());
+		
+		Token t2 = new Token(t1, "TEST", null);
+		System.out.println(t2.toString());
+		
+		Token t3 = Token.parse(t2.toString());
+		System.out.println(t3.toString());
+		System.out.println(t3.validate("TEST", t1));
+		System.out.println(t3.validate("TEST", t2));
+		System.out.println(t3.validate("TEST", t3));
+		
+		Token t4 = new Token(t2, "TEST", null);
+		System.out.println(t4.toString());
+		System.out.println(t4.validate("TEST", t1));
+		System.out.println(t4.validate("TEST", t2));
+		System.out.println(t4.validate("TEST", t3));
+		
+		
+		
+		
 	}
 
 }

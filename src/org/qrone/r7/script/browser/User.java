@@ -59,18 +59,19 @@ public class User{
 				}else if(cookies[i].getName().equals("B")){
 					try{
 						bcookie = Token.parse(cookies[i].getValue());
-						if(bcookie == null || !bcookie.validate("B", key)){
-							bcookie = Token.generate("B",null);
-							Cookie c = new Cookie("B", bcookie.toString());
-							c.setMaxAge(60*60*24*256*20);
-							c.setPath("/");
-							response.addCookie(c);
-						}
 					}catch(Exception e){
 						
 					}
 				}
 			}
+		}
+		
+		if(bcookie == null || !bcookie.validate("B", key)){
+			bcookie = new Token(key,"B",null);
+			Cookie c = new Cookie("B", bcookie.toString());
+			c.setMaxAge(60*60*24*256*20);
+			c.setPath("/");
+			response.addCookie(c);
 		}
 		
 	}
@@ -89,7 +90,7 @@ public class User{
         response.addCookie(q);
 	}
 
-	public String getLogin(){
+	public String getId(){
 		if(qcookie != null)
 			return qcookie.getId();
 		return null;
@@ -102,7 +103,7 @@ public class User{
 		return null;
 	}
 	
-	public String getDeviceID(){
+	public String getDeviceId(){
 		return bcookie.toString();
 	}
 	

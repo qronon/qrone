@@ -262,7 +262,7 @@ public class HTML5OM {
 	public String serialize(){
 		HTML5Template t = new HTML5Template(this);
 		t.out();
-		return t.toString();
+		return t.serialize();
 	}
 	
 	private void parseStyleSheet(final CSS3OM cssom) throws IOException{

@@ -105,8 +105,7 @@ public class HTML5Template implements HTML5Writer{
 		b.append(str);
 	}
 	
-	@Override
-	public String toString() {
+	public String serialize() {
 		StringBuffer b = new StringBuffer();
 		for (Iterator<Object> i = list.iterator(); i
 				.hasNext();) {
@@ -120,7 +119,7 @@ public class HTML5Template implements HTML5Writer{
 	}
 
 	public Object $(String selector, HTML5Node node){
-		return node.select(selector);
+		return select(selector, node);
 	}
 	
 	public HTML5NodeSet select(String selector){
@@ -128,6 +127,10 @@ public class HTML5Template implements HTML5Writer{
 	}
 
 	public HTML5NodeSet select(String selector, HTML5Node node){
+		if( node.getDocument() != this ){
+			return node.getDocument().select(selector, node);
+		}
+		
 		try{
 			Object o = node.get();
 			if(o instanceof Element){
@@ -341,6 +344,15 @@ public class HTML5Template implements HTML5Writer{
 	}
 	*/
 
+	public void out(HTML5NodeSet set) {
+		//final String uniqueid = QrONEUtils.uniqueid();
+		for (Iterator<Node> iter = set.get().iterator(); iter.hasNext();) {
+			om.process(this, this, iter.next(), null, xomlist, ticket);
+			
+		}
+		
+	}
+	
 	public void out(HTML5Element e) {
 		//final String uniqueid = QrONEUtils.uniqueid();
 		om.process(this, this, e.get(), null, xomlist, ticket);
@@ -385,7 +397,7 @@ public class HTML5Template implements HTML5Writer{
 	public HTML5Template newTemplate() {
 		HTML5Template t =  new HTML5Template(om, xomlist, uri, ticket);
 		//t.id = id;
-		t.node5map = node5map;
+		//t.node5map = node5map;
 		return t;
 	}
 	

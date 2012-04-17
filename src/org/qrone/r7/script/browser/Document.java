@@ -31,7 +31,7 @@ public class Document extends HTML5Template{
 		}else if(out instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)out;
 			t.out();
-			writer.append(t.toString());
+			writer.append(t.serialize());
 		}else{
 			writer.append(JSON.encode(out));
 		}
@@ -40,7 +40,7 @@ public class Document extends HTML5Template{
 	public void flush() throws IOException{
 		if(loaded){
 			super.out();
-			writer.append(toString());
+			writer.append(serialize());
 		}
 		writer.flush();
 	}

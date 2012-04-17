@@ -61,10 +61,8 @@ public class QrONEApp {
 		context.addServlet(new ServletHolder(servlet), "/*");
 		server.setHandler(context);
 
-		
-
-        Boolean help = (Boolean) parser.getOptionValue(cliOpt);
-        if(help == null || !help.booleanValue()){
+        Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
+        if(cli == null || !cli.booleanValue()){
 
     		Runnable runnable = new Runnable() {
     			@Override
@@ -84,7 +82,7 @@ public class QrONEApp {
 			Shell shell = new Shell(display);
 			shell.setLayout(new FillLayout());
 			shell.setText("QrONE JavaScript Server");
-			shell.setSize((int) (240 * 1.618), 240);
+			shell.setSize((int) (240 * 1.618), 280);
 			final Browser browser;
 			try {
 				browser = new Browser(shell, SWT.NONE);
@@ -100,11 +98,12 @@ public class QrONEApp {
 			browser.addLocationListener(new LocationListener() {
 				@Override
 				public void changing(LocationEvent event) {
-					if(event.location.equals("qrone-server:home")){
+					if(event.location.equals("http://localhost:9601/system/resource/index")){
+					}else if(event.location.equals("qrone-server:home")){
 						Program.launch("file:///" + new File(".").getAbsoluteFile()
 								.getParentFile().getAbsolutePath());
 						event.doit = false;
-					}if(event.location.equals("qrone-server:clean")){
+					}else if(event.location.equals("qrone-server:clean")){
 						servlet.clean();
 						event.doit = false;
 					}else{

@@ -8,15 +8,18 @@ import org.mozilla.javascript.json.JsonParser.ParseException;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.resolver.URIResolver;
 
+import org.mozilla.javascript.Context;
 public class JSON extends XFormat<Object>{
 	private Scriptable scope;
-	public JSON(URIResolver r, Scriptable scope) throws IOException{
+	private Context context;
+	public JSON(URIResolver r, Scriptable scope, Context context) throws IOException{
 		super(r);
 		this.scope = scope;
+		this.context = context;
 	}
 	
 	public Object parse(String json){
-		JsonParser p = new JsonParser(JSDeck.getContext(), scope);
+		JsonParser p = new JsonParser(context, scope);
 		try {
 			return p.parseValue(json);
 		} catch (ParseException e) {
