@@ -1,0 +1,9 @@
+<tree id="0">
+<item text="Books" id="books" im0="tombs.gif" im1="tombs.gif" im2="iconSafe.gif">
+<userdata name="created">21.07.2005</userdata>
+<userdata name="author">Ivan Petrenko</userdata>
+<userdata name="mode">ReadOnly</userdata></item>
+<item text="Magazines" id="magazines" im0="folderClosed.gif" im1="folderOpen.gif" im2="folderClosed.gif" onclick="alert(1);">
+<item text="Sport" id="mag_sp" im0="folderClosed.gif" im1="folderOpen.gif" im2="folderClosed.gif"/>
+</item>
+</tree>
