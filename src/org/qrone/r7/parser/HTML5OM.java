@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +98,50 @@ public class HTML5OM {
 			Set<Node> nodes = selectcache.get(selector);
 			if(nodes == null){
 				nodes = nodeselector.querySelectorAll(selector);
+				selectcache.put(selector, nodes);
 			}
 			return nodes;
 		}catch(NodeSelectorException e){}
+		return null;
+	}
+
+	
+	private Map<String, Map<Object,Set<Node>>> selectorCache 
+		= new HashMap<String, Map<Object,Set<Node>>>();
+	
+
+	public Set<Node> select(String selector, Object o){
+		try{
+			Map<Object,Set<Node>> cache = selectorCache.get(selector);
+			if(cache != null){
+				Set<Node> rset = cache.get(o);
+				if(rset != null){
+					return rset;
+				}
+			}else{
+				cache = new HashMap<Object, Set<Node>>();
+				selectorCache.put(selector, cache);
+			}
+			
+			Set<Node> lhs = null;
+			if(o instanceof Element){
+				DOMNodeSelector ns = new DOMNodeSelector((Element)o);
+				lhs = ns.querySelectorAll(selector);
+			}else if(o instanceof Set){
+				DOMNodeSelector ns;
+				lhs = new LinkedHashSet<Node>();
+				Set<Node> l = (Set<Node>)o;
+				for (Iterator<Node> i = l.iterator(); i.hasNext();) {
+					Node n = i.next();
+					ns = new DOMNodeSelector(n);
+					lhs.addAll(ns.querySelectorAll(selector));
+				}
+			}
+			
+			cache.put(o, lhs);
+			return lhs;
+			
+		} catch (NodeSelectorException e) {}
 		return null;
 	}
 	
@@ -228,7 +271,6 @@ public class HTML5OM {
 		*/
 	}
 
-
 	private void findRequires(String js){
 		Pattern pattern = Pattern.compile("require\\s*\\(\\s*[\"'](.*?)[\"']\\s*\\)\\s*;?");
 		Matcher matcher = pattern.matcher(js);
@@ -242,7 +284,7 @@ public class HTML5OM {
 		return extmap.get(e);
 	}
 	
-	public void process(final HTML5Writer t, final HTML5Template p,
+	public void process(final HTML5Writer w, final HTML5Template t,
 			final Node node, String id, final Set<HTML5OM> xomlist, final String ticket){
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
@@ -255,14 +297,8 @@ public class HTML5OM {
 			set = null;
 		}
 		
-		HTML5TagWriter s = new HTML5Selializer(body,set,deck,node,uri,p, this, id, ticket);
+		HTML5TagWriter s = new HTML5Selializer(body,set,deck,node,uri,w,t,this, id, ticket);
 		s.visit(node);
-	}
-
-	public String serialize(){
-		HTML5Template t = new HTML5Template(this);
-		t.out();
-		return t.toString();
 	}
 	
 	private void parseStyleSheet(final CSS3OM cssom) throws IOException{
@@ -328,10 +364,6 @@ public class HTML5OM {
 			@Override
 			public void append(char c) {
 				jqueryhtml.str(String.valueOf(c));
-			}
-
-			@Override
-			public void append(HTML5Template t) {
 			}
 		};
 		process(t, null, body, null, null, ticket);

@@ -160,10 +160,7 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 		//---------------
 		StringBuffer css = new StringBuffer();
 		for (Iterator<CSS3OM> j = set.css.iterator(); j.hasNext();) {
-			CSSRuleList l = j.next().getStyleSheet().getCssRules();
-			for (int i = 0; i < l.getLength(); i++) {
-				css.append(l.item(i).getCssText());
-			}
+			css.append(j.next().getCssText());
 		}
 		
 		String css2 = CSS3Parser.compress(css.toString());

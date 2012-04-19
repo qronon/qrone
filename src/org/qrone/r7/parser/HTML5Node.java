@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 
 public interface HTML5Node {
 	public Object get();
+	public Object get(boolean override);
 	public HTML5Template getDocument();
 	public HTML5Node addClass(String cls);
 	public HTML5Node removeClass(String cls);

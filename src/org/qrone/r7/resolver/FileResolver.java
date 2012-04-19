@@ -26,7 +26,7 @@ public class FileResolver extends AbstractURIResolver{
 
 	@Override
 	public boolean exist(String uri) {
-		boolean r = new File(root, uri.substring(1)).exists();
+		boolean r = new File(root, uri.substring(1)).isFile();
 		return r;
 	}
 

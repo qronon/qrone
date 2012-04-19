@@ -1,5 +1,6 @@
 package org.qrone.r7.script.browser;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -9,16 +10,19 @@ import javax.servlet.http.HttpServletResponse;
 import net.arnx.jsonic.JSON;
 
 import org.qrone.r7.parser.HTML5Deck;
+import org.qrone.r7.parser.HTML5StreamWriter;
 import org.qrone.r7.parser.HTML5Template;
 
 public class Document extends HTML5Template{
 	private HttpServletRequest request;
 	private PrintWriter writer;
+	private HTML5StreamWriter streamWriter;
 	
 	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri, String ticket) throws IOException{
 		super(deck, uri, ticket);
 		this.request = request;
 		this.writer = response.getWriter();
+		this.streamWriter = new HTML5StreamWriter(new BufferedWriter(writer));
 	}
 	
 	public String getCookie(){
@@ -30,8 +34,7 @@ public class Document extends HTML5Template{
 			writer.append((String)out);
 		}else if(out instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)out;
-			t.out();
-			writer.append(t.toString());
+			t.out(streamWriter, om.getDocument());
 		}else{
 			writer.append(JSON.encode(out));
 		}
@@ -39,8 +42,7 @@ public class Document extends HTML5Template{
 	
 	public void flush() throws IOException{
 		if(loaded){
-			super.out();
-			writer.append(toString());
+			super.out(streamWriter, om.getDocument());
 		}
 		writer.flush();
 	}

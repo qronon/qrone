@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class MemoryStore implements KeyValueStore{
-	public static Map<String, byte[]> map = new Hashtable<String, byte[]>();
+	public Map<String, byte[]> map = new Hashtable<String, byte[]>();
 
 	@Override
 	public byte[] get(String key) {

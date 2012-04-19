@@ -37,19 +37,13 @@ import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
 
 public class LoginHandler implements URIHandler, LoginService{
-	private static ConsumerManager manager;
+	private ConsumerManager manager;
 	private KeyValueStore store;
-	
-	private static LoginHandler instance;
 	
 	public LoginHandler(KeyValueStoreService service) {
 		this.store = service.getKeyValueStore("qrone.openid");
-		instance = this;
 	}
 	
-	public static LoginHandler instance(){
-		return instance;
-	}
 	
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
@@ -135,7 +129,7 @@ public class LoginHandler implements URIHandler, LoginService{
 					reqURL.toString() + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
 			FetchRequest fetch = FetchRequest.createFetchRequest();
 			
-			store.set("openid-discover:" + user.getDeviceID(), QrONEUtils.serialize(discovered), true);
+			store.set("openid-discover:" + user.getDeviceId(), QrONEUtils.serialize(discovered), true);
 			
 			for (Iterator<Entry<String, String>> i = attributes.entrySet().iterator(); i
 					.hasNext();) {
@@ -165,7 +159,7 @@ public class LoginHandler implements URIHandler, LoginService{
             ParameterList response =
                     new ParameterList(req.getParameterMap());
             DiscoveryInformation discovered = 
-            	(DiscoveryInformation)QrONEUtils.unserialize(store.get("openid-discover:" + user.getDeviceID()));
+            	(DiscoveryInformation)QrONEUtils.unserialize(store.get("openid-discover:" + user.getDeviceId()));
 
             StringBuffer receivingURL = req.getRequestURL();
             String queryString = req.getQueryString();

@@ -17,6 +17,9 @@ import java.nio.charset.Charset;
 
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
+import org.qrone.r7.parser.HTML5StreamWriter;
+import org.qrone.r7.parser.HTML5StringWriter;
+import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.resolver.FileResolver;
 import org.qrone.r7.resolver.URIResolver;
 
@@ -177,7 +180,10 @@ public class QrONECompressor {
 	        }
 			try {
 				HTML5OM xom = deck.compile(new URI(path));
-				xom.serialize();
+
+				HTML5StringWriter w = new HTML5StringWriter();
+				HTML5Template t = new HTML5Template(xom);
+				t.out(w, xom.getDocument());
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -222,6 +222,10 @@ public class HTML5NodeSet implements HTML5Node{
 	public Set<Node> get(){
 		return set;
 	}
+	
+	public Set<Node> get(boolean override){
+		return set;
+	}
 
 	@Override
 	public HTML5Node repeat(final List l) {

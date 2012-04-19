@@ -3,12 +3,17 @@ package org.qrone.r7.app;
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -53,18 +58,21 @@ public class QrONEApp {
         server.addConnector(connector);
 
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-		//FilterHolder gzip = handler.addFilterWithMapping(GzipFilter.class,"/*",0);
-        //gzip.setAsyncSupported(true);
-        //gzip.setInitParameter("minGzipSize","256");
-        
+		
+		FilterHolder gzip = new FilterHolder(new GzipFilter());
+        gzip.setAsyncSupported(true);
+        gzip.setInitParameter("mimeTypes", "text/html,text/plain,text/xml,text/javascript,text/css,application/javascript,image/svg+xml");
+		gzip.setInitParameter("minGzipSize","256");
+		EnumSet<DispatcherType> all = EnumSet.of(DispatcherType.ASYNC, DispatcherType.ERROR, DispatcherType.FORWARD,
+	            DispatcherType.INCLUDE, DispatcherType.REQUEST);
+		
 		final QrONEServlet servlet = new QrONEServlet();
 		context.addServlet(new ServletHolder(servlet), "/*");
+		context.addFilter(gzip, "/*", all);
 		server.setHandler(context);
 
-		
-
-        Boolean help = (Boolean) parser.getOptionValue(cliOpt);
-        if(help == null || !help.booleanValue()){
+        Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
+        if(cli == null || !cli.booleanValue()){
 
     		Runnable runnable = new Runnable() {
     			@Override
@@ -84,7 +92,7 @@ public class QrONEApp {
 			Shell shell = new Shell(display);
 			shell.setLayout(new FillLayout());
 			shell.setText("QrONE JavaScript Server");
-			shell.setSize((int) (240 * 1.618), 240);
+			shell.setSize((int) (240 * 1.618), 280);
 			final Browser browser;
 			try {
 				browser = new Browser(shell, SWT.NONE);
@@ -100,11 +108,12 @@ public class QrONEApp {
 			browser.addLocationListener(new LocationListener() {
 				@Override
 				public void changing(LocationEvent event) {
-					if(event.location.equals("qrone-server:home")){
+					if(event.location.equals("http://localhost:9601/system/resource/index")){
+					}else if(event.location.equals("qrone-server:home")){
 						Program.launch("file:///" + new File(".").getAbsoluteFile()
 								.getParentFile().getAbsolutePath());
 						event.doit = false;
-					}if(event.location.equals("qrone-server:clean")){
+					}else if(event.location.equals("qrone-server:clean")){
 						servlet.clean();
 						event.doit = false;
 					}else{

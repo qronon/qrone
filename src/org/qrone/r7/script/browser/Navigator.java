@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 public class Navigator{
 	
 	public Navigator(HttpServletRequest request){
-		userAgent = request.getHeader("UserAgent");
+		userAgent = request.getHeader("User-Agent");
 	}
 	
 	public String userAgent;

@@ -20,12 +20,13 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 	public static final Set<String> noendtaglist = new HashSet<String>();
 	protected HTML5Writer b;
 	protected String id;
-	protected HTML5Template t;
-	protected HTML5OM om;
 	protected String ticket;
 
-	public HTML5TagWriter() {
+	public HTML5TagWriter(HTML5Writer b, String id, String ticket) {
 		super();
+		this.b = b;
+		this.id = id;
+		this.ticket = ticket;
 	}
 
 	protected void writejs(String attr, String js) {
@@ -48,19 +49,19 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		b.append(attr);
 		b.append('=');
 		b.append('"');
-		write(value);
+		b.append(escape(value));
 		b.append('"');
 	}
-
+/*
 	protected void write(Attr attr) {
 		b.append(' ');
 		b.append(attr.getNodeName());
 		b.append('=');
 		b.append('"');
-		write(attr.getNodeValue());
+		b.append(escape(attr.getNodeValue()));
 		b.append('"');
 	}
-
+*/
 	protected void writeraw(String str) {
 		char[] ch = str.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
@@ -95,9 +96,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		b.append(str);
 	}
 	
-	protected void write(String str) {
-		if(str == null) return;
-		
+	protected String escape(String str) {
 		StringBuilder b = new StringBuilder();
 		boolean white = false;
 		char[] ch = str.toCharArray();
@@ -135,53 +134,69 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 				break;
 			}
 		}
-		this.b.append(b.toString());
+		return b.toString();
 	}
 
 	protected void start(Element e) {
-		b.append('<');
-		if(e.hasAttribute("tag"))
-			b.append(e.getAttribute("tag"));
-		else
-			b.append(e.getNodeName());
-	
-		NamedNodeMap map = e.getAttributes();
-		for (int i = 0; i < map.getLength(); i++) {
-			Node n = map.item(i);
-			if(n.getNodeName().equals("id")){
-	
-				b.append(' ');
-				b.append(n.getNodeName());
-				b.append('=');
-				b.append('"');
-				
-				String rawid = n.getNodeValue();
-				if(rawid.startsWith("qrone.")){
-					write("qrone.");
-					b.append("id",id);
-					write(".");
-					write(rawid.substring("qrone.".length()));
-				}else{
-					write(rawid);
-				}
-				b.append('"');
-			}else{
-				write((Attr)map.item(i));
-			}
-		}
+		if(e.hasAttribute("qrone.starttag")){
+			b.append(e.getAttribute("qrone.starttag"));
+		}else{
+			
+			HTML5StringWriter bw = new HTML5StringWriter();
+			bw.append('<');
+			bw.append(e.getNodeName());
 		
-		b.append('>');
+			NamedNodeMap map = e.getAttributes();
+			for (int i = 0; i < map.getLength(); i++) {
+				Node n = map.item(i);
+				if(n.getNodeName().equals("id")){
+		
+					bw.append(' ');
+					bw.append(n.getNodeName());
+					bw.append('=');
+					bw.append('"');
+					
+					String rawid = n.getNodeValue();
+					if(rawid.startsWith("qrone.")){
+						bw.append("qrone.");
+						bw.append("id",id);
+						bw.append(".");
+						bw.append(escape(rawid.substring("qrone.".length())));
+					}else{
+						bw.append(escape(rawid));
+					}
+					bw.append('"');
+				}else if(!n.getNodeName().startsWith("qrone.")){
+					Attr attr = (Attr)n;
+					bw.append(' ');
+					bw.append(attr.getNodeName());
+					bw.append('=');
+					bw.append('"');
+					bw.append(escape(attr.getNodeValue()));
+					bw.append('"');
+				}
+			}
+			bw.append('>');
+
+			e.setAttribute("qrone.starttag",bw.toString());
+			b.append(bw.toString());
+		}
 	}
 
 	protected void end(Element e) {
-		if(!noendtaglist.contains(e.getNodeName())){
-			b.append('<');
-			b.append('/');
-			if(e.hasAttribute("tag"))
-				b.append(e.getAttribute("tag"));
-			else
-				b.append(e.getNodeName());
-			b.append('>');
+		if(e.hasAttribute("qrone.endtag")){
+			b.append(e.getAttribute("qrone.endtag"));
+		}else{
+			StringBuilder bs = new StringBuilder();
+			if(!noendtaglist.contains(e.getNodeName())){
+				bs.append('<');
+				bs.append('/');
+				bs.append(e.getNodeName());
+				bs.append('>');
+			}
+			
+			e.setAttribute("qrone.endtag",bs.toString());
+			b.append(bs.toString());
 		}
 	}
 
@@ -213,8 +228,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 					.hasNext();) {
 				writec(iterator.next().preend(ticket));
 			}
-			if(!noendtaglist.contains(e.getNodeName()))
-				end(e);
+			end(e);
 			Collections.reverse(rr);
 			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
 					.hasNext();) {
