@@ -15,16 +15,17 @@ import java.util.Set;
 import net.arnx.jsonic.JSON;
 
 import org.qrone.util.QrONEUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import se.fishtank.css.selectors.NodeSelectorException;
 import se.fishtank.css.selectors.dom.DOMNodeSelector;
 
-public class HTML5Template implements HTML5Writer{
+public class HTML5Template{
 	
-	private List<Object> list = new ArrayList<Object>();
-	private StringBuilder b = new StringBuilder(10240);
+	//private List<Object> list = new ArrayList<Object>();
+	//private StringBuilder b = new StringBuilder(10240);
 	
 	protected HTML5OM om;
 	protected Set<HTML5OM> xomlist;
@@ -38,7 +39,6 @@ public class HTML5Template implements HTML5Writer{
 		this.om = om;
 		this.xomlist = xomlist;
 		this.ticket = ticket;
-		list.add(b);
 		loaded = true;
 	}
 
@@ -74,6 +74,7 @@ public class HTML5Template implements HTML5Writer{
 		return loaded;
 	}
 
+	/*
 	public HTML5Template append(){
 		HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
 		list.add(t);
@@ -104,7 +105,8 @@ public class HTML5Template implements HTML5Writer{
 	public void append(String str){
 		b.append(str);
 	}
-	
+	*/
+	/*s
 	public String serialize() {
 		StringBuffer b = new StringBuffer();
 		for (Iterator<Object> i = list.iterator(); i
@@ -113,7 +115,7 @@ public class HTML5Template implements HTML5Writer{
 		}
 		return b.toString();
 	}
-	
+	*/
 	public Object $(String selector){
 		return select(selector);
 	}
@@ -130,25 +132,7 @@ public class HTML5Template implements HTML5Writer{
 		if( node.getDocument() != this ){
 			return node.getDocument().select(selector, node);
 		}
-		
-		try{
-			Object o = node.get();
-			if(o instanceof Element){
-				DOMNodeSelector ns = new DOMNodeSelector((Element)o);
-				return new HTML5NodeSet(this, ns.querySelectorAll(selector));
-			}else if(o instanceof Set){
-				DOMNodeSelector ns;
-				LinkedHashSet<Node> lhs = new LinkedHashSet<Node>();
-				Set<Node> l = (Set<Node>)o;
-				for (Iterator<Node> i = l.iterator(); i.hasNext();) {
-					Node n = i.next();
-					ns = new DOMNodeSelector(n);
-					lhs.addAll(ns.querySelectorAll(selector));
-				}
-				return new HTML5NodeSet(this, lhs);
-			}
-		} catch (NodeSelectorException e) {}
-		return null;
+		return new HTML5NodeSet(this, om.select(selector, node.get(false)));
 	}
 
 	private Map<Element, HTML5Element> node5map = new Hashtable<Element, HTML5Element>();
@@ -302,7 +286,7 @@ public class HTML5Template implements HTML5Writer{
 	
 	*/
 
-	
+	/*
 	public void visit(HTML5Element e){
 		e.getOM().process(this, this, e.get(), null, xomlist, ticket);
 	}
@@ -315,20 +299,20 @@ public class HTML5Template implements HTML5Writer{
 			if(iter != null){
 				if(!iter.hasNext())
 					iter = om.select(selector).iterator();
-				om.process(this, this, iter.next(), null, xomlist, ticket);
+				om.process(this, iter.next(), null, xomlist, ticket);
 			}
 		}else{
 			Set<Node> nodes = om.select(selector);
 			if(nodes != null && !nodes.isEmpty()){
 				Iterator<Node> iter = nodes.iterator();
 				selecting.put(selector, iter);
-				om.process(this, this, iter.next(), null, xomlist, ticket);
+				om.process(this, iter.next(), null, xomlist, ticket);
 			}else{
 				selecting.put(selector, null);
 			}
 		}
 	}
-	
+	*/
 	/*
 	public void out(HTML5NodeSet e) {
 		e.exec(new HTML5NodeSet.Delegate() {
@@ -344,18 +328,23 @@ public class HTML5Template implements HTML5Writer{
 	}
 	*/
 
-	public void out(HTML5NodeSet set) {
+	public void out(HTML5Writer w, HTML5NodeSet set) {
 		//final String uniqueid = QrONEUtils.uniqueid();
 		for (Iterator<Node> iter = set.get().iterator(); iter.hasNext();) {
-			om.process(this, this, iter.next(), null, xomlist, ticket);
+			om.process(w, this, iter.next(), null, xomlist, ticket);
 			
 		}
 		
 	}
 	
-	public void out(HTML5Element e) {
+	public void out(HTML5Writer w, HTML5Element e) {
 		//final String uniqueid = QrONEUtils.uniqueid();
-		om.process(this, this, e.get(), null, xomlist, ticket);
+		om.process(w, this, e.get(), null, xomlist, ticket);
+	}
+	
+	public void out(HTML5Writer w, Document e) {
+		//final String uniqueid = QrONEUtils.uniqueid();
+		om.process(w, this, e, null, xomlist, ticket);
 	}
 
 	/*
@@ -367,12 +356,12 @@ public class HTML5Template implements HTML5Writer{
 	public void out(HTML5OM om) {
 		out(om, this);
 	}
-	*/
 	
 	public void out() {
 		if(om != null)
-			om.process(this, this, om.getDocument(), null, xomlist, ticket);
+			om.process(this, om.getDocument(), null, xomlist, ticket);
 	}
+	*/
 
 	public HTML5Element getBody() {
 		return new HTML5Element(om, this, om.getBody());
@@ -382,6 +371,7 @@ public class HTML5Template implements HTML5Writer{
 		return uri;
 	}
 
+	/*
 	public void write(Object out) throws IOException{
 		if(out instanceof String)
 			append((String)out);
@@ -393,6 +383,7 @@ public class HTML5Template implements HTML5Writer{
 		write(out);
 		write("\n");
 	}
+	*/
 	
 	public HTML5Template newTemplate() {
 		HTML5Template t =  new HTML5Template(om, xomlist, uri, ticket);

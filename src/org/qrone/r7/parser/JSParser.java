@@ -5,7 +5,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-
+import java.util.Map;
+import java.util.WeakHashMap;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 
@@ -57,11 +58,30 @@ public class JSParser {
 	public static String compress(String r){
 		return compress(r, false);
 	}
-	
+
+	private static Map<String, String> compressionCacheTrue = new WeakHashMap<String, String>();
+	private static Map<String, String> compressionCacheFalse = new WeakHashMap<String, String>();
 	public static String compress(String r, boolean qroneSymbol){
+		if(qroneSymbol){
+			String c = compressionCacheTrue.get(r);
+			if(c != null){
+				return c;
+			}
+		}else{
+			String c = compressionCacheFalse.get(r);
+			if(c != null){
+				return c;
+			}
+		}
+		
 		try {
 			StringWriter w = new StringWriter();
 			compress(new StringReader(r), w, qroneSymbol);
+			if(qroneSymbol){
+				compressionCacheTrue.put(r, w.toString());
+			}else{
+				compressionCacheFalse.put(r, w.toString());
+			}
 			return w.toString();
 		} catch (EvaluatorException e) {
 		} catch (IOException e) {

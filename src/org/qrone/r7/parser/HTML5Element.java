@@ -87,7 +87,7 @@ public class HTML5Element implements HTML5Node{
 			if(oe == null) oe = (Element) e.cloneNode(false);
 			return oe;
 		}
-		return get();
+		return e;
 	}
 
 	public Set<Node> getNodeSet(){
@@ -224,9 +224,10 @@ public class HTML5Element implements HTML5Node{
 
 	public String html() {
 		if(t == null) return null;
-		HTML5Template tt = t.newTemplate();
-		tt.out(this);
-		return tt.serialize();
+		
+		HTML5StringWriter w = new HTML5StringWriter();
+		t.out(w, this);
+		return w.toString();
 	}
 
 	public HTML5Node html(HTML5Template html) {

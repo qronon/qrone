@@ -113,23 +113,26 @@ public class Token {
 	}
 	
 	public static void main(String[] args){
-		Token t1 = new Token(null, "TEST", null);
-		System.out.println(t1.toString());
-		
-		Token t2 = new Token(t1, "TEST", null);
-		System.out.println(t2.toString());
-		
-		Token t3 = Token.parse(t2.toString());
-		System.out.println(t3.toString());
-		System.out.println(t3.validate("TEST", t1));
-		System.out.println(t3.validate("TEST", t2));
-		System.out.println(t3.validate("TEST", t3));
-		
-		Token t4 = new Token(t2, "TEST", null);
-		System.out.println(t4.toString());
-		System.out.println(t4.validate("TEST", t1));
-		System.out.println(t4.validate("TEST", t2));
-		System.out.println(t4.validate("TEST", t3));
+		for (int i = 0; i < 100; i++) {
+			Token t1 = new Token(null, "TEST", null);
+			System.out.println(t1.toString());
+			
+			Token t2 = new Token(t1, "TEST", null);
+			System.out.println(t2.toString());
+			
+			Token t3 = Token.parse(t2.toString());
+			System.out.println(t3.toString());
+			System.out.println(t3.validate("TEST", t1));
+			System.out.println(t3.validate("TEST", t2));
+			System.out.println(t3.validate("TEST", t3));
+			
+			Token t4 = new Token(t2, "TEST", null);
+			System.out.println(t4.toString());
+			System.out.println(t4.validate("TEST", t1));
+			System.out.println(t4.validate("TEST", t2));
+			System.out.println(t4.validate("TEST", t3));
+			
+		}
 		
 		
 		

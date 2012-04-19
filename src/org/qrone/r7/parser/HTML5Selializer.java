@@ -30,16 +30,16 @@ public class HTML5Selializer extends HTML5TagWriter{
 			Element body, 
 			HTML5Set set, HTML5Deck deck, 
 			Node node, URI uri, 
-			HTML5Template t, HTML5OM om, String id, String ticket){
+			HTML5Writer w, HTML5Template t, HTML5OM om, String id, String ticket){
+		super(w, id, ticket);
+		
 		this.body = body;
 		this.set = set;
 		this.node = node;
 		this.deck = deck;
 		this.uri = uri;
-		this.b = this.t = t;
+		this.t = t;
 		this.om = om;
-		this.id = id;
-		this.ticket = ticket;
 	}
 	
 	private Element body;
@@ -47,6 +47,9 @@ public class HTML5Selializer extends HTML5TagWriter{
 	private Node node;
 	private HTML5Deck deck;
 	private URI uri;
+	private HTML5OM om;
+	private HTML5Template t;
+	
 	@Override
 	public void visit(Document e) {
 		writec("<!DOCTYPE html>");
@@ -121,7 +124,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 		}else if(formatting>0){
 			writeraw(n.getNodeValue());
 		}else{
-			write(n.getNodeValue());
+			escape(n.getNodeValue());
 		}
 	}
 
@@ -188,8 +191,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 			if(et == t){
 				super.accept(e.get());
 			}else{
-				et.out(e);
-				writec(et.serialize());
+				et.out(b, e);
 			}
 		}else{
 			dispatch(e.content);
@@ -205,11 +207,15 @@ public class HTML5Selializer extends HTML5TagWriter{
 			}
 		}else if(o instanceof Element){
 			accept((Element)o);
-		}else if(o instanceof HTML5Template){
+		}
+		/*
+		else if(o instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)o;
 			t.out();
 			writec(t.serialize());
-		}else if(o instanceof HTML5Element){
+		}
+		*/
+		else if(o instanceof HTML5Element){
 			accept((HTML5Element)o);
 		}else if(o instanceof HTML5NodeSet){
 			HTML5NodeSet set = (HTML5NodeSet)o;
@@ -217,8 +223,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 			if(et == t){
 				dispatch(set.get());
 			}else{
-				et.out(set);
-				writec(et.serialize());
+				et.out(b, set);
 			}
 		}else{
 			writec(o.toString());
