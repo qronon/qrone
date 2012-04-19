@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Editor</title>
+	<link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlx.css">
+	<script src="dhtmlx/dhtmlx.js"></script>
+	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="ace/theme-clouds.js" type="text/javascript" charset="utf-8"></script>
+	<script src="ace/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+	
+  <style type="text/css" media="screen">
+    
+    .editor{ 
+        margin: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    html, body{ 
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+    }
+    
+    div#main{ 
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+    }
+    
+  </style>
+</head>
+<body>
+<script>
+window.onload = function() {
+	var ide = new GithubIDE();
+	
+    dhtmlx.image_path='./dhtmlx/imgs/';
+	var main_layout = new dhtmlXLayoutObject(document.body, '3W', 'dhx_skyblue');
+	main_layout.setEffect('collapse', true);
+
+	var a = main_layout.cells('a');
+	a.setText('Project'); a.setWidth('180');
+	a.fixSize(1,0);
+	ide.projectCell = a;
+
+	var tree_3 = a.attachTree();
+	tree_3.setIconsPath('./dhtmlx/imgs/');
+	tree_3.enableTreeLines(false);
+	tree_3.setIconsPath('./dhtmlx/imgs//csh_yellowbooks/');
+	ide.projectTree = tree_3;
+
+	var b = main_layout.cells('b');
+	b.setText('Files');
+	b.setWidth('10');
+	b.fixSize(1,0);
+
+	var tree_2 = b.attachTree();
+	tree_2.setIconsPath('./dhtmlx/imgs/');
+	tree_2.enableTreeLines(false);
+	tree_2.enableDragAndDrop('1', true);
+	//tree_2.enableItemEditor(1);
+	tree_2.setIconsPath('./dhtmlx/imgs//csh_vista/');
+	//tree_2.loadXML('./data/tree.xml');
+	ide.fileTree = tree_2;
+
+	var toolbar_3 = main_layout.attachToolbar();
+	toolbar_3.setIconsPath('./dhtmlx/imgs/');
+	toolbar_3.loadXMLString('<toolbar><item type="button" text="New File" img="../../img/new.gif" /><item type="button" text="New Folder" img="../../img/open.gif" /><item type="separator" /><item type="button" text="" img="../../img/undo.gif" /><item type="button" text="" img="../../img/redo.gif" /><item type="separator" /><item type="button" text="Save" img="../../img/save.gif" /><item type="button" text="Commit..." img="../../img/save_as.gif" /></toolbar>', function(){}); 
+
+	var status_517 = main_layout.attachStatusBar(); 
+	status_517.setText(''); 
+
+	var menu_2 = main_layout.attachMenu(); 
+	menu_2.setIconsPath('./dhtmlx/imgs/'); 
+	//menu_2.loadXML('./data/menu.xml'); 
+
+	menu_2.loadXMLString('<menu><item type="item" text="File" ><item type="item" text="Menu Item" /><item type="item" text="Menu Item" /><item type="item" text="Menu Item" /></item><item type="item" text="Edit" /></menu>');
+
+
+	var cell_17 = main_layout.cells('c'); 
+
+	var tabbar_6 = cell_17.attachTabbar(); 
+	tabbar_6.enableTabCloseButton(true); 
+	//tabbar_6.setImagePath('./dhtmlx/skins/classic_sea/imgs/'); 
+	
+	ide.tabbar = tabbar_6;
+	
+    
+    ide.ace = editor;
+	ide.onload();
+	
+	ide.openEditor("index2.html");
+};
+
+
+var GithubIDE = function(){
+}
+
+GithubIDE.prototype.onload = function(){
+	var t = this;
+	var sto = 0;
+	this.tabIdCount = 0;
+	this.projectTree.loadXML('./projects.xml');
+	this.projectTree.attachEvent("onSelect",function(id){
+		//alert(t.projectTree.getUserData(id,"created"));
+		clearTimeout(sto);
+		sto = setTimeout(function(){
+			t.fileTree.deleteChildItems("0");
+			t.fileTree.loadXML('./projects.xml');
+			
+			t.projectCell.collapse();
+		},500);
+	});
+	
+	this.fileTree.attachEvent("onSelect",function(id){
+		
+		var str = "test";
+		
+		t.openEditor("index2.html");
+	});
+}
+
+var pathToContent = {};
+var pathToGithubBlob = {};
+
+GithubIDE.prototype.newfile = function(path, content){
+
+}
+
+GithubIDE.prototype.newfolder = function(path, content){
+
+}
+
+GithubIDE.prototype.save = function(path, content){
+
+}
+
+GithubIDE.prototype.openEditor = function(path){
+	var id = 'tab_' + this.tabIdCount++;
+	this.tabbar.addTab(id,path,'');
+	this.tabbar.setContentHTML(id, "<div id=\"" + id + "_editor\" class=\"editor\"></div>");
+    
+	this.tabbar.setTabActive(id);
+	
+	
+    var editor = ace.edit(document.getElementById(id + "_editor"));
+    editor.setTheme("ace/theme/clouds");
+    
+    var JavaScriptMode = require("ace/mode/javascript").Mode;
+    editor.getSession().setMode(new JavaScriptMode());
+    
+}
+
+</script>
+<div id="main"></div>
+<div style="display:none;">
+<pre id="editor">function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+        alert("Ace Rocks " + items[i]);
+    }
+}</pre>
+</div>
+</body>
+</html>

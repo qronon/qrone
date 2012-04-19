@@ -1,6 +1,5 @@
 package org.qrone.r7.script.browser;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -69,8 +68,6 @@ public class Window{
 	public Textile Textile;
 	public JavaProperties JavaProperties;
 	
-	public String home = new File(".").getAbsoluteFile().getParentFile().getAbsolutePath();
-	
 	public Window(ServletScope ss, Scriptable scope, 
 			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
 		this.ss = ss;
@@ -132,7 +129,7 @@ public class Window{
 		return vm.getContext().newObject(scope);
 	}
 
-	private Scriptable toScriptable(Map<String, List<String>> map){
+	public Scriptable toScriptable(Map<String, List<String>> map){
 		Scriptable o = newScriptable();
 		for (Iterator<Entry<String, List<String>>> i = map.entrySet().iterator(); i
 				.hasNext();) {
