@@ -3,6 +3,7 @@ package org.qrone.r7.script.browser;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,14 +16,14 @@ import org.qrone.r7.parser.HTML5Template;
 
 public class Document extends HTML5Template{
 	private HttpServletRequest request;
-	private PrintWriter writer;
+	private Writer writer;
 	private HTML5StreamWriter streamWriter;
 	
 	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri, String ticket) throws IOException{
 		super(deck, uri, ticket);
 		this.request = request;
-		this.writer = response.getWriter();
-		this.streamWriter = new HTML5StreamWriter(new BufferedWriter(writer));
+		this.writer = new BufferedWriter(response.getWriter());
+		this.streamWriter = new HTML5StreamWriter(writer);
 	}
 	
 	public String getCookie(){

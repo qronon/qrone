@@ -29,7 +29,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		this.ticket = ticket;
 	}
 
-	protected void writejs(String attr, String js) {
+	protected void append_js(String attr, String js) {
 		b.append(' ');
 		b.append(attr);
 		b.append('=');
@@ -44,7 +44,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		b.append('"');
 	}
 
-	protected void write(String attr, String value) {
+	protected void append(String attr, String value) {
 		b.append(' ');
 		b.append(attr);
 		b.append('=');
@@ -62,7 +62,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		b.append('"');
 	}
 */
-	protected void writeraw(String str) {
+	protected void append_pre(String str) {
 		char[] ch = str.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
 			switch (ch[i]) {
@@ -91,7 +91,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		}
 	}
 
-	protected void writec(String str) {
+	protected void append(String str) {
 		if(str == null) return;
 		b.append(str);
 	}
@@ -206,7 +206,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
 					.hasNext();) {
-				writec(iterator.next().prestart(ticket));
+				append(iterator.next().prestart(ticket));
 			}
 			
 			start(e);
@@ -214,7 +214,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 			Collections.reverse(rr);
 			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
 					.hasNext();) {
-				writec(iterator.next().poststart(ticket));
+				append(iterator.next().poststart(ticket));
 			}
 		}else{
 			start(e);
@@ -226,13 +226,13 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
 			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
 					.hasNext();) {
-				writec(iterator.next().preend(ticket));
+				append(iterator.next().preend(ticket));
 			}
 			end(e);
 			Collections.reverse(rr);
 			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
 					.hasNext();) {
-				writec(iterator.next().postend(ticket));
+				append(iterator.next().postend(ticket));
 			}
 		}else{
 			end(e);

@@ -52,7 +52,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 	
 	@Override
 	public void visit(Document e) {
-		writec("<!DOCTYPE html>");
+		append("<!DOCTYPE html>");
 		super.visit(e);
 		
 	}
@@ -118,13 +118,13 @@ public class HTML5Selializer extends HTML5TagWriter{
 	@Override
 	public void visit(Text n) {
 		if(inScript){
-			writec(JSParser.compress(n.getNodeValue(), true)
+			append(JSParser.compress(n.getNodeValue(), true)
 					.replace("__QRONE_PREFIX_NAME__", 
 							"qrone[\"" + uri.toString() + "\"]"));
 		}else if(formatting>0){
-			writeraw(n.getNodeValue());
+			append_pre(n.getNodeValue());
 		}else{
-			escape(n.getNodeValue());
+			append(escape(n.getNodeValue()));
 		}
 	}
 
@@ -226,7 +226,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 				et.out(b, set);
 			}
 		}else{
-			writec(o.toString());
+			append(o.toString());
 		}
 	}
 }

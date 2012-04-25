@@ -149,8 +149,6 @@
     <sourceDirectory>src</sourceDirectory>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
-    <outputDirectory>bin</outputDirectory>
-    <testOutputDirectory>bin-test</testOutputDirectory>
     
     <plugins>
       <plugin>
