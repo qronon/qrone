@@ -16,6 +16,7 @@ import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.tag.HTML5TagHandler;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 import org.qrone.util.XDeck;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
@@ -36,17 +37,6 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
     	cssdeck = new CSS3Deck(resolver);
     
     }
-/*
-    protected boolean updated(HTML5OM t, URI uri){
-    	for (Iterator<CSS3OM> i = t.getStyleSheets().iterator(); i
-				.hasNext();) {
-			CSS3OM cssom = i.next();
-			if(resolver.updated(cssom.getURI()))
-				return true;
-		}
-    	return super.updated(t, uri);
-    }
-    */
     
     public PortingService getPortingService(){
     	return services;
@@ -65,12 +55,6 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 			}
 		}
 	}
-	
-	/*
-	public void addTagHandler(HTML5TagHandler h){
-		handlers.add(h);
-	}
-	*/
 	
 	public List<HTML5TagHandler> getTagHandlers() {
 		return handlers;
@@ -120,9 +104,9 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 					if(ijsc == null){
 						try {
 							String ijs = JSParser.compress(
-									QrONEUtils.convertStreamToString(
+									new String(Stream.read(
 											resolver.getInputStream(
-													file.resolve(key))));
+													file.resolve(key))),"utf8"));
 							inlineJSMap.put(key, ijs);
 							js.append(ijs);
 						} catch (IOException e1) {
@@ -142,6 +126,7 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
 			b.append("</script>");
 		}
 	}
+	
 	public void outputStyles(HTML5Writer b, HTML5Set set, URI file){
 
 		//---------------

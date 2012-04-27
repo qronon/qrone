@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 
 @Deprecated
 public class FaviconHandler implements URIHandler{
@@ -29,7 +30,7 @@ public class FaviconHandler implements URIHandler{
 				if(resolver.exist(path)){
 					in = resolver.getInputStream(new URI(path));
 					out = response.getOutputStream();
-					QrONEUtils.copy(in, out);
+					Stream.copy(in, out);
 					in.close();
 					out.flush();
 					out.close();

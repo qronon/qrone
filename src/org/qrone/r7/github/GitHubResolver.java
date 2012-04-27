@@ -21,6 +21,7 @@ import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.resolver.AbstractURIResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 
 public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 	private static final Logger log = Logger.getLogger(GitHubResolver.class.getName());
@@ -81,7 +82,7 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 			if(sha != null){
 				InputStream fin =  fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
 						+ user + "/" + repo + "/" + sha);
-				byte[] bytes = QrONEUtils.read(fin);
+				byte[] bytes = Stream.read(fin);
 				
 				OutputStream out = cacheresolver.getOutputStream(uri);
 				out.write(bytes);

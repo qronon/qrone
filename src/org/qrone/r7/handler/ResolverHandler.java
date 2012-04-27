@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.MimeTypeParser;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 import org.qrone.util.Token;
 
 public class ResolverHandler implements URIHandler{
@@ -69,7 +70,7 @@ public class ResolverHandler implements URIHandler{
 				response.setHeader("ETag", etag);
 				in = resolver.getInputStream(urio);
 				OutputStream out = response.getOutputStream();
-				QrONEUtils.copy(in, out);
+				Stream.copy(in, out);
 				out.flush();
 				out.close();
 				return true;

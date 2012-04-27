@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.ref.SoftReference;
 
+import org.qrone.util.Net;
 import org.qrone.util.QrONEUtils;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRuleList;
@@ -70,7 +71,7 @@ public class CSS3OM{
 			while(m.find()){
 				try {
 					URI uri = new URI(m.group(2));
-					m.appendReplacement(c, m.group(1) + QrONEUtils.relativize(path,uri) + m.group(3));
+					m.appendReplacement(c, m.group(1) + Net.relativize(path,uri) + m.group(3));
 				} catch (URISyntaxException e) {}
 			}
 			

@@ -255,20 +255,6 @@ public class HTML5OM {
 			
 		};
 		visitor.visit(document);
-
-		/*
-		HTML5Visitor v = new HTML5Visitor() {
-			@Override
-			public void visit(Text n) {
-				
-			}
-			
-			@Override
-			public void visit(Element e) {
-			}
-		};
-		v.visit(document);
-		*/
 	}
 
 	private void findRequires(String js){

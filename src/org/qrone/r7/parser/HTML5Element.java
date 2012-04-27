@@ -46,42 +46,6 @@ public class HTML5Element implements HTML5Node{
 		return new HTML5Element(om, t.newTemplate(), get());
 	}
 	
-	/*
-	public void accept(HTML5Selializer t) {
-		int index = 0;
-		if(prepend != null){
-			for (Object o : prepend) {
-				appendTo(t,o,index++);
-			}
-		}
-		
-		appendTo(t,content,-1);
-
-		index = 0;
-		if(append != null){
-			for (Object o : append) {
-				appendTo(t,o,index++);
-			}
-		}
-	}
-	
-	private void appendTo(final HTML5Selializer t, Object o, int index){
-		if(o instanceof HTML5Template){
-			t.getWriter().append((HTML5Template)o);
-		}else if(o instanceof HTML5Node){
-			t.out((HTML5Node)o);
-		}else if(o instanceof List){
-			for (Iterator iter = ((List)o).iterator(); iter.hasNext();) {
-				appendTo(t, iter.next(), index);
-			}
-		}else if(o instanceof Function){
-			appendTo(t, ((Function)o).call(index, html()), index);
-		}else{
-			t.write(o.toString());
-		}
-	}
-	*/
-	
 	public Element get(boolean override){
 		if(override){
 			if(oe == null) oe = (Element) e.cloneNode(false);

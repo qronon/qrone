@@ -11,7 +11,9 @@ import java.util.Map;
 
 import org.qrone.img.ImagePart.TYPE;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.Net;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Serialization;
 
 @Deprecated
 public class ImageSpriter {
@@ -49,7 +51,7 @@ public class ImageSpriter {
 
 	public boolean pack() {
 		try {
-			return QrONEUtils.serialize(pack, resolver.getOutputStream(pspriteURI));
+			return Serialization.serialize(pack, resolver.getOutputStream(pspriteURI));
 		} catch (IOException e) {}
 		return false;
 	}
@@ -57,7 +59,7 @@ public class ImageSpriter {
 	private ImagePack unpack() {
 		if (pack == null && pspriteURI != null) {
 			try {
-				pack = (ImagePack) QrONEUtils.unserialize(
+				pack = (ImagePack) Serialization.unserialize(
 						resolver.getInputStream(pspriteURI));
 			} catch (IOException e) {}
 		}
@@ -112,7 +114,7 @@ public class ImageSpriter {
 	}
 	
 	private URI getPath(URI from, String name){
-		return QrONEUtils.relativize(from,basedir.resolve(name));
+		return Net.relativize(from,basedir.resolve(name));
 	}
 	
 	public void create() throws IOException {

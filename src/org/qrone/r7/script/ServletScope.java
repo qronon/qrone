@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
+import org.qrone.util.Stream;
 
 public class ServletScope{
 	public HttpServletRequest request;
@@ -35,7 +36,7 @@ public class ServletScope{
 		
 		try {
 			InputStream in = request.getInputStream();
-			body = QrONEUtils.read(in);
+			body = Stream.read(in);
 			text = QrONEUtils.getString(body, request.getHeader("Content-Type"));
 			post = parseQueryString(text);
 		} catch (IOException e) {}

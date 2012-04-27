@@ -27,6 +27,7 @@ import org.qrone.r7.script.browser.User;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
@@ -106,7 +107,7 @@ public class JavaScriptHandler implements URIHandler{
 				
 				InputStream in = resolver.getInputStream(new URI(e.sourceName()));
 				if(in != null){
-					map.put("source", new String(QrONEUtils.read(in)));
+					map.put("source", new String(Stream.read(in)));
 				}
 				
 				URI urio = new URI("/admin/error.server.js");

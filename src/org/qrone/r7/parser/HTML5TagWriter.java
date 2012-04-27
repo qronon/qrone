@@ -43,25 +43,7 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 		}
 		b.append('"');
 	}
-
-	protected void append(String attr, String value) {
-		b.append(' ');
-		b.append(attr);
-		b.append('=');
-		b.append('"');
-		b.append(escape(value));
-		b.append('"');
-	}
-/*
-	protected void write(Attr attr) {
-		b.append(' ');
-		b.append(attr.getNodeName());
-		b.append('=');
-		b.append('"');
-		b.append(escape(attr.getNodeValue()));
-		b.append('"');
-	}
-*/
+	
 	protected void append_pre(String str) {
 		char[] ch = str.toCharArray();
 		for (int i = 0; i < ch.length; i++) {

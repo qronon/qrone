@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.qrone.img.ImagePart.TYPE;
+import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
 
 public class ImageSprite {
@@ -39,7 +40,7 @@ public class ImageSprite {
 	public InputStream getInputStream() throws IOException{
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		writeTo(out);
-		sha = QrONEUtils.sha1(out.toByteArray());
+		sha = Digest.sha1(out.toByteArray());
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 

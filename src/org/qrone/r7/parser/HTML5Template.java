@@ -24,9 +24,6 @@ import se.fishtank.css.selectors.dom.DOMNodeSelector;
 
 public class HTML5Template{
 	
-	//private List<Object> list = new ArrayList<Object>();
-	//private StringBuilder b = new StringBuilder(10240);
-	
 	protected HTML5OM om;
 	protected Set<HTML5OM> xomlist;
 	protected URI uri;
@@ -73,49 +70,7 @@ public class HTML5Template{
 	public boolean isLoaded(){
 		return loaded;
 	}
-
-	/*
-	public HTML5Template append(){
-		HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
-		list.add(t);
-		b = new StringBuilder();
-		list.add(b);
-		return t;
-	}
-
-	public void append(String key, String value){
-		if(value != null)
-			b.append(value);
-	}
 	
-	public void append(HTML5Template t){
-		list.add(t);
-		b = new StringBuilder();
-		list.add(b);
-	}
-	
-	public void append(char str){
-		b.append(String.valueOf(str));
-	}
-
-	public void append(CharSequence str){
-		b.append(str);
-	}
-	
-	public void append(String str){
-		b.append(str);
-	}
-	*/
-	/*s
-	public String serialize() {
-		StringBuffer b = new StringBuffer();
-		for (Iterator<Object> i = list.iterator(); i
-				.hasNext();) {
-			b.append(i.next().toString());
-		}
-		return b.toString();
-	}
-	*/
 	public Object $(String selector){
 		return select(selector);
 	}
@@ -161,173 +116,6 @@ public class HTML5Template{
 		return select("#" + id);
 	}
 	
-	/*
-	private void set(Element node, String html){
-		HTML5Element e = node5map.get(node);
-		if(e == null){
-			e = new HTML5Element(om, node);
-			node5map.put(node, e);
-		}
-		e.html(html);
-	}
-	
-	private void set(Element node, NodeLister lister){
-		HTML5Element e = node5map.get(node);
-		if(e == null){
-			e = new HTML5Element(om, node);
-			node5map.put(node, e);
-		}
-		e.list(lister);
-	}
-	*/
-	
-/*
-	public void set(Object o){
-		if(o instanceof List){
-			for(Object i : (List)o){
-				set(i);
-			}
-		}else if(o instanceof Map){
-			for (Object i : ((Map)o).entrySet()) {
-				set(i);
-			}
-		}else if(o instanceof Entry){
-			Entry e = (Entry)o;
-			set("#" + e.getKey(), e.getValue());
-		}
-	}
-
-	public void set(final String selector, final List o){
-		set(select(selector),o,null);
-	}
-
-	public void set(final HTML5Node node, final List o){
-		set(node, o, null);
-	}
-	
-	public void set(final HTML5Node node, final List o, final Function f){
-		if(o instanceof Map){
-			node.exec(new HTML5NodeSet.Delegate() {
-				public void call(final HTML5Element e) {
-					e.html(new Function() {
-						@Override
-						public Object call(Object... args) {
-							HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
-							Set<Entry> entryset = ((Map)o).entrySet();
-							for (Entry el : entryset) {
-								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
-								if(f != null){
-									((Function)o).call(tt);
-								}else{
-									tt.set(node.select(".key"), el.getKey());
-									tt.set(node.select(".value"), el.getValue());
-								}
-								tt.visit(e);
-								t.append(tt);
-							}
-							return t;
-						}
-					});
-				}
-			});
-		}else if(o instanceof List){
-			node.exec(new HTML5NodeSet.Delegate() {
-				public void call(final HTML5Element e) {
-					e.html(new Function() {
-
-						@Override
-						public Object call(Object... args) {
-							HTML5Template t = new HTML5Template(om, xomlist, uri, ticket);
-							for (Iterator iterator = ((List)o).iterator(); iterator
-							.hasNext();) {
-								HTML5Template tt = new HTML5Template(om, xomlist, uri, ticket);
-								if(f != null){
-									((Function)o).call(tt);
-								}else{
-									tt.set(iterator.next());
-								}
-								tt.visit(e);
-								t.append(tt);
-							}
-							return t;
-						}
-					});
-				}
-			});
-		}else{
-			String str = o.toString();
-			if(o instanceof Number && ((Number)o).doubleValue() == ((Number)o).intValue()){
-				str = String.valueOf(((Number)o).intValue());
-			}
-			
-			node.html(str);
-		}
-	}
-	*/
-	
-/*
-	public void set(String selector, NodeLister lister){
-		select(selector).listup(lister);
-	}
-	*/
-	/*
-	private boolean initialized = false;
-	private Map<String, NodeLister> selectmap = new Hashtable<String, NodeLister>();
-	private Map<Element, NodeLister> nodemap;
-	
-	public void set(String selector, final String value){
-		set(selector, new NodeLister() {
-			@Override
-			public void accept(HTML5Template t, HTML5Element e) {
-				t.append(value);
-			}
-		});
-	}
-	
-	*/
-
-	/*
-	public void visit(HTML5Element e){
-		e.getOM().process(this, this, e.get(), null, xomlist, ticket);
-	}
-	
-	private Map<String, Iterator<Node>> selecting
-		= new Hashtable<String, Iterator<Node>>();
-	public void out(String selector){
-		if(selecting.containsKey(selector)){
-			Iterator<Node> iter = selecting.get(selector);
-			if(iter != null){
-				if(!iter.hasNext())
-					iter = om.select(selector).iterator();
-				om.process(this, iter.next(), null, xomlist, ticket);
-			}
-		}else{
-			Set<Node> nodes = om.select(selector);
-			if(nodes != null && !nodes.isEmpty()){
-				Iterator<Node> iter = nodes.iterator();
-				selecting.put(selector, iter);
-				om.process(this, iter.next(), null, xomlist, ticket);
-			}else{
-				selecting.put(selector, null);
-			}
-		}
-	}
-	*/
-	/*
-	public void out(HTML5NodeSet e) {
-		e.exec(new HTML5NodeSet.Delegate() {
-			@Override
-			public void call(HTML5Element e) {
-				visit(e);
-			}
-		});
-	}
-	
-	public void out(HTML5Element e) {
-		visit(e);
-	}
-	*/
-
 	public void out(HTML5Writer w, HTML5NodeSet set) {
 		//final String uniqueid = QrONEUtils.uniqueid();
 		for (Iterator<Node> iter = set.get().iterator(); iter.hasNext();) {
@@ -347,22 +135,6 @@ public class HTML5Template{
 		om.process(w, this, e, null, xomlist, ticket);
 	}
 
-	/*
-	public void out(HTML5OM om, NodeProcessor p) {
-		final String uniqueid = QrONEUtils.uniqueid();
-		om.process(this, p, om.getBody(), uniqueid, xomlist);
-	}
-	
-	public void out(HTML5OM om) {
-		out(om, this);
-	}
-	
-	public void out() {
-		if(om != null)
-			om.process(this, om.getDocument(), null, xomlist, ticket);
-	}
-	*/
-
 	public HTML5Element getBody() {
 		return new HTML5Element(om, this, om.getBody());
 	}
@@ -370,20 +142,6 @@ public class HTML5Template{
 	public URI getURI() {
 		return uri;
 	}
-
-	/*
-	public void write(Object out) throws IOException{
-		if(out instanceof String)
-			append((String)out);
-		else
-			append(JSON.encode(out));
-	}
-
-	public void writeln(Object out) throws IOException{
-		write(out);
-		write("\n");
-	}
-	*/
 	
 	public HTML5Template newTemplate() {
 		HTML5Template t =  new HTML5Template(om, xomlist, uri, ticket);

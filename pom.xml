@@ -123,6 +123,22 @@
   		<version>2.6.3</version>
   	</dependency>
   	
+  	<dependency>
+  		<groupId>qrone</groupId>
+  		<artifactId>qrone-util</artifactId>
+  		<version>0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>qrone</groupId>
+  		<artifactId>qrone-png</artifactId>
+  		<version>0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>qrone</groupId>
+  		<artifactId>qrone-coder</artifactId>
+  		<version>0.1</version>
+  	</dependency>
+  	
     <dependency>
       <groupId>${swt.groupId}</groupId>
       <artifactId>${swt.artifactId}</artifactId>

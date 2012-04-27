@@ -38,7 +38,9 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 
 
 public class Window{
@@ -184,7 +186,7 @@ public class Window{
 	
 	public String load_file(String path) throws IOException, URISyntaxException{
 		if(resolver.exist(resolvePath(path).toString())){
-			return QrONEUtils.convertStreamToString(resolver.getInputStream(resolvePath(path)));
+			return new String(Stream.read(resolver.getInputStream(resolvePath(path))),"utf8");
 		}
 		return null;
 	}
@@ -296,7 +298,7 @@ public class Window{
 	}
 
 	public String digest(String type, String data) throws NoSuchAlgorithmException{
-		return QrONEUtils.digest(type, data);
+		return Digest.digest_hex(type, data);
 	}
 
 	public void header(String header, String value){
