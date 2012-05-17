@@ -1,10 +1,9 @@
 package org.qrone.r7.script.browser;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +23,6 @@ import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseService;
-import org.qrone.login.SecurityService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.RepositoryService;
@@ -40,8 +38,9 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
-import org.qrone.util.QueryString;
+import org.qrone.util.Stream;
 
 
 public class Window{
@@ -60,17 +59,19 @@ public class Window{
 	public Location location;
 	public Navigator navigator;
 	public Scriptable query;
+	public User user;
 
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
-	public SecurityService security;
 	public HTTPFetcher http;
 
 	public JSON JSON;
 	public YAML YAML;
 	public Textile Textile;
 	public JavaProperties JavaProperties;
+	
+	public String home = new File(".").getAbsoluteFile().getParentFile().getAbsolutePath();
 	
 	public Window(ServletScope ss, Scriptable scope, 
 			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
@@ -82,20 +83,21 @@ public class Window{
 		this.vm = vm;
 		
 		this.service = service;
-		db = service.getKVSService();
+		db = service.getDatabaseService();
 		memcached = service.getMemcachedService();
 		repository = service.getRepositoryService();
-		security = service.getSecurityService();
 		resolver = service.getURIResolver();
 		http = service.getURLFetcher();
 
+		user = (User)request.getAttribute("User");
+		
 		document = new Document(request, response, deck, 
 				ss.uri.toString().replaceAll("\\.server\\.js$", ".html"),
-				security.getTicket(request));
+				user.getTicket());
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
-		JSON = new JSON(resolver, scope);
+		JSON = new JSON(resolver, scope, vm.getContext());
 		YAML = new YAML(resolver);
 		Textile = new Textile(resolver);
 		JavaProperties = new JavaProperties(resolver);
@@ -119,7 +121,7 @@ public class Window{
 		req.put("body", req, ss.body);
 		req.put("text", req, ss.text);
 		
-		if(security == null || security.validateTicket(request,ss.getParameter(".ticket"))){
+		if(user.validateTicket(ss.getParameter(".ticket"))){
 			Scriptable post = toScriptable(ss.post);
 			req.put("post", req, post);
 			req.put("secure", req, true);
@@ -129,7 +131,7 @@ public class Window{
 	}
 
 	private Scriptable newScriptable(){
-		return JSDeck.getContext().newObject(scope);
+		return vm.getContext().newObject(scope);
 	}
 
 	public Scriptable toScriptable(Map<String, List<String>> map){
@@ -140,7 +142,7 @@ public class Window{
 			if(e.getValue().size() == 1){
 				o.put(e.getKey(), o, e.getValue().get(0));
 			}else if(e.getValue().size() > 1){
-				Scriptable l = JSDeck.getContext().newArray(scope, e.getValue().size());
+				Scriptable l = vm.getContext().newArray(scope, e.getValue().size());
 				for (int j = 0; j < e.getValue().size(); j++) {
 					l.put(j, l, e.getValue().get(j));
 				}
@@ -176,7 +178,7 @@ public class Window{
 		if(resolver.exist(u.toString())){
 			HTML5OM om = deck.compile(u);
 			if(om != null){
-				return new HTML5Template(om, u, security.getTicket(request));
+				return new HTML5Template(om, u, user.getTicket());
 			}
 		}
 		return null;
@@ -184,7 +186,7 @@ public class Window{
 	
 	public String load_file(String path) throws IOException, URISyntaxException{
 		if(resolver.exist(resolvePath(path).toString())){
-			return QrONEUtils.convertStreamToString(resolver.getInputStream(resolvePath(path)));
+			return new String(Stream.read(resolver.getInputStream(resolvePath(path))),"utf8");
 		}
 		return null;
 	}
@@ -228,6 +230,10 @@ public class Window{
 	
 	public String base64_encode(byte[] binaryData){
 		return Base64.encodeBase64String(binaryData);
+	}
+
+	public String base64_urlsafe_encode(byte[] binaryData){
+		return Base64.encodeBase64URLSafeString(binaryData);
 	}
 
 	public String unescape(String str) throws DecoderException{
@@ -292,7 +298,7 @@ public class Window{
 	}
 
 	public String digest(String type, String data) throws NoSuchAlgorithmException{
-		return QrONEUtils.digest(type, data);
+		return Digest.digest_hex(type, data);
 	}
 
 	public void header(String header, String value){
@@ -308,9 +314,10 @@ public class Window{
 		return net.arnx.jsonic.JSON.encode(out);
 	}
 	
-	public String loginURL(String url, Scriptable attributes, String doneURL){
+	public String openid_login_url(String url, Map attributes, String doneURL){
+		
 		Map<String, String> attrMap = new HashMap<String, String>();
-		if(attributes != null){
+		/*if(attributes != null){
 			Object[] ids = attributes.getIds();
 			for (int i = 0; i < ids.length; i++) {
 				if(ids[i] instanceof String){
@@ -321,18 +328,21 @@ public class Window{
 				}
 			}
 		}
-		return service.getLoginService().loginURL(url, attrMap, doneURL);
+		*/
+		return service.getLoginService().getOpenIDLoginURL(url, attributes, doneURL);
 	}
 
-	public String loginURL(String doneURL) {
-		return service.getLoginService().loginURL(doneURL);
+	public String google_openid_login_url(String doneURL) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("login", "http://axschema.org/contact/email");
+		return openid_login_url("https://www.google.com/accounts/o8/id", map, doneURL);
 	}
 	
-	public String logoutURL(String doneURL){
-		return service.getLoginService().logoutURL(doneURL);
+	public String logout_url(String doneURL){
+		return service.getLoginService().getLogoutURL(doneURL);
 	}
 	
 	public User getUser(){
-		return service.getLoginService().getUser();
+		return (User)request.getAttribute("User");
 	}
 }

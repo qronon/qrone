@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
@@ -20,13 +21,13 @@ import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.Scriptables;
+import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.browser.User;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.QrONEUtils;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
+import org.qrone.util.Stream;
 
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
@@ -59,13 +60,13 @@ public class JavaScriptHandler implements URIHandler{
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 					defaultom.run(subscope);
 					
-					Object result = om.run(globalscope, subscope, window);
+					Object result = 
+						om.run(globalscope, subscope, window);
 					
-					
-					
+					User user = (User)request.getAttribute("User");
 					String done = ss.getParameter(".done");
-					if(done != null && services.getSecurityService().validateTicket(request,ss.getParameter(".ticket"))){
-						String r = QrONEUtils.escape(JSON.encode(result));
+					if(done != null && user.validateTicket(ss.getParameter(".ticket"))){
+						//String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){
 								response.sendRedirect(done);
@@ -74,6 +75,11 @@ public class JavaScriptHandler implements URIHandler{
 							}
 						} catch (IOException e) {
 						}
+					}
+					
+					if(ss.getParameter(".debug") != null){
+						JavaScriptException e =  new JavaScriptException(null, uri, 0);
+						throw e;
 					}
 
 					window.document.flush();
@@ -101,7 +107,7 @@ public class JavaScriptHandler implements URIHandler{
 				
 				InputStream in = resolver.getInputStream(new URI(e.sourceName()));
 				if(in != null){
-					map.put("source", new String(QrONEUtils.read(in)));
+					map.put("source", new String(Stream.read(in)));
 				}
 				
 				URI urio = new URI("/admin/error.server.js");

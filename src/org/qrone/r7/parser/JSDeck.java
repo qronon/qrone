@@ -14,21 +14,18 @@ import org.qrone.util.XDeck;
 
 public class JSDeck extends XDeck<JSOM> implements Extendable{
 	private HTML5Deck deck;
-	private static Map<Thread, Context> map = new Hashtable<Thread, Context>();
-	private static Scriptable globalScope;
-	private static SugarWrapFactory wrapFactory = new SugarWrapFactory();
+	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
+	private Scriptable globalScope;
+	private SugarWrapFactory wrapFactory;
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);
     	this.deck = deck;
+    	wrapFactory = new SugarWrapFactory();
     }
     
     public HTML5Deck getHTML5Deck(){
     	return deck;
-    }
-    
-    public static SugarWrapFactory getSugarWrapFactory(){
-    	return wrapFactory;
     }
 
 	@Override
@@ -45,14 +42,14 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 		return cx.newObject(global);
 	}
 	
-	public static Scriptable getGlobalScope(){
+	public Scriptable getGlobalScope(){
 		if(globalScope == null){
 			globalScope = getContext().initStandardObjects();
 		}
 		return globalScope;
 	}
 	
-	public static Context getContext(){
+	public Context getContext(){
 		Thread t = Thread.currentThread();
 		Context cx = map.get(t);
 		if(cx == null){
@@ -65,6 +62,6 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 	}
 	
 	public void addExtension(Class wrapper) {
-		getSugarWrapFactory().addExtension(wrapper);
+		wrapFactory.addExtension(wrapper);
 	}
 }

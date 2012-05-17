@@ -1,5 +1,6 @@
 package org.qrone.r7.parser;
 
+import java.util.List;
 import java.util.Set;
 
 import org.qrone.r7.script.browser.Function;
@@ -18,8 +19,15 @@ public class HTML5NodeSet implements HTML5Node{
 	public HTML5Node clone(){
 		return new HTML5NodeSet(template.newTemplate(),set);
 	}
+
+	public HTML5Node first(){
+		Node node = set.iterator().next();
+		if(node instanceof Element)
+			return template.override((Element)node);
+		return null;
+	}
 	
-	public HTML5Node exec(final Delegate f){
+	private HTML5Node exec(final Delegate f){
 		for (Node node : set) {
 			if(node instanceof Element)
 				f.call(template.override((Element)node));
@@ -43,12 +51,8 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 	
-	public HTML5Node attr(final String prop){
-		return exec(new Delegate() {
-			public void call(HTML5Element e) {
-				e.attr(prop);
-			}
-		});
+	public String attr(final String prop){
+		return first().attr(prop);
 	}
 	
 	public HTML5Node attr(final String prop, final String value){
@@ -59,12 +63,8 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 
-	public HTML5Node css(final String prop){
-		return exec(new Delegate() {
-			public void call(HTML5Element e) {
-				e.css(prop);
-			}
-		});
+	public String css(final String prop){
+		return first().css(prop);
 	}
 	
 	public HTML5Node css(final String prop, final String value){
@@ -201,6 +201,10 @@ public class HTML5NodeSet implements HTML5Node{
 		});
 	}
 	
+	public HTML5Node remove(HTML5Node node){
+		return removeChild(node);
+	}
+	
 	@Override
 	public HTML5Node remove() {
 		return exec(new Delegate() {
@@ -217,5 +221,32 @@ public class HTML5NodeSet implements HTML5Node{
 
 	public Set<Node> get(){
 		return set;
+	}
+	
+	public Set<Node> get(boolean override){
+		return set;
+	}
+
+	@Override
+	public HTML5Node repeat(final List l) {
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.repeat(l);
+			}
+		});
+	}
+	
+	@Override
+	public HTML5Node repeat(final List l, final Function f) {
+		return exec(new Delegate() {
+			public void call(HTML5Element e) {
+				e.repeat(l, f);
+			}
+		});
+	}
+
+	@Override
+	public HTML5Template getDocument() {
+		return template;
 	}
 }

@@ -1,0 +1,2 @@
+
+$("#homepath").html(window.home);

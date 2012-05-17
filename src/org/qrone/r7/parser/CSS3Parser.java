@@ -7,6 +7,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.mozilla.javascript.EvaluatorException;
 import org.w3c.css.sac.InputSource;
@@ -82,14 +84,26 @@ public class CSS3Parser{
 		compress(new StringReader(r), w);
 	}
 
+	private static Map<String, String> compressionCache = new WeakHashMap<String, String>();
 	public static String compress(String r){
+		String c = compressionCache.get(r);
+		if(c != null){
+			return c;
+		}
+		
 		try {
 			StringWriter w = new StringWriter();
 			compress(new StringReader(r), w);
+			compressionCache.put(r, w.toString());
 			return w.toString();
 		} catch (EvaluatorException e) {
 		} catch (IOException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		} catch (Error e) {
+			e.printStackTrace();
 		}
+		compressionCache.put(r, r);
 		return r;
 	}
 	

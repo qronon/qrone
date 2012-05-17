@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ho.yaml.Yaml;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;
 import org.qrone.database.DatabaseService;
@@ -23,29 +21,25 @@ import org.qrone.r7.RepositoryService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.resolver.CascadeResolver;
-import org.qrone.r7.resolver.SHAResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Scriptables;
 
 public class GitHubRepositoryService implements URIHandler, RepositoryService{
 	private Map<String, GitHubResolver> idToResolverMap = new Hashtable<String, GitHubResolver>();
 	private CascadeResolver cascade = new CascadeResolver();
-	private DatabaseService service;
 	private DatabaseTable table;
 	
 	private static final String KIND = "qrone.repository";
-	private static final String ID = "id";
 	private static final String OWNER = "owner";
 	private static final String NAME = "name";
 	private static final String TREE_SHA = "tree_sha";
 	
 	private HTTPFetcher fetcher;
-	private SHAResolver cacher;
+	private URIResolver cacher;
 	
-	public GitHubRepositoryService(HTTPFetcher fetcher, SHAResolver cacher, DatabaseService service){
+	public GitHubRepositoryService(HTTPFetcher fetcher, URIResolver cacher, DatabaseService service){
 		this.fetcher = fetcher;
 		this.cacher = cacher;
-		this.service = service;
 		this.table = service.getCollection(KIND);
 		
 		DatabaseCursor cursor = table.find();

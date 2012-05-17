@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +98,50 @@ public class HTML5OM {
 			Set<Node> nodes = selectcache.get(selector);
 			if(nodes == null){
 				nodes = nodeselector.querySelectorAll(selector);
+				selectcache.put(selector, nodes);
 			}
 			return nodes;
 		}catch(NodeSelectorException e){}
+		return null;
+	}
+
+	
+	private Map<String, Map<Object,Set<Node>>> selectorCache 
+		= new HashMap<String, Map<Object,Set<Node>>>();
+	
+
+	public Set<Node> select(String selector, Object o){
+		try{
+			Map<Object,Set<Node>> cache = selectorCache.get(selector);
+			if(cache != null){
+				Set<Node> rset = cache.get(o);
+				if(rset != null){
+					return rset;
+				}
+			}else{
+				cache = new HashMap<Object, Set<Node>>();
+				selectorCache.put(selector, cache);
+			}
+			
+			Set<Node> lhs = null;
+			if(o instanceof Element){
+				DOMNodeSelector ns = new DOMNodeSelector((Element)o);
+				lhs = ns.querySelectorAll(selector);
+			}else if(o instanceof Set){
+				DOMNodeSelector ns;
+				lhs = new LinkedHashSet<Node>();
+				Set<Node> l = (Set<Node>)o;
+				for (Iterator<Node> i = l.iterator(); i.hasNext();) {
+					Node n = i.next();
+					ns = new DOMNodeSelector(n);
+					lhs.addAll(ns.querySelectorAll(selector));
+				}
+			}
+			
+			cache.put(o, lhs);
+			return lhs;
+			
+		} catch (NodeSelectorException e) {}
 		return null;
 	}
 	
@@ -212,20 +255,7 @@ public class HTML5OM {
 			
 		};
 		visitor.visit(document);
-
-		HTML5Visitor v = new HTML5Visitor() {
-			@Override
-			public void visit(Text n) {
-				
-			}
-			
-			@Override
-			public void visit(Element e) {
-			}
-		};
-		v.visit(document);
 	}
-
 
 	private void findRequires(String js){
 		Pattern pattern = Pattern.compile("require\\s*\\(\\s*[\"'](.*?)[\"']\\s*\\)\\s*;?");
@@ -240,7 +270,7 @@ public class HTML5OM {
 		return extmap.get(e);
 	}
 	
-	public void process(final HTML5Writer t, final NodeProcessor p,
+	public void process(final HTML5Writer w, final HTML5Template t,
 			final Node node, String id, final Set<HTML5OM> xomlist, final String ticket){
 		if(xomlist != null && !xomlist.contains(this)){
 			xomlist.add(this);
@@ -253,107 +283,8 @@ public class HTML5OM {
 			set = null;
 		}
 		
-		HTML5Selializer s = new HTML5Selializer() {
-			int formatting = 0;
-			boolean inScript;
-			boolean inHead;
-
-			@Override
-			public void visit(Document e) {
-				out("<!DOCTYPE html>");
-				super.visit(e);
-				
-			}
-			
-			@Override
-			public void visit(Element e) {
-				if(e.getNodeName().equals("head")){
-					start(e);
-					inHead = true;
-					accept(e);
-					inHead = false;
-					deck.outputStyles(b, set, uri);
-					end(e);
-				}else if(e.getNodeName().equals("body")){
-					if(node != body){
-						start(e);
-					}
-					
-					final HTML5Element e5 = p != null ? p.get(e) : null;
-					if(e5 != null && e5.hasContent()){
-						HTML5Template t = p.newTemplate();
-						e5.accept(t);
-						getWriter().append(t);
-					}else{
-						accept(e);
-					}
-					
-					if(node != body){
-						deck.outputScripts(b, set, uri);
-						end(e);
-					}
-				}else if(e.getNodeName().equals("script")){
-					if(!inHead){
-						start(e);
-						inScript = true;
-						accept(e);
-						inScript = false;
-						end(e);
-					}
-				}else if(e.getNodeName().equals("style")){
-				}else if(e.getNodeName().equals("link")){
-				}else if(e.getNodeName().equals("meta")){
-					if(e.getAttribute("name").equals("extends")){
-					}else{
-						start(e);
-						accept(e);
-						end(e);
-					}
-				}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code") || e.getNodeName().equals("textarea")){
-					formatting++;
-					out(e);
-					formatting--;
-				}else if(e.getNodeName().equals("meta")){
-					if(e.getAttribute("name").equals("extends")){
-					}else{
-						start(e);
-						accept(e);
-						end(e);
-					}
-				}else{
-					out(e);
-				}
-			}
-
-			@Override
-			public void visit(Text n) {
-				if(inScript){
-					out(JSParser.compress(n.getNodeValue(), true)
-							.replace("__QRONE_PREFIX_NAME__", 
-									"qrone[\"" + getURI().toString() + "\"]"));
-				}else if(formatting>0){
-					writeraw(n.getNodeValue());
-				}else{
-					write(n.getNodeValue());
-				}
-			}
-			
-			protected void out(final Element e4) {
-				HTML5Element e = null;
-				if(p != null)
-					e = p.get(e4);
-				else
-					e = new HTML5Element(om, null, e4);
-				super.out(e, p, ticket);
-			}
-		};
-		s.visit(this, node, id, t);
-	}
-
-	public String serialize(){
-		HTML5Template t = new HTML5Template(this);
-		t.out();
-		return t.toString();
+		HTML5TagWriter s = new HTML5Selializer(body,set,deck,node,uri,w,t,this, id, ticket);
+		s.visit(node);
 	}
 	
 	private void parseStyleSheet(final CSS3OM cssom) throws IOException{
@@ -419,10 +350,6 @@ public class HTML5OM {
 			@Override
 			public void append(char c) {
 				jqueryhtml.str(String.valueOf(c));
-			}
-
-			@Override
-			public void append(HTML5Template t) {
 			}
 		};
 		process(t, null, body, null, null, ticket);

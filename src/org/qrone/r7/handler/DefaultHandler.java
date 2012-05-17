@@ -1,7 +1,5 @@
 package org.qrone.r7.handler;
 
-import java.net.URI;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,7 +10,6 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.resolver.URIResolver;
 
 public class DefaultHandler implements URIHandler, Extendable{
-	private PortingService services;
 	private URIResolver resolver;
 	private HTML5Deck deck;
 	private JSDeck vm;
@@ -23,7 +20,6 @@ public class DefaultHandler implements URIHandler, Extendable{
 	private URIHandler handler;
 	
 	public DefaultHandler(PortingService services) {
-		this.services = services;
 		this.resolver = services.getURIResolver();
 		deck = new HTML5Deck(services);
 		vm = new JSDeck(resolver, deck);

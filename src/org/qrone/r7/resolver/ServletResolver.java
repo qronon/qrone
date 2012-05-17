@@ -57,10 +57,6 @@ public class ServletResolver implements URIResolver{
 	}
 	
 	@Override
-	public boolean updated(URI uri) {
-		return false;
-	}
-	@Override
 	public OutputStream getOutputStream(URI uri) throws IOException {
 		return null;
 	}
@@ -68,5 +64,9 @@ public class ServletResolver implements URIResolver{
 	@Override
 	public boolean remove(URI uri) {
 		return false;
+	}
+
+	@Override
+	public void addUpdateListener(Listener l) {
 	}
 }

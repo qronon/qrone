@@ -29,10 +29,7 @@ public class InternalResourceResolver implements URIResolver{
 	public InputStream getInputStream(URI uri) throws IOException {
 		return new UnicodeInputStream(QrONEUtils.getResourceAsStream(uri.toString(),cx));
 	}
-	@Override
-	public boolean updated(URI uri) {
-		return false;
-	}
+	
 	@Override
 	public OutputStream getOutputStream(URI uri) throws IOException {
 		return null;
@@ -41,5 +38,9 @@ public class InternalResourceResolver implements URIResolver{
 	@Override
 	public boolean remove(URI uri) {
 		return false;
+	}
+
+	@Override
+	public void addUpdateListener(Listener l) {
 	}
 }

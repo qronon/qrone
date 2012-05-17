@@ -1,8 +1,14 @@
 if(!window.$){
-	window.$ = function(s){
-		return document.select(s);
+	window.$ = function(){
+		if(arguments.length == 1){
+			return document.select(arguments[0]);
+		}else if(arguments.length == 2){
+			return document.select(arguments[0],arguments[1]);
+		}
+		
 	}
 }
+
 if(!window.XMLHttpRequest){
 	window.XMLHttpRequest = function(){
 		

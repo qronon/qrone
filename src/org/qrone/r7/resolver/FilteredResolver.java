@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class FilteredResolver implements URIResolver{
+public class FilteredResolver extends AbstractURIResolver{
 	private URIResolver r;
 	private String prefix;
 	public FilteredResolver(String prefix, URIResolver r) {
@@ -46,14 +46,6 @@ public class FilteredResolver implements URIResolver{
 		if(uri != null)
 			return r.getOutputStream(uri);
 		return null;
-	}
-
-	@Override
-	public boolean updated(URI uri) {
-		uri = prefixed(uri);
-		if(uri != null)
-			return r.updated(uri);
-		return false;
 	}
 
 	@Override

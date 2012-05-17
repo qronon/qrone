@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.lang.ref.SoftReference;
 
+import org.qrone.util.Net;
 import org.qrone.util.QrONEUtils;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRuleList;
@@ -18,6 +21,7 @@ public class CSS3OM{
 	
 	private URI path;
 	private CSSStyleSheet stylesheet;
+	private SoftReference<String> cache;
 	
 	public void parse(URI path, String css) throws IOException{
 		this.path = path;
@@ -31,6 +35,22 @@ public class CSS3OM{
 	public void parse(URI path, InputSource source) throws IOException{
 		this.path = path;
 		stylesheet = CSS3Parser.parse(source);
+	}
+	
+	public String getCssText(){
+		if(cache != null){
+			String c = cache.get();
+			if(c != null)
+				return c;
+		}
+		
+		StringBuffer css = new StringBuffer();
+		CSSRuleList l = getStyleSheet().getCssRules();
+		for (int i = 0; i < l.getLength(); i++) {
+			css.append(l.item(i).getCssText());
+		}
+		cache = new SoftReference(css.toString());
+		return css.toString();
 	}
 	
 	public CSSStyleSheet getStyleSheet(){
@@ -51,7 +71,7 @@ public class CSS3OM{
 			while(m.find()){
 				try {
 					URI uri = new URI(m.group(2));
-					m.appendReplacement(c, m.group(1) + QrONEUtils.relativize(path,uri) + m.group(3));
+					m.appendReplacement(c, m.group(1) + Net.relativize(path,uri) + m.group(3));
 				} catch (URISyntaxException e) {}
 			}
 			

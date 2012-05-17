@@ -3,19 +3,15 @@ package org.qrone.r7.script;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-import org.qrone.r7.parser.JSDeck;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
+import org.qrone.util.Stream;
 
 public class ServletScope{
 	public HttpServletRequest request;
@@ -40,7 +36,7 @@ public class ServletScope{
 		
 		try {
 			InputStream in = request.getInputStream();
-			body = QrONEUtils.read(in);
+			body = Stream.read(in);
 			text = QrONEUtils.getString(body, request.getHeader("Content-Type"));
 			post = parseQueryString(text);
 		} catch (IOException e) {}

@@ -6,29 +6,20 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.qrone.r7.handler.URIHandler;
-import org.qrone.r7.resolver.SHAResolver;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.util.QrONEUtils;
 
 public class ImageSpriteService implements URIResolver{
 	private URIResolver resolver;
-	private SHAResolver cache;
+	private URIResolver cache;
 	private ImageBufferService service;
 	private Map<String, ImageSprite> map = new Hashtable<String, ImageSprite>();
-	private Map<URI, String> shamap = new Hashtable<URI, String>();
 	private Map<URI, ImageSize> smap = new Hashtable<URI, ImageSize>();
 	private Map<URI, ImageBuffer> imap = new WeakHashMap<URI, ImageBuffer>();
-	private URI dot;
 	
-	public ImageSpriteService(URIResolver resolver, SHAResolver cache, ImageBufferService service) {
+	public ImageSpriteService(URIResolver resolver, URIResolver cache, ImageBufferService service) {
 		this.resolver = resolver;
 		this.cache = cache;
 		this.service = service;
@@ -113,32 +104,22 @@ public class ImageSpriteService implements URIResolver{
 	}
 
 	@Override
-	public boolean updated(URI uri) {
-		return false;
-	}
-
-	@Override
 	public boolean remove(URI uri) {
 		return false;
 	}
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
-		String sha = shamap.get(uri);
 		try{
-			if(sha != null){
-				InputStream in = cache.getInputStream(uri, sha);
-				if(in != null){
-					return in;
-				}
+			InputStream in = cache.getInputStream(uri);
+			if(in != null){
+				return in;
 			}
 			
 			ImageSprite sprite = map.get(uri.toString());
 			if(sprite != null){
-				String spritesha = sprite.getSHA();
-				OutputStream out = cache.getOutputStream(uri, spritesha);
+				OutputStream out = cache.getOutputStream(uri);
 				sprite.writeTo(out);
-				shamap.put(uri, spritesha);
 				
 				return sprite.getInputStream();
 			}
@@ -152,5 +133,10 @@ public class ImageSpriteService implements URIResolver{
 		return null;
 	}
 	
+
+
+	@Override
+	public void addUpdateListener(Listener l) {
+	}
 	
 }

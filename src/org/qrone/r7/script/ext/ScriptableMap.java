@@ -27,7 +27,6 @@ package org.qrone.r7.script.ext;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;

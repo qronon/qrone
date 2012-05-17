@@ -7,6 +7,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,13 +16,22 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.util.MimeTypeParser;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
+import org.qrone.util.Token;
 
 public class ResolverHandler implements URIHandler{
 	private MimeTypeParser parser;
 	private URIResolver resolver;
+	private Map<String, String> cacheMap = new HashMap<String, String>();
 	
 	public ResolverHandler(URIResolver resolver) {
 		this.resolver = resolver;
+		resolver.addUpdateListener(new URIResolver.Listener() {
+			@Override
+			public void update(URI uri) {
+				cacheMap.remove(uri.toString());
+			}
+		});
 	}
 
 	@Override
@@ -29,11 +40,23 @@ public class ResolverHandler implements URIHandler{
 		InputStream in = null;
 		try{
 			URI urio = new URI(uri);
+			String etag = cacheMap.get(uri);
+			if(etag != null && etag.equals(request.getHeader("If-None-Match"))){
+				response.setStatus(304);
+				return true;
+			}
+			
 			if(resolver.exist(uri)){
+				if(etag == null){
+					etag = new Token(null,"L",null).toString();
+					cacheMap.put(uri, etag);
+				}
+				
 				URI mimetype = new URI("/system/resource/mime.types");
 				if(parser == null){
-					parser = new MimeTypeParser();
-					parser.parse(resolver.getInputStream(mimetype));
+					MimeTypeParser p = new MimeTypeParser();
+					p.parse(resolver.getInputStream(mimetype));
+					parser = p;
 				}
 				
 				int eidx = uri.lastIndexOf('.');
@@ -44,16 +67,10 @@ public class ResolverHandler implements URIHandler{
 					}
 				}
 				
-				byte[] buf = QrONEUtils.read(resolver.getInputStream(urio));
-				String str = QrONEUtils.base64_encode(MessageDigest.getInstance("SHA-1").digest(buf));
-				String etag = request.getHeader("If-None-Match");
-				if(etag != null && etag.equals(str.trim())){
-					response.setStatus(304);
-					return true;
-				}
-				response.setHeader("ETag", str.trim());
+				response.setHeader("ETag", etag);
+				in = resolver.getInputStream(urio);
 				OutputStream out = response.getOutputStream();
-				out.write(buf);
+				Stream.copy(in, out);
 				out.flush();
 				out.close();
 				return true;
@@ -61,8 +78,6 @@ public class ResolverHandler implements URIHandler{
 		}catch (IOException e) {
 			e.printStackTrace();
 		}catch (URISyntaxException e) {
-			e.printStackTrace();
-		}catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}finally{
 			if(in != null){

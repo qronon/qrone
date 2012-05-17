@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.Stream;
 
 public class HTTPResponse {
 	private InputStream in;
@@ -26,7 +27,7 @@ public class HTTPResponse {
 	
 	public byte[] getBody() throws IOException{
 		if(body == null){
-			body = QrONEUtils.read(in);
+			body = Stream.read(in);
 		}
 		return body;
 	}
