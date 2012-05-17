@@ -46,5 +46,9 @@ public class QrONEServlet extends PortingServlet {
 		}
 		setPortingService(services);
 	}
+	
+	public PortingService getPortingService(){
+		return services;
+	}
 
 }

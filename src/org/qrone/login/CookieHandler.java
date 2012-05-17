@@ -24,20 +24,10 @@ import org.qrone.util.Token;
 
 public class CookieHandler implements URIHandler{
 
-	private KeyValueStore kvs;
 	private Token key;
 	
-	public CookieHandler(KeyValueStoreService service){
-		this.kvs = service.getKeyValueStore("qrone.setting");
-		if(key == null){
-			byte[] keybytes = kvs.get("secretkey");
-			if(keybytes == null){
-				key = new Token(key, "M",null);
-				kvs.set("secretkey", key.getBytes());
-			}else{
-				key = new Token();
-			}
-		}
+	public CookieHandler(Token key){
+		this.key = key;
 	}
 	
 

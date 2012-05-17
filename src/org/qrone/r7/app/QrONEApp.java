@@ -23,6 +23,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.qrone.messaging.QrONEMessagingServer;
 
 public class QrONEApp {
 	private static Server server = null;
@@ -37,6 +38,7 @@ public class QrONEApp {
         CmdLineParser.Option verboseOpt  = parser.addBooleanOption('v', "verbose");
         CmdLineParser.Option cliOpt      = parser.addBooleanOption('c', "cli");
         CmdLineParser.Option portOpt     = parser.addIntegerOption('p', "port");
+        CmdLineParser.Option mportOpt     = parser.addIntegerOption('m', "mport");
 
         try {
 			parser.parse(args);
@@ -45,6 +47,7 @@ public class QrONEApp {
             System.exit(1);
         }
         
+
         
 		server = new Server();
 		Connector connector = new SelectChannelConnector();
@@ -87,6 +90,14 @@ public class QrONEApp {
     		};
     		Thread jettyThread = new Thread(runnable);
     		jettyThread.start();
+
+            Integer mport = (Integer)parser.getOptionValue(mportOpt);
+            QrONEMessagingServer mserver = new QrONEMessagingServer(servlet.getPortingService().getMasterToken());
+            if(port != null){
+            	mserver.listen(mport);
+            }else{
+            	mserver.listen(9699);
+            }
     		
     		Display display = new Display();
 			Shell shell = new Shell(display);
