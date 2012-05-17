@@ -73,6 +73,10 @@ public class HTML5OM {
 		return deck;
 	}
 
+	public CSS3Deck getCSS3Deck(){
+		return cssdeck;
+	}
+
 	public URI getURI(){
 		return uri;
 	}
