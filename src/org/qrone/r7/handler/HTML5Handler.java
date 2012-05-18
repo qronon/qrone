@@ -39,9 +39,11 @@ public class HTML5Handler implements URIHandler{
 					
 					User user = (User)request.getAttribute("User");
 					
-					HTML5StreamWriter w = new HTML5StreamWriter(new BufferedWriter(out));
+					Writer bufw = new BufferedWriter(out);
+					HTML5StreamWriter w = new HTML5StreamWriter(bufw);
 					HTML5Template t = new HTML5Template(om, urio, user.getTicket());
 					t.out(w, om.getDocument());
+					bufw.flush();
 					out.flush();
 					out.close();
 					return true;

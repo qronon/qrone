@@ -38,8 +38,10 @@ import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ServletScope;
+import org.qrone.r7.script.ext.ObjectMap;
 import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
+import org.qrone.util.QueryString;
 import org.qrone.util.Stream;
 
 
@@ -241,9 +243,32 @@ public class Window{
 		return c.decode(str);
 	}
 	
+	public Map parse_query(String query){
+		QueryString qa = new QueryString(query);
+		return qa.getParameterMap();
+	}
+	
 	public String escape(String str) throws EncoderException{
 		URLCodec c = new URLCodec();
 		return c.encode(str);
+	}
+
+	public String escape(Map map) throws EncoderException{
+		URLCodec c = new URLCodec();
+		StringBuilder b = new StringBuilder();
+		
+		for (Object key : map.keySet()) {
+			b.append("&");
+			b.append(c.encode(key.toString()));
+			b.append("=");
+			b.append(c.encode(map.get(key.toString()).toString()));
+		}
+		
+		return b.substring(1);
+	}
+	
+	public String escape(Object obj) throws EncoderException{
+		return escape(ObjectMap.from(obj));
 	}
 
 	public String md2(String data){
@@ -344,5 +369,13 @@ public class Window{
 	
 	public User getUser(){
 		return (User)request.getAttribute("User");
+	}
+	
+	public void login(String id){
+		getUser().login(id);
+	}
+	
+	public void logout(){
+		getUser().logout();
 	}
 }

@@ -8,12 +8,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.qrone.util.UnicodeInputStream;
 
 public class FileResolver extends AbstractURIResolver{
 	private File root;
 	private boolean noOutput = false;
+	private Map<String, Long> map = new HashMap<String, Long>();
 
 	public FileResolver(File basedir) {
 		root = basedir;
@@ -26,7 +30,19 @@ public class FileResolver extends AbstractURIResolver{
 
 	@Override
 	public boolean exist(String uri) {
-		boolean r = new File(root, uri.substring(1)).isFile();
+		File f = new File(root, uri.substring(1));
+		boolean r = f.isFile();
+		if(r){
+			long curr = f.lastModified();
+			Long last = map.get(uri);
+			if(last != null && curr > last.longValue()){
+				try {
+					fireUpdate(new URI(uri));
+				} catch (URISyntaxException e) {}
+			}
+			
+			map.put(uri, f.lastModified());			
+		}
 		return r;
 	}
 
