@@ -220,7 +220,7 @@ public class HTML5Element implements HTML5Node{
 	}
 
 	public String css(String prop) {
-		return getAttribute(prop);
+		return getProperty(prop);
 	}
 
 	public HTML5Node attr(String prop, String value) {

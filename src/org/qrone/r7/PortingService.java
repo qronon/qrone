@@ -3,11 +3,13 @@ package org.qrone.r7;
 import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageBufferService;
 import org.qrone.img.ImageSpriteService;
+import org.qrone.kvs.KeyValueStore;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.login.LoginService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.util.Token;
 
 public class PortingService {
 	public ImageBufferService getImageBufferService() {
@@ -86,6 +88,22 @@ public class PortingService {
 	}
 	public void setFileSystemService(URIResolver fileSystemService) {
 		this.fileSystemService = fileSystemService;
+	}
+	
+	private Token key;
+	public Token getMasterToken(){
+		if(key == null){
+			KeyValueStore kvs = keyValueStoreService.getKeyValueStore("qrone.setting");
+			byte[] keybytes = kvs.get("secretkey");
+			if(keybytes == null){
+				key = new Token(key, "M",null);
+				kvs.set("secretkey", key.getBytes());
+			}else{
+				key = new Token();
+			}
+		}
+		
+		return key;
 	}
 	
 }

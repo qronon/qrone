@@ -42,7 +42,7 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			resolver.add(new FileResolver(new File("./htdocs/"), true));
 			
 			// Login/Crumb Service
-			CookieHandler cookie = new CookieHandler(kvs);
+			CookieHandler cookie = new CookieHandler(service.getMasterToken());
 			handler.add(cookie);
 			
 			// Scale9 Service
