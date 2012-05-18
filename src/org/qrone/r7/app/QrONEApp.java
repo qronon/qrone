@@ -39,6 +39,7 @@ public class QrONEApp {
         CmdLineParser.Option cliOpt      = parser.addBooleanOption('c', "cli");
         CmdLineParser.Option portOpt     = parser.addIntegerOption('p', "port");
         CmdLineParser.Option mportOpt     = parser.addIntegerOption('m', "mport");
+        CmdLineParser.Option dirOpt     = parser.addStringOption('d', "dir");
 
         try {
 			parser.parse(args);
@@ -73,6 +74,12 @@ public class QrONEApp {
 		context.addServlet(new ServletHolder(servlet), "/*");
 		context.addFilter(gzip, "/*", all);
 		server.setHandler(context);
+		
+
+        String path = (String) parser.getOptionValue(dirOpt);
+        if(path != null){
+        	servlet.setLocalFilePath(path);
+        }
 
         Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
         if(cli == null || !cli.booleanValue()){

@@ -30,7 +30,7 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 	private GitHubRepositoryService repository;
 	private MongoResolver cache;
 	
-	public QrONEURIHandler( ServletContext cx, PortingService service ){
+	public QrONEURIHandler( ServletContext cx, PortingService service, String path ){
 		try {
 			KeyValueStoreService kvs = service.getKeyValueStoreService();
 			HTTPFetcher fetcher = service.getURLFetcher();
@@ -38,8 +38,10 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			DatabaseService db = service.getDatabaseService();
 			service.setURIResolver(resolver);
 	
-			// Local Files overrides at anytime.
-			resolver.add(new FileResolver(new File("./htdocs/"), true));
+			if(path != null){
+				// Local Files overrides at anytime.
+				resolver.add(new FileResolver(new File(path), true));
+			}
 			
 			// Login/Crumb Service
 			CookieHandler cookie = new CookieHandler(service.getMasterToken());

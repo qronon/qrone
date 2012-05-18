@@ -14,7 +14,6 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 public class QrONEServlet extends PortingServlet {
-	private PortingService services;
 	
 	public QrONEServlet() {
 		PortingService services = new PortingService();
@@ -45,10 +44,6 @@ public class QrONEServlet extends PortingServlet {
 			e.printStackTrace();
 		}
 		setPortingService(services);
-	}
-	
-	public PortingService getPortingService(){
-		return services;
 	}
 
 }
