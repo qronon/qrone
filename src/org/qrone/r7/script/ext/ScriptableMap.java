@@ -46,9 +46,10 @@ import org.qrone.r7.script.ScriptablePrototype;
  */
 public class ScriptableMap extends ScriptableObject implements Wrapper, ScriptablePrototype<Map>{
 
-    Map<Object,Object> map;
+    private Map<Object,Object> map;
     final static String CLASSNAME = "ScriptableMap";
 
+    /*
     public static void init(Scriptable scope) throws NoSuchMethodException {
         Constructor<?> cnst = ScriptableMap.class.getConstructor(Object.class);
         FunctionObject jsCnst = new FunctionObject(CLASSNAME, cnst, scope);
@@ -67,6 +68,7 @@ public class ScriptableMap extends ScriptableObject implements Wrapper, Scriptab
             throw new EvaluatorException("Invalid argument to ScriptableMap(): " + obj);
         }
     }
+    */
 
     public ScriptableMap(Scriptable scope, Map wappedMap) {
         super(scope, ScriptUtils.getClassOrObjectProto(scope, CLASSNAME));

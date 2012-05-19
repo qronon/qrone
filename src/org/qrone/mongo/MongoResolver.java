@@ -7,11 +7,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 
 import org.qrone.r7.resolver.AbstractURIResolver;
+import org.qrone.r7.resolver.URIFileSystem;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -19,7 +24,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class MongoResolver extends AbstractURIResolver{
+public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
 	private static final String ID = "id";
 	private static final String DATA = "data";
 	
@@ -33,6 +38,21 @@ public class MongoResolver extends AbstractURIResolver{
 	
 	public void drop(){
 		col.drop();
+	}
+
+	@Override
+	public SortedSet<String> list(){
+		SortedSet<String> set = new TreeSet<String>();
+		BasicDBObject ref = new BasicDBObject();
+		BasicDBObject keys = new BasicDBObject();
+		keys.append(ID, true);
+		DBCursor c = col.find(ref, keys);
+		for (; c.hasNext(); ) {
+			DBObject obj = c.next();
+			set.add((String)obj.get(ID));
+		}
+		
+		return set;
 	}
 
 	@Override
@@ -69,8 +89,7 @@ public class MongoResolver extends AbstractURIResolver{
 		try{
 			BasicDBObject obj = new BasicDBObject();
 			obj.put(ID, uri.toString());
-			DBCursor c = col.find(obj);
-			DBObject o = c.next();
+			DBObject o = col.findOne(obj);
 			byte[] v = (byte[])o.get(DATA);
 			weakmap.put(uri.toString(), v);
 			return new ByteArrayInputStream(v);
