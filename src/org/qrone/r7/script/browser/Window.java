@@ -59,8 +59,9 @@ public class Window{
 	public Document document;
 	public Location location;
 	public Navigator navigator;
-	public Scriptable query;
+	public Map<String, Object> query;
 	public User user;
+	public boolean secure;
 
 	public DatabaseService db;
 	public MemcachedService memcached;
@@ -114,19 +115,17 @@ public class Window{
 		if(ss.leftpath.length() > 0)
 			req.put("leftpath", req, ss.leftpath.toString());
 		
-		query = toScriptable(ss.get);
+		query = ss.get;
 		req.put("get", req, query);
 		
 		req.put("body", req, ss.body);
 		req.put("text", req, ss.text);
 		
-		if(user.validateTicket(ss.getParameter(".ticket"))){
-			Scriptable post = toScriptable(ss.post);
-			req.put("post", req, post);
-			req.put("secure", req, true);
-		}else{
-			req.put("secure", req, false);
-		}
+		secure = user.validateTicket(ss.getParameter(".ticket"));
+	}
+	
+	public Map getPost(){
+		return ss.getPost(user, secure);
 	}
 	
 	public PortingService getPortingService(){
@@ -137,6 +136,7 @@ public class Window{
 		return vm.getContext().newObject(scope);
 	}
 
+	/*
 	public Scriptable toScriptable(Map<String, List<String>> map){
 		Scriptable o = newScriptable();
 		for (Iterator<Entry<String, List<String>>> i = map.entrySet().iterator(); i
@@ -154,6 +154,7 @@ public class Window{
 		}
 		return o;
 	}
+	*/
 	
 	public URI resolvePath(String path) throws URISyntaxException {
 		return ss.uri.resolve(new URI(path));
