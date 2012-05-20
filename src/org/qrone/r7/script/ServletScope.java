@@ -54,7 +54,7 @@ public class ServletScope{
 				factory.setSizeThreshold(1024);
 				
 				ServletFileUpload upload = new ServletFileUpload(factory);
-				upload.setSizeMax(1024 * 1000);
+				upload.setSizeMax(-1);
 				
 				try {
 					List<FileItem> list = upload.parseRequest(request);
