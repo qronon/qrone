@@ -61,7 +61,7 @@ public class JavaScriptHandler implements URIHandler{
 					defaultom.run(subscope);
 					
 					Object result = 
-						om.run(globalscope, subscope, window);
+						om.run(globalscope, window, subscope, window);
 					
 					User user = (User)request.getAttribute("User");
 					String done = ss.getParameter(".done");
@@ -122,7 +122,7 @@ public class JavaScriptHandler implements URIHandler{
 				Window window = new Window(ss,scope,deck,vm,services);
 				window.init(scope);
 				
-				om.run(scope, window);
+				om.run(scope, window, window);
 				window.document.flush();
 				window.document.close();
 			}catch (Exception e1){

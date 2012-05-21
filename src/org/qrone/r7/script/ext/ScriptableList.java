@@ -50,6 +50,7 @@ public class ScriptableList extends NativeJavaObject implements ScriptableProtot
     List<Object> list;
     static final String CLASSNAME = "ScriptableList";
 
+    /*
     // Set up a custom constructor, for this class is somewhere between a host class and
     // a native wrapper, for which no standard constructor class exists
     public static void init(Scriptable scope) throws NoSuchMethodException {
@@ -79,7 +80,8 @@ public class ScriptableList extends NativeJavaObject implements ScriptableProtot
         this.staticType = this.list.getClass();
         initMembers();
     }
-
+     */
+    
     public ScriptableList(Scriptable scope, List wrappedList) {
         super(scope, wrappedList, wrappedList.getClass());
         this.list = wrappedList;

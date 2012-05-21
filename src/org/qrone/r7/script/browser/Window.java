@@ -37,6 +37,7 @@ import org.qrone.r7.parser.HTML5Template;
 import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.resolver.URIFileSystem;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.ext.ObjectMap;
 import org.qrone.util.Digest;
@@ -60,19 +61,19 @@ public class Window{
 	public Document document;
 	public Location location;
 	public Navigator navigator;
-	public Scriptable query;
+	public Map<String, Object> query;
 	public User user;
+	public boolean secure;
 
 	public DatabaseService db;
 	public MemcachedService memcached;
 	public RepositoryService repository;
 	public HTTPFetcher http;
+	
+	public URIFileSystem filesystem;
 
 	public JSON JSON;
-	public YAML YAML;
-	public Textile Textile;
-	public JavaProperties JavaProperties;
-	
+
 	public String home = new File(".").getAbsoluteFile().getParentFile().getAbsolutePath();
 	
 	public Window(ServletScope ss, Scriptable scope, 
@@ -99,10 +100,9 @@ public class Window{
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
+		filesystem = service.getFileSystemService();
+
 		JSON = new JSON(resolver, scope, vm.getContext());
-		YAML = new YAML(resolver);
-		Textile = new Textile(resolver);
-		JavaProperties = new JavaProperties(resolver);
 	}
 	
 	public void init(Scriptable scope){
@@ -117,25 +117,28 @@ public class Window{
 		if(ss.leftpath.length() > 0)
 			req.put("leftpath", req, ss.leftpath.toString());
 		
-		query = toScriptable(ss.get);
+		query = ss.get;
 		req.put("get", req, query);
 		
 		req.put("body", req, ss.body);
 		req.put("text", req, ss.text);
 		
-		if(user.validateTicket(ss.getParameter(".ticket"))){
-			Scriptable post = toScriptable(ss.post);
-			req.put("post", req, post);
-			req.put("secure", req, true);
-		}else{
-			req.put("secure", req, false);
-		}
+		secure = user.validateTicket(ss.getParameter(".ticket"));
+	}
+	
+	public Map getPost(){
+		return ss.getPost(user, secure);
+	}
+	
+	public PortingService getPortingService(){
+		return service;
 	}
 
 	private Scriptable newScriptable(){
 		return vm.getContext().newObject(scope);
 	}
 
+	/*
 	public Scriptable toScriptable(Map<String, List<String>> map){
 		Scriptable o = newScriptable();
 		for (Iterator<Entry<String, List<String>>> i = map.entrySet().iterator(); i
@@ -153,8 +156,9 @@ public class Window{
 		}
 		return o;
 	}
+	*/
 	
-	private URI resolvePath(String path) throws URISyntaxException {
+	public URI resolvePath(String path) throws URISyntaxException {
 		return ss.uri.resolve(new URI(path));
 	}
 	
@@ -192,7 +196,6 @@ public class Window{
 		}
 		return null;
 	}
-	
 
 	public void redirect(String uri) throws URISyntaxException{
 		String url = resolvePath(uri).toString();
@@ -201,129 +204,6 @@ public class Window{
 		}
 		
 		header("Location: " + url);
-	}
-	
-	/*
-	private JavaProperties propDeck;
-	public Object load_properties(String path) throws IOException, URISyntaxException{
-		if(propDeck == null)
-			propDeck = new JavaProperties(resolver);
-		return propDeck.compile(resolvePath(path));
-	}
-
-	private YAML yamlDeck;
-	public Object load_yaml(String path) throws IOException, URISyntaxException{
-		if(yamlDeck == null)
-			yamlDeck = new YAML(resolver);
-		return yamlDeck.compile(resolvePath(path));
-	}
-	
-	private Textile textileDeck;
-	public String load_textile(String path) throws IOException, URISyntaxException{
-		if(textileDeck == null)
-			textileDeck = new Textile(resolver);
-		return textileDeck.compile(resolvePath(path));
-	}
-	*/
-	
-	public byte[] base64_decode(String base64String){
-		return Base64.decodeBase64(base64String);
-	}
-	
-	public String base64_encode(byte[] binaryData){
-		return Base64.encodeBase64String(binaryData);
-	}
-
-	public String base64_urlsafe_encode(byte[] binaryData){
-		return Base64.encodeBase64URLSafeString(binaryData);
-	}
-
-	public String unescape(String str) throws DecoderException{
-		URLCodec c = new URLCodec();
-		return c.decode(str);
-	}
-	
-	public Map parse_query(String query){
-		QueryString qa = new QueryString(query);
-		return qa.getParameterMap();
-	}
-	
-	public String escape(String str) throws EncoderException{
-		URLCodec c = new URLCodec();
-		return c.encode(str);
-	}
-
-	public String escape(Map map) throws EncoderException{
-		URLCodec c = new URLCodec();
-		StringBuilder b = new StringBuilder();
-		
-		for (Object key : map.keySet()) {
-			b.append("&");
-			b.append(c.encode(key.toString()));
-			b.append("=");
-			b.append(c.encode(map.get(key.toString()).toString()));
-		}
-		
-		return b.substring(1);
-	}
-	
-	public String escape(Object obj) throws EncoderException{
-		return escape(ObjectMap.from(obj));
-	}
-
-	public String md2(String data){
-		return digest_safe("MD2", data);
-	}
-	
-	public String md5(String data){
-		return digest_safe("MD5", data);
-	}
-	
-	public String sha1(String data){
-		return digest_safe("SHA-1", data);
-	}
-
-	public String sha256(String data){
-		return digest_safe("SHA-256", data);
-	}
-
-	public String sha384(String data){
-		return digest_safe("SHA-384", data);
-	}
-	
-	public String sha512(String data){
-		return digest_safe("SHA-512", data);
-	}
-	
-	/*
-	public String serialize(Scriptable obj) throws IOException{
-		ByteArrayOutputStream bo = new ByteArrayOutputStream();
-		ScriptableOutputStream out = new ScriptableOutputStream(bo, scope.getPrototype());
-		out.writeObject(obj);
-		out.close();
-		return QrONEUtils.base64_encode(bo.toByteArray());
-	}
-	
-	public Object deserialize(String ser) throws IOException, ClassNotFoundException{
-		ByteArrayInputStream bin = new ByteArrayInputStream(QrONEUtils.base64_decode(ser));
-		ObjectInputStream in = new ScriptableInputStream(bin, scope.getPrototype());
-		Object deserialized = in.readObject();
-		in.close();
-		return deserialized;
-	}
-	*/
-	
-	private String digest_safe(String type, String data){
-		try {
-			return digest(type, data);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public String digest(String type, String data) throws NoSuchAlgorithmException{
-		return Digest.digest_hex(type, data);
 	}
 
 	public void header(String header, String value){
@@ -340,20 +220,7 @@ public class Window{
 	}
 	
 	public String openid_login_url(String url, Map attributes, String doneURL){
-		
 		Map<String, String> attrMap = new HashMap<String, String>();
-		/*if(attributes != null){
-			Object[] ids = attributes.getIds();
-			for (int i = 0; i < ids.length; i++) {
-				if(ids[i] instanceof String){
-					Object v = attributes.get((String)ids[i], attributes);
-					if(v instanceof String){
-						attrMap.put((String)ids[i], (String)v);
-					}
-				}
-			}
-		}
-		*/
 		return service.getLoginService().getOpenIDLoginURL(url, attributes, doneURL);
 	}
 
@@ -367,15 +234,11 @@ public class Window{
 		return service.getLoginService().getLogoutURL(doneURL);
 	}
 	
-	public User getUser(){
-		return (User)request.getAttribute("User");
-	}
-	
 	public void login(String id){
-		getUser().login(id);
+		user.login(id);
 	}
 	
 	public void logout(){
-		getUser().logout();
+		user.logout();
 	}
 }

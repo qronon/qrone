@@ -4,12 +4,15 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
+import org.qrone.r7.handler.URIHandler;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.SugarWrapFactory;
+import org.qrone.r7.script.window.WindowPrototype;
 import org.qrone.util.XDeck;
 
 public class JSDeck extends XDeck<JSOM> implements Extendable{
@@ -17,6 +20,7 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
 	private Scriptable globalScope;
 	private SugarWrapFactory wrapFactory;
+	private Set<Class> set;
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);
@@ -34,6 +38,10 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 		JSOM om = new JSOM(this);
 		om.parser(uri);
 		return om;
+	}
+	
+	public Set<Class> getWindowPrototypes(){
+		return set;
 	}
 	
 	public Scriptable createScope(){
@@ -63,5 +71,8 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 	
 	public void addExtension(Class wrapper) {
 		wrapFactory.addExtension(wrapper);
+		if(WindowPrototype.class.isAssignableFrom(wrapper)){
+			set.add(wrapper);
+		}
 	}
 }

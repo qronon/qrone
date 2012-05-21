@@ -65,6 +65,16 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 		logger.info("onError:" + e);
 		e.printStackTrace();
 	}
+
+	public void to(String target, Map obj){
+		logger.info("to:" + target + ":" + obj);
+		Set<QrONEMessagingClientConn> set = map.get(target);
+		if(set != null){
+			for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
+				iter.next().getSocket().send(JSON.encode(obj));
+			}
+		}
+	}
 	
 	public void to(QrONEMessagingClientConn conn, String target, Map obj){
 		logger.info("to:" + target + ":" + obj);

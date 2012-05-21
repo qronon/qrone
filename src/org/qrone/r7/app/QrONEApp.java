@@ -3,9 +3,15 @@ package org.qrone.r7.app;
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
+import java.net.URI;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.DispatcherType;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -24,6 +30,7 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.qrone.messaging.QrONEMessagingServer;
+import org.qrone.r7.resolver.URIResolver.Listener;
 
 public class QrONEApp {
 	private static Server server = null;
@@ -39,6 +46,7 @@ public class QrONEApp {
         CmdLineParser.Option cliOpt      = parser.addBooleanOption('c', "cli");
         CmdLineParser.Option portOpt     = parser.addIntegerOption('p', "port");
         CmdLineParser.Option mportOpt     = parser.addIntegerOption('m', "mport");
+        CmdLineParser.Option dirOpt     = parser.addStringOption('d', "dir");
 
         try {
 			parser.parse(args);
@@ -73,6 +81,12 @@ public class QrONEApp {
 		context.addServlet(new ServletHolder(servlet), "/*");
 		context.addFilter(gzip, "/*", all);
 		server.setHandler(context);
+		
+
+        String path = (String) parser.getOptionValue(dirOpt);
+        if(path != null){
+        	servlet.setLocalFilePath(path);
+        }
 
         Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
         if(cli == null || !cli.booleanValue()){
@@ -92,7 +106,18 @@ public class QrONEApp {
     		jettyThread.start();
 
             Integer mport = (Integer)parser.getOptionValue(mportOpt);
-            QrONEMessagingServer mserver = new QrONEMessagingServer(servlet.getPortingService().getMasterToken());
+            final QrONEMessagingServer mserver = new QrONEMessagingServer(servlet.getPortingService().getMasterToken());
+            servlet.getPortingService().getURIResolver().addUpdateListener(new Listener(){
+
+				@Override
+				public void update(URI uri) {
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("path", uri.toString());
+					mserver.to("qrone.update", map);
+				}
+            	
+            });
+            
             if(port != null){
             	mserver.listen(mport);
             }else{
