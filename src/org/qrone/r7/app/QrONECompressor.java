@@ -185,7 +185,6 @@ public class QrONECompressor {
 				HTML5Template t = new HTML5Template(xom);
 				t.out(w, xom.getDocument());
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			/*

@@ -5,7 +5,6 @@ import java.util.Map;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;
 import org.qrone.database.DatabaseTable;
-import org.qrone.r7.app.ObjectConverter;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -20,7 +19,7 @@ public class MongoTable implements DatabaseTable {
 
 	@Override
 	public void remove(Scriptable o) {
-		coll.remove((DBObject)ObjectConverter.to(o));
+		coll.remove((DBObject)BsonUtil.to(o));
 	}
 
 	@Override
@@ -31,7 +30,7 @@ public class MongoTable implements DatabaseTable {
 	
 	@Override
 	public String save(Scriptable o) {
-		coll.save((DBObject)ObjectConverter.to(o));
+		coll.save((DBObject)BsonUtil.to(o));
 		return null;
 	}
 
@@ -57,13 +56,13 @@ public class MongoTable implements DatabaseTable {
 
 	@Override
 	public DatabaseCursor find(Scriptable o) {
-		return new MongoCursor(coll.find((DBObject)ObjectConverter.to(o)));
+		return new MongoCursor(coll.find((DBObject)BsonUtil.to(o)));
 	}
 	
 	@Override
 	public DatabaseCursor find(Scriptable o, Scriptable p) {
-		return new MongoCursor(coll.find((DBObject)ObjectConverter.to(o),
-				(DBObject)ObjectConverter.to(p)));
+		return new MongoCursor(coll.find((DBObject)BsonUtil.to(o),
+				(DBObject)BsonUtil.to(p)));
 	}
 
 	@Override

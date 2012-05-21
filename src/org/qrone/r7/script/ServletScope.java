@@ -32,6 +32,7 @@ public class ServletScope{
 	public String text;
 	public Map<String, Object> get;
 	private Map<String, Object> post;
+	private List<FileItem> fileItemList;
 	
 	public ServletScope(HttpServletRequest request, HttpServletResponse response, URI uri, String path, String leftpath) {
 		this.request = request;
@@ -43,6 +44,12 @@ public class ServletScope{
 		get = parseQueryString(request.getQueryString());
 		
 		
+	}
+	
+	public void close(){
+		for (FileItem fileItem : fileItemList) {
+			fileItem.delete();
+		}
 	}
 	
 	public Map<String, Object> getPost(User user, boolean secure){
@@ -57,9 +64,9 @@ public class ServletScope{
 				upload.setSizeMax(-1);
 				
 				try {
-					List<FileItem> list = upload.parseRequest(request);
+					fileItemList = upload.parseRequest(request);
 					Map<String, Object> p = new HashMap<String, Object>();
-					for (FileItem fileItem : list) {
+					for (FileItem fileItem : fileItemList) {
 						if(fileItem.isFormField()){
 							Object o = p.get(fileItem.getFieldName());
 							if(o == null){

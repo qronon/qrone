@@ -15,7 +15,6 @@ public class HTML5StreamWriter implements HTML5Writer{
 		try {
 			w.append(c);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -25,7 +24,6 @@ public class HTML5StreamWriter implements HTML5Writer{
 		try {
 			w.append(str);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -36,7 +34,6 @@ public class HTML5StreamWriter implements HTML5Writer{
 		try {
 			w.append(value);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -9,8 +9,8 @@ import org.qrone.r7.Extendable;
 import org.qrone.r7.resolver.CascadeResolver;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.ext.ClassPrototype;
-import org.qrone.r7.script.ext.ScriptableList;
-import org.qrone.r7.script.ext.ScriptableMap;
+import org.qrone.r7.script.ext.ListPrototype;
+import org.qrone.r7.script.ext.MapPrototype;
 import org.qrone.r7.script.window.WindowEncodes;
 import org.qrone.r7.script.window.WindowFileSystem;
 import org.qrone.r7.script.window.WindowFormats;
@@ -51,8 +51,8 @@ public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 
 	protected void rawextend(Extendable e){
 		e.addExtension(ClassPrototype.class);
-		e.addExtension(ScriptableMap.class);
-		e.addExtension(ScriptableList.class);
+		e.addExtension(MapPrototype.class);
+		e.addExtension(ListPrototype.class);
 		
 		e.addExtension(ImageHandler.class);
 		e.addExtension(Scale9Handler.class);

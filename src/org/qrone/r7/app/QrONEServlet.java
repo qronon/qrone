@@ -37,10 +37,8 @@ public class QrONEServlet extends PortingServlet {
 			services.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), "qrone.filesystem"));
 
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MongoException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		setPortingService(services);

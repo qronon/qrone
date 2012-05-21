@@ -30,6 +30,7 @@ import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrapFactory;
 import org.qrone.r7.Extendable;
+import org.qrone.r7.script.ext.ScriptablePrototype;
 
 /**
  * Wraps Java objects by adding support for function extensions, which are

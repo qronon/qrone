@@ -39,7 +39,6 @@ import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIFileSystem;
 import org.qrone.r7.script.ServletScope;
-import org.qrone.r7.script.ext.ObjectMap;
 import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
@@ -241,5 +240,13 @@ public class Window{
 	
 	public void logout(){
 		user.logout();
+	}
+
+	public void close() throws IOException {
+
+		document.flush();
+		document.close();
+		ss.close();
+		user.close();
 	}
 }

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.mozilla.javascript.Scriptable;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageException;
@@ -22,6 +23,9 @@ import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchResponse;
 import org.qrone.kvs.KeyValueStore;
 import org.qrone.kvs.KeyValueStoreService;
+import org.qrone.r7.PortingService;
+import org.qrone.r7.script.ext.ScriptableMap;
+import org.qrone.r7.script.ext.MapPrototype;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.Token;
 
@@ -32,16 +36,22 @@ public class User{
 	private Token key;
 	private KeyValueStore kvs;
 
+	private String initialstore;
+	private Map store;
+
 	private Token qcookie = null;
 	private Token ncookie = null;
 	private Token bcookie = null;
 	
-	public User(HttpServletRequest request, HttpServletResponse response, Token key){
+	private PortingService service;
+	
+	public User(HttpServletRequest request, HttpServletResponse response, Token key, PortingService service){
 		
 		this.request = request;
 		this.response = response;
 		this.key = key;
 		this.kvs = kvs;
+		this.service = service;
 		
 		Cookie[] cookies = request.getCookies();
 		if(cookies != null){
@@ -146,6 +156,25 @@ public class User{
 			return t.validate("C",bcookie);
 		else
 			return false;
+	}
+	
+	public Map getStore(){
+		return store;
+	}
+	
+	public void setStore(Object s){
+		if(s instanceof Scriptable){
+			store = new ScriptableMap((Scriptable)s);
+		}else if(s instanceof Map){
+			store = (Map)s;
+		}else{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

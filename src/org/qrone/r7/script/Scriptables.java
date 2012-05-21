@@ -10,9 +10,24 @@ import java.util.Set;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Wrapper;
 
 public class Scriptables {
-	
+
+	public static Map asMap(Object obj){
+		if(obj instanceof Scriptable){
+			if( obj instanceof Wrapper){
+				Object unwrapped = ((Wrapper)obj).unwrap();
+				if(unwrapped instanceof Map)
+					return (Map)unwrapped;
+			}
+			
+			return asMap((Scriptable)obj);
+		}else if(obj instanceof Map){
+			return (Map)obj;
+		}
+		throw new IllegalArgumentException();
+	}
 
     public static Map asMap(Scriptable s){
     	Map m = null;

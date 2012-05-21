@@ -1,14 +1,18 @@
 package org.qrone.r7.script.window;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Scriptable;
+import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.browser.Window;
+import org.qrone.r7.script.ext.ScriptableMap;
 import org.qrone.util.Digest;
+import org.qrone.util.QueryString;
 
 public class WindowEncodes implements WindowPrototype {
 	
@@ -45,6 +49,15 @@ public class WindowEncodes implements WindowPrototype {
 	public String escape(String str) throws EncoderException{
 		URLCodec c = new URLCodec();
 		return c.encode(str);
+	}
+
+	public String escape(Map obj) throws EncoderException{
+		QueryString qs = new QueryString(obj);
+		return qs.toString();
+	}
+	
+	public String escape(Object obj) throws EncoderException{
+		return escape(Scriptables.asMap(obj));
 	}
 
 	public String md2(String data){

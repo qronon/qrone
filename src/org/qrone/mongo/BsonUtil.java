@@ -1,4 +1,4 @@
-package org.qrone.r7.app;
+package org.qrone.mongo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,14 +25,14 @@ import com.mongodb.BasicDBObject;
  * 
  * @author Tal Liron
  */
-public class ObjectConverter
+public class BsonUtil
 {
 	public static String stringify( Object s){
 		if(s.getClass().getName().equals("org.mozilla.javascript.xmlimpl.XML")){
 			return s.toString();
 		}
 		if(s instanceof Scriptable){
-			BSONObject bson = ObjectConverter.to((Scriptable)s);
+			BSONObject bson = BsonUtil.to((Scriptable)s);
 			return com.mongodb.util.JSON.serialize(bson);
 		}
 		return JSON.encode(s);

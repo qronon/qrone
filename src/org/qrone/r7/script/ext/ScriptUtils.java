@@ -57,9 +57,9 @@ public class ScriptUtils {
      */
 	public static Object javaToJS(Scriptable scope, Object obj) {
         if (obj instanceof List<?>) {
-            return new ScriptableList(scope, (List<?>) obj);
+            return new ListPrototype(scope, (List<?>) obj);
         } else if (obj instanceof Map<?,?>) {
-            return new ScriptableMap(scope, (Map<?, ?>) obj);
+            return new MapPrototype(scope, (Map<?, ?>) obj);
         } else {
             return Context.javaToJS(obj, scope);
         }

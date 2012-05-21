@@ -4,9 +4,8 @@ import java.util.Map;
 
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;
-import org.qrone.r7.app.ObjectConverter;
-import org.qrone.r7.script.ScriptablePrototype;
 import org.qrone.r7.script.browser.Function;
+import org.qrone.r7.script.ext.ScriptablePrototype;
 
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -45,7 +44,7 @@ public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCurso
 	
 	@Override
 	public DatabaseCursor sort(Scriptable o) {
-		return new MongoCursor(c.sort((DBObject)ObjectConverter.to(o)));
+		return new MongoCursor(c.sort((DBObject)BsonUtil.to(o)));
 	}
 
 	@Override

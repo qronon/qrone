@@ -37,7 +37,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.Wrapper;
-import org.qrone.r7.script.ScriptablePrototype;
 
 /**
  * ScriptableList is a wrapper for java.util.List instances that allows developers 
@@ -45,7 +44,7 @@ import org.qrone.r7.script.ScriptablePrototype;
  * @desc Wraps a Java List into a JavaScript Array
  */
 
-public class ScriptableList extends NativeJavaObject implements ScriptablePrototype<List> {
+public class ListPrototype extends NativeJavaObject implements ScriptablePrototype<List> {
 
     List<Object> list;
     static final String CLASSNAME = "ScriptableList";
@@ -82,7 +81,7 @@ public class ScriptableList extends NativeJavaObject implements ScriptableProtot
     }
      */
     
-    public ScriptableList(Scriptable scope, List wrappedList) {
+    public ListPrototype(Scriptable scope, List wrappedList) {
         super(scope, wrappedList, wrappedList.getClass());
         this.list = wrappedList;
     }

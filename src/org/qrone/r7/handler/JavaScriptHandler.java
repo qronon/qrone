@@ -25,7 +25,7 @@ import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.User;
 import org.qrone.r7.script.browser.Window;
-import org.qrone.r7.script.ext.ScriptableMap;
+import org.qrone.r7.script.ext.MapPrototype;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.Stream;
 
@@ -81,9 +81,8 @@ public class JavaScriptHandler implements URIHandler{
 						JavaScriptException e =  new JavaScriptException(null, uri, 0);
 						throw e;
 					}
-
-					window.document.flush();
-					window.document.close();
+					
+					window.close();
 					
 					return true;
 				}
@@ -113,7 +112,7 @@ public class JavaScriptHandler implements URIHandler{
 				URI urio = new URI("/admin/error.server.js");
 				Scriptable scope = vm.createScope();
 				ServletScope ss = new ServletScope(request,response,urio, path, leftpath);
-				scope.put("exception", scope, new ScriptableMap(scope, map));
+				scope.put("exception", scope, new MapPrototype(scope, map));
 				
 				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 				defaultom.run(scope);
@@ -123,8 +122,7 @@ public class JavaScriptHandler implements URIHandler{
 				window.init(scope);
 				
 				om.run(scope, window, window);
-				window.document.flush();
-				window.document.close();
+				window.close();
 			}catch (Exception e1){
 				e1.printStackTrace();
 			}

@@ -44,7 +44,7 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			}
 			
 			// Login/Crumb Service
-			CookieHandler cookie = new CookieHandler(service.getMasterToken());
+			CookieHandler cookie = new CookieHandler(service.getMasterToken(), service);
 			handler.add(cookie);
 			
 			// Scale9 Service
@@ -76,10 +76,8 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			rawextend(this);
 			handler.add(defaulthandler);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MongoException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
