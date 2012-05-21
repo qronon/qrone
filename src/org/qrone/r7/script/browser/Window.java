@@ -234,6 +234,7 @@ public class Window{
 		return service.getLoginService().getLogoutURL(doneURL);
 	}
 	
+	
 	public void login(String id){
 		user.login(id);
 	}
