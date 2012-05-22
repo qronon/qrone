@@ -160,7 +160,7 @@ public class LoginHandler implements URIHandler, LoginService{
             ParameterList response =
                     new ParameterList(req.getParameterMap());
             DiscoveryInformation discovered = 
-            	(DiscoveryInformation)Serialization.unserialize(store.get("openid-discover:" + user.getDeviceId()));
+            	(DiscoveryInformation)Serialization.unserialize((byte[])store.get("openid-discover:" + user.getDeviceId()));
 
             StringBuffer receivingURL = req.getRequestURL();
             String queryString = req.getQueryString();

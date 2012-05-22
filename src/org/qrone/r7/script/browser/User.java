@@ -1,20 +1,13 @@
 package org.qrone.r7.script.browser;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
-import java.net.CookieHandler;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
+import net.arnx.jsonic.JSON;
+
 import org.mozilla.javascript.Scriptable;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthSuccess;
@@ -22,10 +15,9 @@ import org.openid4java.message.MessageException;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchResponse;
 import org.qrone.kvs.KeyValueStore;
-import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.r7.PortingService;
+import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.ext.ScriptableMap;
-import org.qrone.r7.script.ext.MapPrototype;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.Token;
 
@@ -63,21 +55,33 @@ public class User{
 					}
 				}else if(cookies[i].getName().equals("N")){
 					Token n = Token.parse(cookies[i].getValue());
-					if(n.validate("N", key)){
+					if(n != null && n.validate("N", key)){
 						ncookie = n;
 					}
 				}else if(cookies[i].getName().equals("B")){
-					try{
-						bcookie = Token.parse(cookies[i].getValue());
-					}catch(Exception e){
-						
+					Token b = Token.parse(cookies[i].getValue());
+					if(b != null && b.validate("B", key)){
+						bcookie = b;
 					}
 				}
 			}
 		}
 		
-		if(bcookie == null || !bcookie.validate("B", key)){
-			bcookie = new Token(key,"B",null);
+		KeyValueStore kvs = service.getKeyValueStoreService()
+			.getKeyValueStore("qrone.user");
+		if(qcookie != null){
+			String name = qcookie.getId();
+			initialstore = kvs.get("q." + name).toString();
+			store = JSON.decode(initialstore);
+		}else if(bcookie != null){
+			String unique = bcookie.getId();
+			initialstore = kvs.get("b." + unique).toString();
+			store = JSON.decode(initialstore);
+		}
+		
+		
+		if(bcookie == null){
+			bcookie = new Token(key,"B",Token.uniqueid());
 			Cookie c = new Cookie("B", bcookie.toString());
 			c.setMaxAge(60*60*24*256*20);
 			c.setPath("/");
@@ -158,7 +162,7 @@ public class User{
 			return false;
 	}
 	
-	public Map getStore(){
+	public Object getStore(){
 		return store;
 	}
 	
@@ -173,8 +177,18 @@ public class User{
 	}
 
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		if(store != null && !store.equals(initialstore)){
+			KeyValueStore kvs = service.getKeyValueStoreService()
+				.getKeyValueStore("qrone.user");
+			
+			if(qcookie != null){
+				String name = qcookie.getId();
+				kvs.set("q." + name, JSON.encode(Scriptables.asMap(store)));
+			}else if(bcookie != null){
+				String unique = bcookie.getId();
+				kvs.set("b." + unique, JSON.encode(Scriptables.asMap(store)));
+			}
+		}
 	}
 
 

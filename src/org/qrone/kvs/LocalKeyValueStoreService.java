@@ -7,31 +7,30 @@ import java.util.Map;
 import org.qrone.database.DatabaseCursor;
 import org.qrone.database.DatabaseService;
 import org.qrone.database.DatabaseTable;
+import org.qrone.memcached.Memcached;
 import org.qrone.memcached.MemcachedService;
 
 public class LocalKeyValueStoreService implements KeyValueStoreService{
 
 	private DatabaseService db;
-	private MemcachedService mem;
-	private KeyValueStore kvs;
+	private MemcachedService mems;
 	
 	public LocalKeyValueStoreService(DatabaseService db, MemcachedService mem){
 		this.db = db;
-		this.mem = mem;
+		this.mems = mem;
 	}
 	
 	@Override
 	public KeyValueStore getKeyValueStore(String collection) {
-		if(kvs == null){
-			kvs = new LocalKeyValueStore(collection);
-		}
-		return kvs;
+		return new LocalKeyValueStore(db, mems, collection);
 	}
 	
-	public class LocalKeyValueStore implements KeyValueStore {
+	public static class LocalKeyValueStore implements KeyValueStore {
 		private DatabaseTable table;
-		public LocalKeyValueStore(String collection){
+		private Memcached mem;
+		public LocalKeyValueStore(DatabaseService db, MemcachedService mems, String collection){
 			table = db.getCollection(collection);
+			mem = mems.getKeyValueStore(collection);
 		}
 		
 		@Override
@@ -55,7 +54,7 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 		}
 
 		@Override
-		public void set(String key, byte[] value) {
+		public void set(String key, Object value) {
 			mem.put(key, value);
 			
 			Map map = new HashMap();
@@ -65,7 +64,7 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 		}
 
 		@Override
-		public void set(String key, byte[] value, boolean weak) {
+		public void set(String key, Object value, boolean weak) {
 			if(weak){
 				mem.put(key, value);
 			}else{

@@ -95,7 +95,7 @@ public class PortingService {
 	public Token getMasterToken(){
 		if(key == null){
 			KeyValueStore kvs = keyValueStoreService.getKeyValueStore("qrone.setting");
-			byte[] keybytes = kvs.get("secretkey");
+			byte[] keybytes = (byte[])kvs.get("secretkey");
 			if(keybytes == null){
 				key = new Token(key, "M",null);
 				kvs.set("secretkey", key.getBytes());

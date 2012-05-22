@@ -4,20 +4,20 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class MemoryStore implements KeyValueStore{
-	public Map<String, byte[]> map = new Hashtable<String, byte[]>();
+	public Map<String, Object> map = new Hashtable<String, Object>();
 
 	@Override
-	public byte[] get(String key) {
+	public Object get(String key) {
 		return map.get(key);
 	}
 
 	@Override
-	public void set(String key, byte[] value) {
+	public void set(String key, Object value) {
 		map.put(key, value);
 	}
 	
 	@Override
-	public void set(String key, byte[] value, boolean weak) {
+	public void set(String key, Object value, boolean weak) {
 		map.put(key, value);
 	}
 }
