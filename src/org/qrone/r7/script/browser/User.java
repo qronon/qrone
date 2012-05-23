@@ -87,7 +87,7 @@ public class User{
 		
 		
 		if(bcookie == null){
-			bcookie = new Token(key,"B",Token.uniqueid());
+			bcookie = new Token(key,"B",null);
 			Cookie c = new Cookie("B", bcookie.toString());
 			c.setMaxAge(60*60*24*256*20);
 			c.setPath("/");
@@ -124,7 +124,7 @@ public class User{
 	}
 	
 	public String getDeviceId(){
-		return bcookie.toString();
+		return bcookie.getUniqueId();
 	}
 	
 	public void login(String id) {

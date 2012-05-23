@@ -73,6 +73,9 @@ public class Scriptables {
     }
     
     private static Object asJava(Object o, Set r){
+    	if(o == null)
+    		return null;
+    	
     	if(r.contains(o)){
     		return null;
     	}

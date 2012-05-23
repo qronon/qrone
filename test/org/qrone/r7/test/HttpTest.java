@@ -58,6 +58,13 @@ public class HttpTest {
 		map = fetchJSON("/test/hello");
 		assertEquals("OK", map.get("status"));
 	}
+
+	@Test
+	public void testUserJS(){
+		Map map;
+		map = fetchJSON("/test/user");
+		assertEquals("OK", map.get("status"));
+	}
 	
 	public Map fetchJSON(String path){
 		HttpGet r = new HttpGet("http://localhost:9601" + path);
