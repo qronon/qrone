@@ -17,27 +17,46 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.eclipse.jetty.util.ajax.JSONObjectConvertor;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.qrone.r7.app.QrONEApp;
 import org.qrone.util.Stream;
 
 import static org.junit.Assert.*;
 
 public class HttpTest {
-	private QrONEApp app;
-	private HttpClient c;
+	private static QrONEApp app;
+	private static HttpClient c;
 	
-	@Before
-	public void setUp(){
+	@BeforeClass
+	public static void setUp(){
 		ClientConnectionManager cm = new ThreadSafeClientConnManager();
 		c = new DefaultHttpClient(cm);
-		app = new QrONEApp(9601, 9699, "/htdocs");
+		app = new QrONEApp(9601, 9699, "./htdocs");
 		app.start();
 	}
 
-	@After
-	public void tearDown(){
+	@AfterClass
+	public static void tearDown(){
 		app.stop();
+	}
+	
+	@Test
+	public void testHelloFile(){
+		Map map = fetchJSON("/test/hello.json");
+		assertEquals("OK", map.get("status"));
+	}
+
+	@Test
+	public void testHelloJS(){
+		Map map;
+		map = fetchJSON("/test/hello.server.js");
+		assertEquals("OK", map.get("status"));
+
+		map = fetchJSON("/test/hello");
+		assertEquals("OK", map.get("status"));
 	}
 	
 	public Map fetchJSON(String path){
@@ -51,6 +70,7 @@ public class HttpTest {
 			HttpResponse res = c.execute(r);
 			
 			String body = new String(Stream.read(res.getEntity().getContent()),"utf8");
+			System.out.println(body);
 			
 			return JSON.decode(body);
 		} catch (ClientProtocolException e) {

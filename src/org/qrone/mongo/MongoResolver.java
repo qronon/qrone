@@ -86,16 +86,17 @@ public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
 		if(cache != null){
 			return new ByteArrayInputStream(cache);
 		}
-		try{
-			BasicDBObject obj = new BasicDBObject();
-			obj.put(ID, uri.toString());
-			DBObject o = col.findOne(obj);
+		
+		BasicDBObject obj = new BasicDBObject();
+		obj.put(ID, uri.toString());
+		DBObject o = col.findOne(obj);
+		if(o != null){
 			byte[] v = (byte[])o.get(DATA);
 			weakmap.put(uri.toString(), v);
 			return new ByteArrayInputStream(v);
-		}catch(NoSuchElementException e){
-			return null;
 		}
+			
+		return null;
 	}
 
 	@Override

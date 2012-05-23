@@ -71,12 +71,18 @@ public class User{
 			.getKeyValueStore("qrone.user");
 		if(qcookie != null){
 			String name = qcookie.getId();
-			initialstore = kvs.get("q." + name).toString();
-			store = JSON.decode(initialstore);
+			Object o = kvs.get("q." + name);
+			if(o != null){
+				initialstore = o.toString();
+				store = JSON.decode(initialstore);
+			}
 		}else if(bcookie != null){
 			String unique = bcookie.getId();
-			initialstore = kvs.get("b." + unique).toString();
-			store = JSON.decode(initialstore);
+			Object o = kvs.get("b." + unique);
+			if(o != null){
+				initialstore = o.toString();
+				store = JSON.decode(initialstore);
+			}
 		}
 		
 		

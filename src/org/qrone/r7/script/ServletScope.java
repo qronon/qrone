@@ -47,8 +47,10 @@ public class ServletScope{
 	}
 	
 	public void close(){
-		for (FileItem fileItem : fileItemList) {
-			fileItem.delete();
+		if(fileItemList != null){
+			for (FileItem fileItem : fileItemList) {
+				fileItem.delete();
+			}
 		}
 	}
 	

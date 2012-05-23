@@ -2,6 +2,7 @@ package org.qrone.r7.parser;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
 	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
 	private Scriptable globalScope;
 	private SugarWrapFactory wrapFactory;
-	private Set<Class> set;
+	private Set<Class> set = new HashSet<Class>();
 
     public JSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);

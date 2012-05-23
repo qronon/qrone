@@ -13,6 +13,7 @@ import net.arnx.jsonic.JSON;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5StreamWriter;
 import org.qrone.r7.parser.HTML5Template;
+import org.qrone.r7.script.Scriptables;
 
 public class Document extends HTML5Template{
 	private HttpServletRequest request;
@@ -37,7 +38,7 @@ public class Document extends HTML5Template{
 			HTML5Template t = (HTML5Template)out;
 			t.out(streamWriter, om.getDocument());
 		}else{
-			writer.append(JSON.encode(out));
+			writer.append(JSON.encode(Scriptables.asMap(out)));
 		}
 	}
 	

@@ -36,7 +36,8 @@ public class HTML5Template{
 		this.om = om;
 		this.xomlist = xomlist;
 		this.ticket = ticket;
-		loaded = true;
+		if(om != null)
+			loaded = true;
 	}
 
 	public HTML5Template(HTML5OM om, URI uri, String ticket){

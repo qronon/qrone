@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.servlet.DispatcherType;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -30,6 +29,8 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.qrone.messaging.QrONEMessagingServer;
+import org.qrone.r7.PortingService;
+import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIResolver.Listener;
 
 public class QrONEApp {
@@ -48,7 +49,7 @@ public class QrONEApp {
 		servlet = new QrONEServlet();
 		
 		initWebServer();
-		initMessegingServer();
+		//initMessegingServer();
 
 		
 	}
@@ -79,7 +80,10 @@ public class QrONEApp {
 	
 	private void initMessegingServer(){
 		mserver = new QrONEMessagingServer(servlet.getPortingService().getMasterToken());
-        servlet.getPortingService().getURIResolver().addUpdateListener(new Listener(){
+		
+        PortingService p = servlet.getPortingService();
+        URIResolver r = p.getURIResolver();
+        r.addUpdateListener(new Listener(){
 
 			@Override
 			public void update(URI uri) {
@@ -92,7 +96,7 @@ public class QrONEApp {
 	}
 	
 	public void start(){
-		new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			public void run() {
 				try {
 	    			server.start();
@@ -102,6 +106,15 @@ public class QrONEApp {
 				}
 			}
 		});
+		t.start();
+		/*
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//*/
 	}
 
 	public void startAndWait(boolean window){
