@@ -1,4 +1,5 @@
 
+user.store = { "userdata" : "stored" };
 
 document.write({
 	"status" : "OK",

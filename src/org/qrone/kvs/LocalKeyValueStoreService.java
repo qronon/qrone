@@ -34,21 +34,23 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 		}
 		
 		@Override
-		public byte[] get(String key) {
+		public Object get(String key) {
 			Object v;
 			v = mem.get(key);
-			if(v != null & v instanceof byte[]){
-				return (byte[])v;
+			if(v != null){
+				System.out.println("Memcached:get:" + key + ":" + v);
+				return v;
 			}
 
 			Map map = new HashMap();
-			map.put("id", key);
+			map.put("_id", key);
 			DatabaseCursor cursor = table.find(map);
 			Map result = cursor.next();
 			if(result == null) return null;
-			v = result.get(key);
-			if(v != null & v instanceof byte[]){
-				return (byte[])v;
+			v = result.get("value");
+			if(v != null){
+				System.out.println("Database:get:" + key + ":" + v);
+				return v;
 			}
 			return null;
 		}
@@ -58,9 +60,11 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 			mem.put(key, value);
 			
 			Map map = new HashMap();
-			map.put("id", key);
+			map.put("_id", key);
 			map.put("value", value);
 			table.save(map);
+			
+			System.out.println("Database/Memcached:set:" + key + ":" + value);
 		}
 
 		@Override

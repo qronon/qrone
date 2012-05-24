@@ -31,15 +31,19 @@ public class HttpTest {
 	private static HttpClient c;
 	
 	@BeforeClass
-	public static void setUp(){
-		ClientConnectionManager cm = new ThreadSafeClientConnManager();
-		c = new DefaultHttpClient(cm);
+	public static void beforeClass(){
 		app = new QrONEApp(9601, 9699, "./htdocs");
 		app.start();
 	}
 
+	@Before
+	public void before(){
+		ClientConnectionManager cm = new ThreadSafeClientConnManager();
+		c = new DefaultHttpClient(cm);
+	}
+
 	@AfterClass
-	public static void tearDown(){
+	public static void afterClass(){
 		app.stop();
 	}
 	
@@ -64,6 +68,72 @@ public class HttpTest {
 		Map map;
 		map = fetchJSON("/test/user");
 		assertEquals("OK", map.get("status"));
+	}
+
+	@Test
+	public void testLoginLogoutJS(){
+		Map map;
+		map = fetchJSON("/test/user_logout");
+		assertEquals("OK", map.get("status"));
+
+		map = fetchJSON("/test/user");
+		assertEquals(null, map.get("id"));
+
+		map = fetchJSON("/test/user_login");
+		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+
+		map = fetchJSON("/test/user");
+		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		
+	}
+
+	@Test
+	public void testBStore(){
+		Map map;
+		map = fetchJSON("/test/user_logout");
+		assertEquals("OK", map.get("status"));
+
+		map = fetchJSON("/test/user_store");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+
+		map = fetchJSON("/test/user");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+		
+		map = fetchJSON("/test/user_logout");
+		assertEquals(null, ((Map)map.get("user")).get("id"));
+
+		map = fetchJSON("/test/user_store");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+
+		map = fetchJSON("/test/user");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+		
+	}
+
+	@Test
+	public void testQStore(){
+		Map map;
+		map = fetchJSON("/test/user_logout");
+		assertEquals("OK", map.get("status"));
+
+		map = fetchJSON("/test/user_login");
+		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		
+		map = fetchJSON("/test/user_store");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+
+		map = fetchJSON("/test/user");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+		
+		map = fetchJSON("/test/user_logout");
+		assertEquals(null, ((Map)map.get("user")).get("id"));
+		assertEquals(null, ((Map)map.get("user")).get("store"));
+
+		map = fetchJSON("/test/user_login");
+		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+
+		map = fetchJSON("/test/user");
+		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
 	}
 	
 	public Map fetchJSON(String path){

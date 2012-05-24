@@ -1,4 +1,5 @@
 
+user.login("testuser");
 
 document.write({
 	"status" : "OK",

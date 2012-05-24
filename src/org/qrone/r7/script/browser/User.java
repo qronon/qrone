@@ -27,7 +27,7 @@ public class User{
 	private HttpServletResponse response;
 	private Token key;
 	private KeyValueStore kvs;
-
+	
 	private String initialstore;
 	private Map store;
 
@@ -77,7 +77,7 @@ public class User{
 				store = JSON.decode(initialstore);
 			}
 		}else if(bcookie != null){
-			String unique = bcookie.getId();
+			String unique = bcookie.getUniqueId();
 			Object o = kvs.get("b." + unique);
 			if(o != null){
 				initialstore = o.toString();
@@ -128,11 +128,13 @@ public class User{
 	}
 	
 	public void login(String id) {
-		updateQCookie(new Token(key, "Q", "id:" + id));
+		updateQCookie(new Token(key, "Q", id));
+		initialstore = null;
 	}
 	
 	public void guestLogin() {
 		updateQCookie(new Token(key, "Q", "guest:" + QrONEUtils.uniqueid()));
+		initialstore = null;
 	}
 	
 	public void openidLogin(Identifier verified, AuthSuccess authSuccess) {
@@ -153,6 +155,7 @@ public class User{
         Cookie q = new Cookie("Q", "");
         q.setPath("/");
         response.addCookie(q);
+		store = null;
 	}
 	
 	public String getTicket(){
@@ -174,7 +177,7 @@ public class User{
 	
 	public void setStore(Object s){
 		if(s instanceof Scriptable){
-			store = new ScriptableMap((Scriptable)s);
+			store = Scriptables.asMap(s);
 		}else if(s instanceof Map){
 			store = (Map)s;
 		}else{
@@ -191,7 +194,7 @@ public class User{
 				String name = qcookie.getId();
 				kvs.set("q." + name, JSON.encode(Scriptables.asMap(store)));
 			}else if(bcookie != null){
-				String unique = bcookie.getId();
+				String unique = bcookie.getUniqueId();
 				kvs.set("b." + unique, JSON.encode(Scriptables.asMap(store)));
 			}
 		}

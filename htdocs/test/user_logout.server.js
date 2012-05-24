@@ -1,4 +1,5 @@
 
+user.logout();
 
 document.write({
 	"status" : "OK",

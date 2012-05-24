@@ -26,5 +26,8 @@ public interface DatabaseTable {
 	public String save(Map o);
 	
 	public void drop();
+	
+	public String update(Scriptable o, Scriptable o2);
+	public String update(Map o, Map o2);
 
 }

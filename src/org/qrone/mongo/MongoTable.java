@@ -23,6 +23,18 @@ public class MongoTable implements DatabaseTable {
 	}
 
 	@Override
+	public String update(Map o, Map o2) {
+		coll.update(new BasicDBObject(o),new BasicDBObject(o2));
+		return null;
+	}
+	
+	@Override
+	public String update(Scriptable o, Scriptable o2) {
+		coll.update((DBObject)BsonUtil.to(o),(DBObject)BsonUtil.to(o2));
+		return null;
+	}
+	
+	@Override
 	public String save(Map o) {
 		coll.save(new BasicDBObject(o));
 		return null;
