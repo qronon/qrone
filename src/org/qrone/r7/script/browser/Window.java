@@ -52,8 +52,8 @@ public class Window{
 	private JSDeck vm;
 	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
 	private URIResolver resolver;
-	
 	private ServletScope ss;
+	
 	public HttpServletRequest request;
 	public HttpServletResponse response;
 	

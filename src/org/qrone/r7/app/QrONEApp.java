@@ -28,7 +28,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.qrone.messaging.QrONEMessagingServer;
+import org.qrone.messaging.MessagingServer;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIResolver.Listener;
@@ -39,7 +39,7 @@ public class QrONEApp {
 	private String path;
 	private Server server = null;
 	private QrONEServlet servlet;
-	private QrONEMessagingServer mserver;
+	private MessagingServer mserver;
 	
 	public QrONEApp(int port, int mport, String path){
 		this.port = port;
@@ -48,13 +48,6 @@ public class QrONEApp {
 
 		servlet = new QrONEServlet();
 		
-		initWebServer();
-		//initMessegingServer();
-
-		
-	}
-	
-	private void initWebServer(){
 		server = new Server();
 		
 		Connector connector = new SelectChannelConnector();
@@ -78,23 +71,6 @@ public class QrONEApp {
         }
 	}
 	
-	private void initMessegingServer(){
-		mserver = new QrONEMessagingServer(servlet.getPortingService().getMasterToken());
-		
-        PortingService p = servlet.getPortingService();
-        URIResolver r = p.getURIResolver();
-        r.addUpdateListener(new Listener(){
-
-			@Override
-			public void update(URI uri) {
-				Map<String,String> map = new HashMap<String, String>();
-				map.put("path", uri.toString());
-				mserver.to("qrone.update", map);
-			}
-        	
-        });
-	}
-	
 	public void start(){
 		Thread t = new Thread(new Runnable() {
 			public void run() {
@@ -107,14 +83,6 @@ public class QrONEApp {
 			}
 		});
 		t.start();
-		/*
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//*/
 	}
 
 	public void startAndWait(boolean window){

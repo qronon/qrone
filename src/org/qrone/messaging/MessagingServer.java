@@ -21,21 +21,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-public class QrONEMessagingServer implements XMLSocketServerListener{
-	private static final Logger logger = LoggerFactory.getLogger(QrONEMessagingServer.class);
+public class MessagingServer implements XMLSocketServerListener, MessagingService{
+	private static final Logger logger = LoggerFactory.getLogger(MessagingServer.class);
 	public static final int SERVER_PORT = 9699;
 	
 	private XMLSocketServer socketServer;
 	private Map<String, Token> signmap
 		= new HashMap<String, Token>();
-	private Map<String, Set<QrONEMessagingClientConn>> map
-		= new HashMap<String, Set<QrONEMessagingClientConn>>();
+	private Map<String, Set<MessagingClientConn>> map
+		= new HashMap<String, Set<MessagingClientConn>>();
+	private Set<MessagingService.Listener> listener = new HashSet<MessagingService.Listener>();
 
 	private KeyValueStore kvs;
-	private Token key;
+	//private Token key;
+	private MessagingService service;
 	
-	public QrONEMessagingServer(Token key){
-		this.key = key;
+	public MessagingServer(){
+		//this.key = key;
+		this.service = service;
 		
 		try {
 			socketServer = new XMLSocketServer();
@@ -68,39 +71,53 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 
 	public void to(String target, Map obj){
 		logger.info("to:" + target + ":" + obj);
-		Set<QrONEMessagingClientConn> set = map.get(target);
+		Set<MessagingClientConn> set = map.get(target);
 		if(set != null){
-			for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
+			for (Iterator<MessagingClientConn> iter = set.iterator(); iter.hasNext();) {
 				iter.next().getSocket().send(JSON.encode(obj));
 			}
 		}
+		for (MessagingService.Listener l : listener) {
+			l.onData(target, obj);
+		}
 	}
 	
-	public void to(QrONEMessagingClientConn conn, String target, Map obj){
+	public void to(MessagingClientConn conn, String target, Map obj){
 		logger.info("to:" + target + ":" + obj);
-		Set<QrONEMessagingClientConn> set = map.get(target);
+		Set<MessagingClientConn> set = map.get(target);
 		if(set != null){
-			for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
+			for (Iterator<MessagingClientConn> iter = set.iterator(); iter.hasNext();) {
 				iter.next().getSocket().send(JSON.encode(obj));
 			}
+		}
+		for (MessagingService.Listener l : listener) {
+			l.onData(target, obj);
 		}
 	}
 
-	public boolean join(QrONEMessagingClientConn conn, String target){
+	public boolean join(MessagingClientConn conn, String target){
 		logger.info("join:" + target);
-		Set<QrONEMessagingClientConn> set = map.get(target);
-		if(set == null){
-			set = new HashSet<QrONEMessagingClientConn>();
-			map.put(target, set);
+		for (MessagingService.Listener l : listener) {
+			l.onJoin(conn, target);
 		}
 		
+		Set<MessagingClientConn> set = map.get(target);
+		if(set == null){
+			set = new HashSet<MessagingClientConn>();
+			map.put(target, set);
+		}
 		set.add(conn);
 		return true;
+		
 	}
 	
-	public boolean left(QrONEMessagingClientConn conn, String target){
+	public boolean left(MessagingClientConn conn, String target){
 		logger.info("join:" + target);
-		Set<QrONEMessagingClientConn> set = map.get(target);
+		for (MessagingService.Listener l : listener) {
+			l.onJoin(conn, target);
+		}
+		
+		Set<MessagingClientConn> set = map.get(target);
 		if(set != null){
 			if(set.size() <= 1){
 				if(map.containsKey(target)){					
@@ -111,6 +128,7 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 				return set.remove(conn);
 			}
 		}
+		
 		return false;
 		
 	}
@@ -126,13 +144,23 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 	@Override
 	public void onNewClient(XMLSocket xmlsocket) {
 		logger.info("onNewClient:" + xmlsocket.toString());
-		QrONEMessagingClientConn conn = new QrONEMessagingClientConn(this, xmlsocket);
+		MessagingClientConn conn = new MessagingClientConn(this, xmlsocket);
 	}
 		
 	public static void main(String[] args){
 		logger.info("main:");
-		QrONEMessagingServer server = new QrONEMessagingServer(new Token());
+		MessagingServer server = new MessagingServer();
 		server.listen(SERVER_PORT);
+	}
+
+	@Override
+	public void addListener(Listener l) {
+		listener.add(l);
+	}
+
+	@Override
+	public void removeListener(Listener l) {
+		listener.remove(l);
 	}
 
 }

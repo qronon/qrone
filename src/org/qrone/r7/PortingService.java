@@ -7,6 +7,7 @@ import org.qrone.kvs.KeyValueStore;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.login.LoginService;
 import org.qrone.memcached.MemcachedService;
+import org.qrone.messaging.MessagingService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIFileSystem;
@@ -89,6 +90,14 @@ public class PortingService {
 	}
 	public void setFileSystemService(URIFileSystem fileSystemService) {
 		this.fileSystemService = fileSystemService;
+	}
+	private MessagingService messengerService;
+	
+	public MessagingService getMessengerService() {
+		return messengerService;
+	}
+	public void setMessengerService(MessagingService messengerService) {
+		this.messengerService = messengerService;
 	}
 	
 	private Token key;

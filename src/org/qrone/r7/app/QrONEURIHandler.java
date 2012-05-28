@@ -1,7 +1,10 @@
 package org.qrone.r7.app;
 
 import java.io.File;
+import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -9,6 +12,8 @@ import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageSpriteService;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.login.CookieHandler;
+import org.qrone.messaging.MessagingServer;
+import org.qrone.messaging.MessagingService;
 import org.qrone.mongo.MongoResolver;
 import org.qrone.png.PNGMemoryImageService;
 import org.qrone.r7.PortingService;
@@ -65,6 +70,17 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			resolver.add(repository.getResolver());
 			resolver.add(new FilteredResolver("/system/resource/", new InternalResourceResolver(cx)));
 			resolver.add(service.getFileSystemService());
+			
+			// Update
+			final MessagingService ms = service.getMessengerService();
+			resolver.addUpdateListener(new URIResolver.Listener() {
+				@Override
+				public void update(URI uri) {
+					Map map = new HashMap();
+					map.put("path", uri.toString());
+					ms.to("qrone.fs.update", map);
+				}
+			});
 			
 			
 			handler.add(github);

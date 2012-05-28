@@ -15,16 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-public class QrONEMessagingClientConn implements XMLSocketListener{
-	private static final Logger logger = LoggerFactory.getLogger(QrONEMessagingClientConn.class);
+public class MessagingClientConn implements XMLSocketListener{
+	private static final Logger logger = LoggerFactory.getLogger(MessagingClientConn.class);
 	
-	private QrONEMessagingServer server;
+	private MessagingServer server;
 	private XMLSocket xmlsocket;
 
 	private Map<String, Token> map = new HashMap<String, Token>();
 	private Set<String> joined = new HashSet<String>();
 	
-	public QrONEMessagingClientConn(QrONEMessagingServer server, XMLSocket xmlsocket) {
+	public MessagingClientConn(MessagingServer server, XMLSocket xmlsocket) {
 		this.server = server;
 		this.xmlsocket = xmlsocket;
 	}

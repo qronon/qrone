@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 
 import org.qrone.kvs.LocalKeyValueStoreService;
 import org.qrone.memcached.LocalMemcachedService;
+import org.qrone.messaging.MessagingServer;
 import org.qrone.mongo.MongoDatabaseService;
 import org.qrone.mongo.MongoResolver;
 import org.qrone.r7.PortingService;
@@ -25,11 +26,14 @@ public class QrONEServlet extends PortingServlet {
 
 			String[] memcachedServer = {"localhost"};
 			services.setMemcachedService(new LocalMemcachedService(memcachedServer));
-			
 	
 			services.setKeyValueStoreService(
 					new LocalKeyValueStoreService(services.getDatabaseService(), 
 							services.getMemcachedService()));
+			
+			MessagingServer ms = new MessagingServer();
+			ms.listen(9699);
+			services.setMessengerService(ms);
 			
 			services.setLoginService(null); // TODO OpenIDHandler
 			services.setTaskManagerService(null); // TODO TaskManager unimplemented!
