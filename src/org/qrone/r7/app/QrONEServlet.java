@@ -1,51 +1,37 @@
 package org.qrone.r7.app;
 
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Map;
 
-import org.qrone.kvs.LocalKeyValueStoreService;
-import org.qrone.memcached.LocalMemcachedService;
-import org.qrone.messaging.MessagingServer;
-import org.qrone.mongo.MongoDatabaseService;
-import org.qrone.mongo.MongoResolver;
-import org.qrone.r7.PortingService;
-import org.qrone.r7.PortingServlet;
-import org.qrone.r7.fetcher.LocalHTTPFetcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
 
-public class QrONEServlet extends PortingServlet {
+public class QrONEServlet extends HttpServlet {
 	
-	public QrONEServlet() {
-		PortingService services = new PortingService();
-		services.setURLFetcher(new LocalHTTPFetcher());
-		
-		try {
-			MongoDatabaseService mongo = new MongoDatabaseService(new Mongo().getDB("qrone"));
-			services.setDatabaseService(mongo);
-
-			String[] memcachedServer = {"localhost"};
-			services.setMemcachedService(new LocalMemcachedService(memcachedServer));
+	private String path;
+	private Map<String, QrONEURIHandler> map = new Hashtable<String, QrONEURIHandler>();
 	
-			services.setKeyValueStoreService(
-					new LocalKeyValueStoreService(services.getDatabaseService(), 
-							services.getMemcachedService()));
-			
-			MessagingServer ms = new MessagingServer();
-			ms.listen(9699);
-			services.setMessengerService(ms);
-			
-			services.setLoginService(null); // TODO OpenIDHandler
-			services.setTaskManagerService(null); // TODO TaskManager unimplemented!
-			
-			services.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), "qrone.filesystem"));
-
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (MongoException e) {
-			e.printStackTrace();
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String host = request.getHeader("Host");
+		QrONEURIHandler h = map.get(host);
+		if(h == null){
+			h = new QrONEURIHandler(getServletContext(), host, path);
+			map.put(host, h);
 		}
-		setPortingService(services);
+		h.handle(request, response, request.getPathInfo(), "", "");
+	}
+	
+	public void clean(){
+		for (QrONEURIHandler h : map.values()) {			
+			h.clean();
+		}
 	}
 
+	public void setLocalFilePath( String path) {
+		this.path = path;
+	}
 }

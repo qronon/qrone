@@ -3,31 +3,54 @@ package org.qrone.memcached;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.mozilla.javascript.Scriptable;
+import org.qrone.mongo.MongoTable;
+import org.qrone.r7.script.AbstractScriptable;
+
 import com.danga.MemCached.MemCachedClient;
 import com.danga.MemCached.SockIOPool;
 
-public class LocalMemcachedService implements MemcachedService{
+public class LocalMemcachedService extends AbstractScriptable implements MemcachedService{
 	private static SockIOPool pool;
-	private MemCachedClient client;
 	
-	public LocalMemcachedService(String[] serverlist) {
+	private String domain;
+	private MemCachedClient client;
+	private Map<String, LocalMemcached> map = new Hashtable<String, LocalMemcached>();
+	
+	public LocalMemcachedService(String[] serverlist, String domain) {
 		if (pool == null) {
 			SockIOPool pool = SockIOPool.getInstance();
 			pool.setServers(serverlist);
 			pool.initialize();
 		}
 		client = new MemCachedClient();
+		this.domain = domain;
 	}
 	
 	@Override
-	public Memcached getKeyValueStore(String collection) {
-		// TODO Auto-generated method stub
-		return new LocalMemcached(client, collection);
+	public Memcached getKeyValueStore(String name) {
+		LocalMemcached t = map.get(name);
+		if(t == null){
+			t = new LocalMemcached(client, domain + "/" + name);
+			map.put(name, t);
+		}
+		return t;
+	}
+
+	@Override
+	public Object get(String key, Scriptable start) {
+		return getKeyValueStore(key);
+	}
+
+	@Override
+	public Object[] getIds() {
+		return map.keySet().toArray(new Object[map.size()]);
 	}
 	
 	public static class LocalMemcached implements Memcached{

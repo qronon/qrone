@@ -11,13 +11,17 @@ import javax.servlet.ServletContext;
 import org.qrone.database.DatabaseService;
 import org.qrone.img.ImageSpriteService;
 import org.qrone.kvs.KeyValueStoreService;
+import org.qrone.kvs.LocalKeyValueStoreService;
 import org.qrone.login.CookieHandler;
+import org.qrone.memcached.LocalMemcachedService;
 import org.qrone.messaging.MessagingServer;
 import org.qrone.messaging.MessagingService;
+import org.qrone.mongo.MongoDatabaseService;
 import org.qrone.mongo.MongoResolver;
 import org.qrone.png.PNGMemoryImageService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.fetcher.HTTPFetcher;
+import org.qrone.r7.fetcher.LocalHTTPFetcher;
 import org.qrone.r7.github.GitHubRepositoryService;
 import org.qrone.r7.github.GitHubResolver;
 import org.qrone.r7.handler.DefaultHandler;
@@ -35,7 +39,34 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 	private GitHubRepositoryService repository;
 	private MongoResolver cache;
 	
-	public QrONEURIHandler( ServletContext cx, PortingService service, String path ){
+	public QrONEURIHandler( ServletContext cx, String domain, String path){
+
+		PortingService service = new PortingService();
+		service.setURLFetcher(new LocalHTTPFetcher());
+		
+		try {
+			MongoDatabaseService mongo = new MongoDatabaseService(new Mongo().getDB("qrone"), domain);
+			service.setDatabaseService(mongo);
+
+			String[] memcachedServer = {"localhost"};
+			service.setMemcachedService(new LocalMemcachedService(memcachedServer,domain));
+	
+			service.setKeyValueStoreService(
+					new LocalKeyValueStoreService(service.getDatabaseService(), 
+							service.getMemcachedService()));
+			
+			MessagingServer ms = new MessagingServer();
+			ms.listen(9699);
+			service.setMessengerService(ms);
+			
+			service.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), domain + "/qrone.filesystem"));
+
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (MongoException e) {
+			e.printStackTrace();
+		}
+		
 		try {
 			KeyValueStoreService kvs = service.getKeyValueStoreService();
 			HTTPFetcher fetcher = service.getURLFetcher();

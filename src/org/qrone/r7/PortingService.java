@@ -26,12 +26,6 @@ public class PortingService {
 	public void setImageSpriteService(ImageSpriteService imageSpriteService) {
 		this.imageSpriteService = imageSpriteService;
 	}
-	public LoginService getLoginService() {
-		return loginService;
-	}
-	public void setLoginService(LoginService loginService) {
-		this.loginService = loginService;
-	}
 	public HTTPFetcher getURLFetcher() {
 		return uriFetcher;
 	}
@@ -62,12 +56,6 @@ public class PortingService {
 	public void setRepositoryService(RepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
-	public TaskManagerService getTaskManagerService() {
-		return taskManagerService;
-	}
-	public void setTaskManagerService(TaskManagerService taskManagerService) {
-		this.taskManagerService = taskManagerService;
-	}
 	public KeyValueStoreService getKeyValueStoreService() {
 		return keyValueStoreService;
 	}
@@ -76,13 +64,11 @@ public class PortingService {
 	}
 	private ImageBufferService imageBufferService;
 	private ImageSpriteService imageSpriteService;
-	private LoginService loginService;
 	private HTTPFetcher uriFetcher;
 	private URIResolver uriResolver;
 	private DatabaseService databaseService;
 	private MemcachedService memcachedService;
 	private RepositoryService repositoryService;
-	private TaskManagerService taskManagerService;
 	private KeyValueStoreService keyValueStoreService;
 	private URIFileSystem fileSystemService;
 	public URIFileSystem getFileSystemService() {

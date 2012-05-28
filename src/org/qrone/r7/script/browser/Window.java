@@ -218,6 +218,7 @@ public class Window{
 		return net.arnx.jsonic.JSON.encode(out);
 	}
 	
+	/*
 	public String openid_login_url(String url, Map attributes, String doneURL){
 		Map<String, String> attrMap = new HashMap<String, String>();
 		return service.getLoginService().getOpenIDLoginURL(url, attributes, doneURL);
@@ -232,6 +233,7 @@ public class Window{
 	public String logout_url(String doneURL){
 		return service.getLoginService().getLogoutURL(doneURL);
 	}
+	*/
 	
 	
 	public void login(String id){

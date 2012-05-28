@@ -11,31 +11,28 @@ import org.qrone.r7.script.AbstractScriptable;
 import com.mongodb.DB;
 
 public class MongoDatabaseService extends AbstractScriptable implements DatabaseService{
+	private String domain;
 	private DB db;
 	private Map<String, MongoTable> map = new Hashtable<String, MongoTable>();
 
-	public MongoDatabaseService(DB db){
+	public MongoDatabaseService(DB db, String domain){
 		this.db = db;
+		this.domain = domain;
 	}
 	
 	@Override
 	public DatabaseTable getCollection(String name) {
 		MongoTable t = map.get(name);
 		if(t == null){
-			t = new MongoTable(db.getCollection(name));
+			t = new MongoTable(db.getCollection(domain + "/" + name));
+			map.put(name, t);
 		}
 		return t;
 	}
 
 	@Override
 	public Object get(String key, Scriptable start) {
-		if(map.containsKey(key)){
-			return map.get(key);
-		}
-		
-		DatabaseTable table = getCollection(key);
-		map.put(key, (MongoTable)table);
-		return table;
+		return getCollection(key);
 	}
 
 	@Override
