@@ -69,7 +69,7 @@ public class Window{
 	public RepositoryService repository;
 	public HTTPFetcher http;
 	
-	public URIFileSystem filesystem;
+	public URIFileSystem fs;
 
 	public JSON JSON;
 
@@ -99,7 +99,7 @@ public class Window{
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
-		filesystem = service.getFileSystemService();
+		fs = service.getFileSystemService();
 
 		JSON = new JSON(resolver, scope, vm.getContext());
 	}

@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
-	private static final String ID = "id";
+	private static final String ID = "_id";
 	private static final String DATA = "data";
 	
 	private Map<String, byte[]> weakmap = new WeakHashMap<String, byte[]>();
@@ -124,6 +125,44 @@ public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
 			col.save(obj);
 			fireUpdate(uri);
 		}
+	}
+
+
+	@Override
+	public void write(String path, String data) {
+		writeBytes(path, data.getBytes());
+	}
+
+	@Override
+	public void writeBytes(String path, byte[] data) {
+		BasicDBObject obj = new BasicDBObject();
+		obj.put(ID, path);
+		obj.put(DATA, data);
+		col.save(obj);
+		try {
+			fireUpdate(new URI(path));
+		} catch (URISyntaxException e) {}
+	}
+
+	@Override
+	public byte[] readBytes(String path) {
+		BasicDBObject obj = new BasicDBObject();
+		obj.put(ID, path);
+		DBObject o = col.findOne(obj);
+		if(o != null){
+			return (byte[])o.get(DATA);
+		}
+			
+		return null;
+	}
+
+	@Override
+	public String read(String path) {
+		try {
+			return new String(readBytes(path),"utf8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		return null;
 	}
 	
 }

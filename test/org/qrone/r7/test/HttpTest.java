@@ -1,6 +1,7 @@
 package org.qrone.r7.test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import net.arnx.jsonic.JSON;
@@ -134,6 +135,35 @@ public class HttpTest {
 
 		map = fetchJSON("/test/user");
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
+	}
+
+	@Test
+	public void testFS(){
+		Map map;
+		List l;
+		map = fetchJSON("/test/fsdrop");
+		
+		map = fetchJSON("/test/fslist");
+		l = (List)map.get("list");
+		assertEquals(0, l.size());
+
+		map = fetchJSON("/test/fscreate");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+		
+		map = fetchJSON("/test/fscreate");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+
+		map = fetchJSON("/test/fsread");
+		assertEquals("{\"test234\":\"test345\"}", map.get("data"));
+
+		map = fetchJSON("/test/fstest");
+		assertEquals("test345", map.get("test234"));
+
+		map = fetchJSON("/test/fsdrop");
+		l = (List)map.get("list");
+		assertEquals(0, l.size());
 	}
 	
 	public Map fetchJSON(String path){
