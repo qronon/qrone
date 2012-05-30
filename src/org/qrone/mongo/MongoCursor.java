@@ -2,13 +2,13 @@ package org.qrone.mongo;
 
 import java.util.Map;
 
-import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseCursor;
+import org.qrone.r7.script.Scriptables;
 import org.qrone.r7.script.browser.Function;
 import org.qrone.r7.script.ext.ScriptablePrototype;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 
 public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCursor {
 	private DBCursor c;
@@ -16,7 +16,6 @@ public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCurso
 		this.c = c;
 	}
 	 
-	@Override
 	public void forEach(Function func) {
 		while(hasNext()){
 			func.call(next());
@@ -27,30 +26,29 @@ public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCurso
 	public boolean hasNext() {
 		return c.hasNext();
 	}
-	@Override
-	public DatabaseCursor limit(Number o) {
-		return new MongoCursor(c.limit(o.intValue()));
-	}
+	
 	@Override
 	public Map next() {
 		if(c.hasNext())
 			return c.next().toMap();
 		return null;
 	}
-	@Override
-	public DatabaseCursor skip(Number o) {
+
+	public MongoCursor limit(Number o) {
+		return new MongoCursor(c.limit(o.intValue()));
+	}
+	
+	public MongoCursor skip(Number o) {
 		return new MongoCursor(c.skip(o.intValue()));
 	}
 	
-	@Override
-	public DatabaseCursor sort(Scriptable o) {
-		return new MongoCursor(c.sort((DBObject)BsonUtil.to(o)));
+
+	public MongoCursor sort(Map o) {
+		return new MongoCursor(c.sort(new BasicDBObject(o)));
 	}
 
-	@Override
-	public DatabaseCursor sort(Map o) {
-		// TODO Auto-generated method stub
-		return null;
+	public MongoCursor sort(Object o) {
+		return sort(Scriptables.asMap(o));
 	}
 
 }

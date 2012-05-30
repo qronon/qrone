@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -41,8 +44,8 @@ public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
 	}
 
 	@Override
-	public SortedSet<String> list(){
-		SortedSet<String> set = new TreeSet<String>();
+	public List<String> list(){
+		List<String> set = new ArrayList<String>();
 		BasicDBObject ref = new BasicDBObject();
 		BasicDBObject keys = new BasicDBObject();
 		keys.append(ID, true);
@@ -51,7 +54,7 @@ public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
 			DBObject obj = c.next();
 			set.add((String)obj.get(ID));
 		}
-		
+		Collections.sort(set);
 		return set;
 	}
 

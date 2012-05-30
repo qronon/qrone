@@ -2,13 +2,11 @@ package org.qrone.mongo;
 
 import java.util.Map;
 
-import org.mozilla.javascript.Scriptable;
-import org.qrone.database.DatabaseCursor;
 import org.qrone.database.DatabaseTable;
+import org.qrone.r7.script.Scriptables;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 
 public class MongoTable implements DatabaseTable {
 	private DBCollection coll;
@@ -16,97 +14,65 @@ public class MongoTable implements DatabaseTable {
 		this.coll = coll;
 	}
 	
-
-	@Override
-	public void remove(Scriptable o) {
-		coll.remove((DBObject)BsonUtil.to(o));
+	
+	public String update(Object o, Object o2) {
+		return update(Scriptables.asMap(o), Scriptables.asMap(o2));
 	}
 
-	@Override
 	public String update(Map o, Map o2) {
-		coll.update(new BasicDBObject(o),new BasicDBObject(o2));
-		return null;
+		BasicDBObject dbo = new BasicDBObject(o);
+		coll.update(dbo,new BasicDBObject(o2));
+		return dbo.get("_id").toString();
 	}
 	
-	@Override
-	public String update(Scriptable o, Scriptable o2) {
-		coll.update((DBObject)BsonUtil.to(o),(DBObject)BsonUtil.to(o2));
-		return null;
+	public String save(Object o) {
+		return save(Scriptables.asMap(o));
 	}
-	
+
 	@Override
 	public String save(Map o) {
-		coll.save(new BasicDBObject(o));
-		return null;
-	}
-	
-	@Override
-	public String save(Scriptable o) {
-		coll.save((DBObject)BsonUtil.to(o));
-		return null;
+		BasicDBObject dbo = new BasicDBObject(o);
+		coll.save(dbo);
+		return dbo.get("_id").toString();
 	}
 
-	@Override
-	public void drop() {
-		coll.drop();
-	}
-
-	@Override
-	public String insert(Scriptable o) {
-		return save(o);
+	public String insert(Object o) {
+		return insert(Scriptables.asMap(o));
 	}
 	
 	@Override
 	public String insert(Map o) {
-		return save(o);
+		BasicDBObject dbo = new BasicDBObject(o);
+		coll.insert(dbo);
+		return dbo.get("_id").toString();
 	}
 
 	@Override
-	public DatabaseCursor find() {
+	public MongoCursor find() {
 		return new MongoCursor(coll.find());
 	}
 
-	@Override
-	public DatabaseCursor find(Scriptable o) {
-		return new MongoCursor(coll.find((DBObject)BsonUtil.to(o)));
-	}
-	
-	@Override
-	public DatabaseCursor find(Scriptable o, Scriptable p) {
-		return new MongoCursor(coll.find((DBObject)BsonUtil.to(o),
-				(DBObject)BsonUtil.to(p)));
+	public MongoCursor find(Object o) {
+		return find(Scriptables.asMap(o));
 	}
 
 	@Override
-	public DatabaseCursor find(Scriptable o, Scriptable p, Number skip) {
-		return find(o, p).skip(skip);
-	}
-
-	@Override
-	public DatabaseCursor find(Scriptable o, Scriptable p, Number skip, Number limit) {
-		return find(o, p).skip(skip).limit(limit);
-	}
-
-	@Override
-	public DatabaseCursor find(Map o) {
+	public MongoCursor find(Map o) {
 		return new MongoCursor(coll.find(new BasicDBObject(o)));
 	}
+	
+	public MongoCursor find(Object o, Object p) {
+		return find(Scriptables.asMap(o),Scriptables.asMap(p));
+	}
 
-	@Override
-	public DatabaseCursor find(Map o, Map p) {
+	public MongoCursor find(Map o, Map p) {
 		return new MongoCursor(coll.find(new BasicDBObject(o),new BasicDBObject(p)));
 	}
 
-	@Override
-	public DatabaseCursor find(Map o, Map p, Number skip) {
-		return find(o, p).skip(skip);
+	public void remove(Object o) {
+		remove(Scriptables.asMap(o));
 	}
-
-	@Override
-	public DatabaseCursor find(Map o, Map p, Number skip, Number limit) {
-		return find(o, p).skip(skip).limit(limit);
-	}
-
+	
 	@Override
 	public void remove(Map o) {
 		coll.remove(new BasicDBObject(o));
@@ -114,7 +80,12 @@ public class MongoTable implements DatabaseTable {
 
 	@Override
 	public void remove(String id) {
-		
+		coll.remove(new BasicDBObject("_id", id));
+	}
+	
+	@Override
+	public void drop() {
+		coll.drop();
 	}
 
 }
