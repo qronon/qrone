@@ -2,6 +2,7 @@ package org.qrone.r7.handler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -51,10 +52,28 @@ public class JavaScriptHandler implements URIHandler{
 				URI urio = new URI(uri);
 				JSOM om = vm.compile(urio);
 				if(om != null){
+					
+					
 					globalscope = vm.createScope();
 					ServletScope ss = new ServletScope(request, response, urio, path, leftpath);
 					Window window = new Window(ss,globalscope,deck,vm,services);
 					window.init(globalscope);
+					
+
+					if(uri.indexOf("/api/") >= 0 && !window.secure){
+						Map map = new HashMap();
+						map.put("status", "error");
+						map.put("code", "NO_TICKET");
+						map.put("message", "Need ticket for accessing apis.");
+						map.put("url", "http://...");
+						Writer w = response.getWriter();
+						w.write(JSON.encode(map));
+						w.flush();
+						w.close();
+						return true;
+					}
+					
+					
 					
 					Scriptable subscope = vm.createScope();
 					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
@@ -63,9 +82,8 @@ public class JavaScriptHandler implements URIHandler{
 					Object result = 
 						om.run(globalscope, window, subscope, window);
 					
-					User user = (User)request.getAttribute("User");
 					String done = ss.getParameter(".done");
-					if(done != null && user.validateTicket(ss.getParameter(".ticket"))){
+					if(done != null && window.secure){
 						//String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){

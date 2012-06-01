@@ -65,6 +65,23 @@ public class HttpTest {
 	}
 
 	@Test
+	public void testApi(){
+		Map map;
+		map = fetchJSON("/test/api/api");
+		assertEquals("error", map.get("status"));
+		assertEquals("NO_TICKET", map.get("code"));
+
+		map = fetchJSON("/test/ticket");
+		assertEquals("OK", map.get("status"));
+		String ticket = map.get("ticket").toString();
+
+		map = fetchJSON("/test/api/api?.ticket=" + ticket);
+		assertEquals("OK", map.get("status"));
+		
+		
+	}
+
+	@Test
 	public void testUserJS(){
 		Map map;
 		map = fetchJSON("/test/user");
