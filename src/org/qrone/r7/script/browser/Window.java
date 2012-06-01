@@ -62,7 +62,6 @@ public class Window{
 	public Navigator navigator;
 	public Map<String, Object> query;
 	public User user;
-	public boolean secure;
 
 	public DatabaseService db;
 	public MemcachedService memcached;

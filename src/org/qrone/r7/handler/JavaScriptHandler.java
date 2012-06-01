@@ -60,7 +60,7 @@ public class JavaScriptHandler implements URIHandler{
 					window.init(globalscope);
 					
 
-					if(uri.indexOf("/api/") >= 0 && !window.secure){
+					if(uri.indexOf("/api/") >= 0 && !ss.secure){
 						Map map = new HashMap();
 						map.put("status", "error");
 						map.put("code", "NO_TICKET");
@@ -83,7 +83,7 @@ public class JavaScriptHandler implements URIHandler{
 						om.run(globalscope, window, subscope, window);
 					
 					String done = ss.getParameter(".done");
-					if(done != null && window.secure){
+					if(done != null && ss.secure){
 						//String r = QrONEUtils.escape(JSON.encode(result));
 						try {
 							if(done.indexOf('?') >= 0){

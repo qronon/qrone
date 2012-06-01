@@ -65,14 +65,15 @@ public class ServletScope{
 	}
 	
 	private boolean isMultipart(){
-		return request.getHeader("Content-Type").equals("multipart/form-data");
+		String ct = request.getHeader("Content-Type");
+		return ct != null && ct.equals("multipart/form-data");
 	}
 	
 	private void parseForm(){
 		try {
 			InputStream in = request.getInputStream();
 			byte[] b = Stream.read(in);
-			String t = QrONEUtils.getString(body, request.getHeader("Content-Type"));
+			String t = QrONEUtils.getString(b, request.getHeader("Content-Type"));
 			
 			Map<String, Object> p = parseQueryString(text);
 

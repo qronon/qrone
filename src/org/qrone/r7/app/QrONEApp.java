@@ -39,7 +39,6 @@ public class QrONEApp {
 	private String path;
 	private Server server = null;
 	private QrONEServlet servlet;
-	private MessagingServer mserver;
 	
 	public QrONEApp(int port, int mport, String path){
 		this.port = port;
@@ -88,8 +87,6 @@ public class QrONEApp {
 	public void startAndWait(boolean window){
 
 		try {
-            mserver.listen(mport);
-            
             if(!window){
             	try {
 	    			server.start();
@@ -178,7 +175,7 @@ public class QrONEApp {
         }
 
         Boolean help = (Boolean) parser.getOptionValue(helpOpt);
-        if(help.booleanValue()){
+        if(help != null && help.booleanValue()){
         	usage();
             System.exit(0);
         }
@@ -199,10 +196,10 @@ public class QrONEApp {
 
         Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
         if(cli == null || !cli.booleanValue()){
-        	app.startAndWait(false);
+        	app.startAndWait(true);
         	app.stop();
         }else{
-        	app.startAndWait(true);
+        	app.startAndWait(false);
         	app.stop();
         }
 	}

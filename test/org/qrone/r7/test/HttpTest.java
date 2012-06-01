@@ -1,8 +1,13 @@
 package org.qrone.r7.test;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.arnx.jsonic.JSON;
 
@@ -24,17 +29,26 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.qrone.r7.app.QrONEApp;
 import org.qrone.util.Stream;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import static org.junit.Assert.*;
 
 public class HttpTest {
 	private static QrONEApp app;
 	private static HttpClient c;
+	private static DocumentBuilder db;
 	
 	@BeforeClass
 	public static void beforeClass(){
 		app = new QrONEApp(9601, 9699, "./htdocs");
 		app.start();
+		
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    try {
+			db = dbf.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {}
 	}
 
 	@Before
@@ -182,6 +196,39 @@ public class HttpTest {
 		l = (List)map.get("list");
 		assertEquals(0, l.size());
 	}
+
+	@Test
+	public void testXML(){
+		Document doc;
+		List l;
+		doc = fetchXML("/test/helloXML");
+		assertEquals("OK", doc.getDocumentElement().getAttribute("status"));
+		
+	}
+
+	public Document fetchXML(String path){
+		HttpGet r = new HttpGet("http://localhost:9601" + path);
+
+		HttpParams params = new BasicHttpParams();
+		params.setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
+		r.setParams(params);
+		
+		try {
+			HttpResponse res = c.execute(r);
+			String body = new String(Stream.read(res.getEntity().getContent()),"utf8");
+			return db.parse(new InputSource(new StringReader(body)));
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	public Map fetchJSON(String path){
 		HttpGet r = new HttpGet("http://localhost:9601" + path);
@@ -206,6 +253,5 @@ public class HttpTest {
 		}
 		
 		return null;
-		
 	}
 }

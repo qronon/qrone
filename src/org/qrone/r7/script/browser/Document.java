@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.mozilla.javascript.xml.XMLObject;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5StreamWriter;
 import org.qrone.r7.parser.HTML5Template;
@@ -37,6 +38,10 @@ public class Document extends HTML5Template{
 		}else if(out instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)out;
 			t.out(streamWriter, om.getDocument());
+		}else if(out instanceof XMLObject){
+			XMLObject xo = (XMLObject)out;
+			String o = xo.callMethod(xo, "toXMLString", null).toString();
+			writer.append(o);
 		}else{
 			writer.append(JSON.encode(Scriptables.asMap(out)));
 		}
