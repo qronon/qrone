@@ -73,32 +73,32 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 		}
 
 		@Override
-		public boolean delete(String key) {
+		public boolean remove(String key) {
 			return client.delete(collection + key);
 		}
 
 		@Override
-		public boolean delete(String key, long millisNoReAdd) {
+		public boolean remove(String key, long millisNoReAdd) {
 			return client.delete(collection + key, new Date(System.currentTimeMillis()+millisNoReAdd));
 		}
 
 		@Override
-		public Set<String> deleteAll(Collection<String> keys) {
+		public Set<String> removeAll(Collection<String> keys) {
 			Set<String> set = new HashSet<String>();
 			for (Iterator<String> i = keys.iterator(); i.hasNext();) {
 				String string = i.next();
-				if(delete(string))
+				if(remove(string))
 					set.add(string);
 			}
 			return set;
 		}
 
 		@Override
-		public Set<String> deleteAll(Collection<String> keys, long millisNoReAdd) {
+		public Set<String> removeAll(Collection<String> keys, long millisNoReAdd) {
 			Set<String> set = new HashSet<String>();
 			for (Iterator<String> i = keys.iterator(); i.hasNext();) {
 				String string = i.next();
-				if(delete(string,millisNoReAdd))
+				if(remove(string,millisNoReAdd))
 					set.add(string);
 			}
 			return set;

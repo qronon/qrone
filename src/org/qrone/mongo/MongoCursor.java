@@ -1,5 +1,7 @@
 package org.qrone.mongo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.qrone.database.DatabaseCursor;
@@ -32,6 +34,14 @@ public class MongoCursor implements ScriptablePrototype<DBCursor>, DatabaseCurso
 		if(c.hasNext())
 			return c.next().toMap();
 		return null;
+	}
+	
+	public List toArray(){
+		List l = new ArrayList();
+		while(c.hasNext()){
+			l.add(c.next());
+		}
+		return l;
 	}
 
 	public MongoCursor limit(Number o) {

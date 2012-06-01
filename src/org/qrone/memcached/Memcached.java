@@ -8,10 +8,10 @@ import java.util.Set;
 public interface Memcached {
 	public void clearAll();
 	public boolean contains(String key);
-	public boolean delete(String key);
-	public boolean delete(String key, long millisNoReAdd);
-	public Set<String> deleteAll(Collection<String> keys);
-	public Set<String> deleteAll(Collection<String> keys, long millisNoReAdd);
+	public boolean remove(String key);
+	public boolean remove(String key, long millisNoReAdd);
+	public Set<String> removeAll(Collection<String> keys);
+	public Set<String> removeAll(Collection<String> keys, long millisNoReAdd);
 	public Object get(String key);
 	public Map<String, Object> getAll(Collection<String> keys);
 	public long increment(String key, long delta);

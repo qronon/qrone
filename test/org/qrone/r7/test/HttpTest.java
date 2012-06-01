@@ -209,6 +209,9 @@ public class HttpTest {
 	public void testMemcached(){
 		Map map;
 		List l;
+		map = fetchJSON("/test/memcacheremove");
+		assertEquals(null, map.get("mem"));
+		
 		map = fetchJSON("/test/memcacheget");
 		assertEquals(null, map.get("mem"));
 
@@ -219,6 +222,37 @@ public class HttpTest {
 		assertEquals("test89", map.get("mem"));
 	}
 
+
+	@Test
+	public void testMongo(){
+		Map map;
+		List l;
+		map = fetchJSON("/test/mongodrop");
+		l = (List)map.get("list");
+		assertEquals(0, l.size());
+		
+		map = fetchJSON("/test/mongofind");
+		l = (List)map.get("list");
+		assertEquals(0, l.size());
+
+		map = fetchJSON("/test/mongosave");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+
+		map = fetchJSON("/test/mongofind");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+
+		map = fetchJSON("/test/mongosave");
+		l = (List)map.get("list");
+		assertEquals(2, l.size());
+
+		map = fetchJSON("/test/mongofind");
+		l = (List)map.get("list");
+		assertEquals(2, l.size());
+	}
+	
+	
 	public Document fetchXML(String path){
 		HttpGet r = new HttpGet("http://localhost:9601" + path);
 
