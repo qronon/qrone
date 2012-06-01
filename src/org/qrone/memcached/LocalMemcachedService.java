@@ -106,6 +106,7 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 
 		@Override
 		public Object get(String key) {
+			System.out.println(collection + key);
 			return client.get(collection + key);
 		}
 
@@ -126,17 +127,18 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 
 		@Override
 		public void put(String key, Object value) {
-			client.add(collection + key, value);
+			System.out.println(collection + key);
+			client.set(collection + key, value);
 		}
 
 		@Override
 		public void put(String key, Object value, int ttlmillis) {
-			client.add(collection + key, value, new Date(System.currentTimeMillis()+ttlmillis));
+			client.set(collection + key, value, new Date(System.currentTimeMillis()+ttlmillis));
 		}
 
 		@Override
 		public void put(String key, Object value, Date expire) {
-			client.add(collection + key, value, expire);
+			client.set(collection + key, value, expire);
 		}
 
 		@Override
@@ -147,12 +149,12 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 		@Override
 		public void put(String key, Object value, Date expire, SetPolicy policy) {
 			if(policy == SetPolicy.SET_ALWAYS){
-				client.add(collection + key, value, expire);
+				client.set(collection + key, value, expire);
 			}else if(policy == SetPolicy.REPLACE_ONLY_IF_PRESENT){
 				client.replace(collection + key, value, expire);
 			}else if(policy == SetPolicy.ADD_ONLY_IF_NOT_PRESENT){
 				if(!client.keyExists(collection + key))
-					client.add(collection + key, value, expire);
+					client.set(collection + key, value, expire);
 			}
 		}
 

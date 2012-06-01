@@ -48,7 +48,7 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			MongoDatabaseService mongo = new MongoDatabaseService(new Mongo().getDB("qrone"), domain);
 			service.setDatabaseService(mongo);
 
-			String[] memcachedServer = {"localhost"};
+			String[] memcachedServer = {"localhost:11211"};
 			service.setMemcachedService(new LocalMemcachedService(memcachedServer,domain));
 	
 			service.setKeyValueStoreService(

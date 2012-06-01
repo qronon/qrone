@@ -203,7 +203,20 @@ public class HttpTest {
 		List l;
 		doc = fetchXML("/test/helloXML");
 		assertEquals("OK", doc.getDocumentElement().getAttribute("status"));
-		
+	}
+
+	@Test
+	public void testMemcached(){
+		Map map;
+		List l;
+		map = fetchJSON("/test/memcacheget");
+		assertEquals(null, map.get("mem"));
+
+		map = fetchJSON("/test/memcacheset");
+		assertEquals("test89", map.get("mem"));
+
+		map = fetchJSON("/test/memcacheget");
+		assertEquals("test89", map.get("mem"));
 	}
 
 	public Document fetchXML(String path){
