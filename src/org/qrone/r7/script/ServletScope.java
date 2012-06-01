@@ -31,8 +31,11 @@ public class ServletScope{
 	public byte[] body;
 	public String text;
 	public Map<String, Object> get;
-	private Map<String, Object> post;
-	private List<FileItem> fileItemList;
+	public Map<String, Object> post;
+	public List<FileItem> fileItemList;
+	public boolean secure;
+	
+	private User user;
 	
 	public ServletScope(HttpServletRequest request, HttpServletResponse response, URI uri, String path, String leftpath) {
 		this.request = request;
@@ -43,6 +46,13 @@ public class ServletScope{
 		
 		get = parseQueryString(request.getQueryString());
 		
+		user = (User)request.getAttribute("User");
+		secure = user.validateTicket(getParameter(".ticket"));
+		if(!isMultipart()){
+			parseForm();
+		}else{
+			parseMultipart();
+		}
 		
 	}
 	
@@ -54,80 +64,68 @@ public class ServletScope{
 		}
 	}
 	
-	public Map<String, Object> getPost(User user, boolean secure){
-		if(post == null){
-			
-			if(request.getHeader("Content-Type").equals("multipart/form-data")){
-				
-				DiskFileItemFactory factory = new DiskFileItemFactory();
-				factory.setSizeThreshold(1024);
-				
-				ServletFileUpload upload = new ServletFileUpload(factory);
-				upload.setSizeMax(-1);
-				
-				try {
-					fileItemList = upload.parseRequest(request);
-					Map<String, Object> p = new HashMap<String, Object>();
-					for (FileItem fileItem : fileItemList) {
-						if(fileItem.isFormField()){
-							Object o = p.get(fileItem.getFieldName());
-							if(o == null){
-								p.put(fileItem.getFieldName(), fileItem.getString());
-							}else if(o instanceof String){
-								List<String> l = new ArrayList<String>();
-								l.add((String)o);
-								l.add(fileItem.getString());
-								p.put(fileItem.getFieldName(), l);
-							}else{
-								List<String> l = (List<String>)o;
-								l.add(fileItem.getString());
-							}
-						}else{
-							String fileName = fileItem.getName();
-							if ((fileName != null) && (!fileName.equals(""))) {
-								fileName = (new File(fileName)).getName();
-							}
-						}
-					}
-					
-					if(validateTicket(user, secure, p)){
-						post = p;
-						return post;
-					}else{
-						return null;
-					}
-					
-				} catch (FileUploadException e) {
-					e.printStackTrace();
-				}
-				
-			}else{
-				try {
-					InputStream in = request.getInputStream();
-					body = Stream.read(in);
-					text = QrONEUtils.getString(body, request.getHeader("Content-Type"));
-					
-					Map<String, Object> p = parseQueryString(text);
-					if(validateTicket(user, secure, p)){
-						post = p;
-						return post;
-					}else{
-						return null;
-					}
-
-				} catch (IOException e) {}
-			}
-		}
-		return null;
+	private boolean isMultipart(){
+		return request.getHeader("Content-Type").equals("multipart/form-data");
 	}
 	
-	private boolean validateTicket(User user, boolean secure, Map<String, Object> p){
-		Object pt = p.get(".ticket");
-		if( secure
-				|| pt != null && pt instanceof String && user.validateTicket((String)pt) ){
-			return true;
+	private void parseForm(){
+		try {
+			InputStream in = request.getInputStream();
+			byte[] b = Stream.read(in);
+			String t = QrONEUtils.getString(body, request.getHeader("Content-Type"));
+			
+			Map<String, Object> p = parseQueryString(text);
+
+			Object pt = p.get(".ticket");
+			if( secure || user.validateTicket((String)pt) ){
+				post = p;
+				body = b;
+				text = t;
+			}
+
+		} catch (IOException e) {}
+	}
+	
+	private void parseMultipart(){
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		factory.setSizeThreshold(1024);
+		
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		upload.setSizeMax(-1);
+		
+		try {
+			fileItemList = upload.parseRequest(request);
+			Map<String, Object> p = new HashMap<String, Object>();
+			for (FileItem fileItem : fileItemList) {
+				if(fileItem.isFormField()){
+					Object o = p.get(fileItem.getFieldName());
+					if(o == null){
+						p.put(fileItem.getFieldName(), fileItem.getString());
+					}else if(o instanceof String){
+						List<String> l = new ArrayList<String>();
+						l.add((String)o);
+						l.add(fileItem.getString());
+						p.put(fileItem.getFieldName(), l);
+					}else{
+						List<String> l = (List<String>)o;
+						l.add(fileItem.getString());
+					}
+				}else{
+					String fileName = fileItem.getName();
+					if ((fileName != null) && (!fileName.equals(""))) {
+						fileName = (new File(fileName)).getName();
+					}
+				}
+			}
+			
+			Object pt = p.get(".ticket");
+			if( secure || user.validateTicket((String)pt) ){
+				post = p;
+			}
+			
+		} catch (FileUploadException e) {
+			e.printStackTrace();
 		}
-		return false;
 	}
 	
 	public String getParameter(String name){

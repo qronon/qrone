@@ -118,15 +118,9 @@ public class Window{
 		
 		query = ss.get;
 		req.put("get", req, query);
-		
+		req.put("post", req, ss.post);
 		req.put("body", req, ss.body);
 		req.put("text", req, ss.text);
-		
-		secure = user.validateTicket(ss.getParameter(".ticket"));
-	}
-	
-	public Map getPost(){
-		return ss.getPost(user, secure);
 	}
 	
 	public PortingService getPortingService(){
