@@ -178,11 +178,23 @@ public class HttpTest {
 		l = (List)map.get("list");
 		assertEquals(0, l.size());
 
+		map = fetchJSON("/test/fslist2");
+		l = (List)map.get("list");
+		assertEquals(0, l.size());
+
 		map = fetchJSON("/test/fscreate");
 		l = (List)map.get("list");
 		assertEquals(1, l.size());
 		
 		map = fetchJSON("/test/fscreate");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+
+		map = fetchJSON("/test/fslist");
+		l = (List)map.get("list");
+		assertEquals(1, l.size());
+
+		map = fetchJSON("/test/fslist2");
 		l = (List)map.get("list");
 		assertEquals(1, l.size());
 
@@ -201,7 +213,10 @@ public class HttpTest {
 	public void testXML(){
 		Document doc;
 		List l;
-		doc = fetchXML("/test/helloXML");
+		doc = fetchXML("/test/helloxml");
+		assertEquals("OK", doc.getDocumentElement().getAttribute("status"));
+		
+		doc = fetchXML("/test/helloxml2");
 		assertEquals("OK", doc.getDocumentElement().getAttribute("status"));
 	}
 
@@ -263,6 +278,7 @@ public class HttpTest {
 		try {
 			HttpResponse res = c.execute(r);
 			String body = new String(Stream.read(res.getEntity().getContent()),"utf8");
+			System.out.println(body);
 			return db.parse(new InputSource(new StringReader(body)));
 		} catch (IllegalStateException e) {
 			e.printStackTrace();

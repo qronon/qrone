@@ -19,6 +19,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import org.qrone.r7.resolver.AbstractURIFileSystem;
 import org.qrone.r7.resolver.AbstractURIResolver;
 import org.qrone.r7.resolver.URIFileSystem;
 
@@ -28,7 +29,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class MongoResolver extends AbstractURIResolver implements URIFileSystem{
+public class MongoResolver extends AbstractURIFileSystem{
 	private static final String ID = "_id";
 	private static final String DATA = "data";
 	
