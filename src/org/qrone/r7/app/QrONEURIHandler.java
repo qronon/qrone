@@ -14,8 +14,6 @@ import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.kvs.LocalKeyValueStoreService;
 import org.qrone.login.CookieHandler;
 import org.qrone.memcached.LocalMemcachedService;
-import org.qrone.messaging.MessagingServer;
-import org.qrone.messaging.MessagingService;
 import org.qrone.mongo.MongoDatabaseService;
 import org.qrone.mongo.MongoResolver;
 import org.qrone.png.PNGMemoryImageService;
@@ -55,9 +53,6 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 					new LocalKeyValueStoreService(service.getDatabaseService(), 
 							service.getMemcachedService()));
 			
-			MessagingServer ms = new MessagingServer();
-			ms.listen(9699);
-			service.setMessengerService(ms);
 			
 			service.setFileSystemService(new MongoResolver(new Mongo().getDB("qrone"), domain + "/qrone.filesystem"));
 
@@ -101,17 +96,6 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			resolver.add(repository.getResolver());
 			resolver.add(new FilteredResolver("/system/resource/", new InternalResourceResolver(cx)));
 			resolver.add(service.getFileSystemService());
-			
-			// Update
-			final MessagingService ms = service.getMessengerService();
-			resolver.addUpdateListener(new URIResolver.Listener() {
-				@Override
-				public void update(URI uri) {
-					Map map = new HashMap();
-					map.put("path", uri.toString());
-					ms.to("qrone.fs.update", map);
-				}
-			});
 			
 			
 			handler.add(github);

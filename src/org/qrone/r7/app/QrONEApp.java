@@ -28,7 +28,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.qrone.messaging.MessagingServer;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIResolver.Listener;
