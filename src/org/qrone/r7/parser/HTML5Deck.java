@@ -14,16 +14,14 @@ import java.util.Set;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.tag.HTML5TagHandler;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.Stream;
 import org.qrone.util.XDeck;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSRuleList;
 
-public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
+public class HTML5Deck extends XDeck<HTML5OM>{
 	private CSS3Deck cssdeck;
-	private List<HTML5TagHandler> handlers = new ArrayList<HTML5TagHandler>();
 	private PortingService services;
 	
 	public HTML5Deck(URIResolver resolver){
@@ -41,25 +39,6 @@ public class HTML5Deck extends XDeck<HTML5OM> implements Extendable{
     public PortingService getPortingService(){
     	return services;
     }
-	
-	public void addExtension(Class c){
-		if(HTML5TagHandler.class.isAssignableFrom(c)){
-			try{
-				HTML5TagHandler h = (HTML5TagHandler)c.getConstructor(HTML5Deck.class).newInstance(this);
-				handlers.add(h);
-			}catch(Exception e){
-				try{
-					HTML5TagHandler h = (HTML5TagHandler)c.getConstructor().newInstance();
-					handlers.add(h);
-				}catch(Exception e1){}
-			}
-		}
-	}
-	
-	public List<HTML5TagHandler> getTagHandlers() {
-		return handlers;
-	}
-
 
 	@Override
 	public HTML5OM compile(URI uri, InputStream in, String encoding)

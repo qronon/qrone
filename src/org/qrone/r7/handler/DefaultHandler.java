@@ -40,7 +40,6 @@ public class DefaultHandler implements URIHandler, Extendable{
 	
 	public void addExtension(Class c){
 		vm.addExtension(c);
-		deck.addExtension(c);
 	}
 	
 	public boolean mainHandle(HttpServletRequest request, HttpServletResponse response, 

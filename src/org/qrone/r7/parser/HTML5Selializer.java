@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.qrone.r7.parser.HTML5Deck.HTML5Set;
 import org.qrone.r7.script.browser.Function;
-import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,60 +58,66 @@ public class HTML5Selializer extends HTML5TagWriter{
 	
 	@Override
 	public void visit(Element e) {
-		List<HTML5TagResult> r = getTagResult(e);
 		if(e.getNodeName().equals("head")){
-			start(e,r);
+			start(e);
 			inHead = true;
 			accept(e);
 			inHead = false;
 			deck.outputStyles(b, set, uri);
-			end(e,r);
+			end(e);
 		}else if(e.getNodeName().equals("body")){
 			if(node != body){
-				start(e,r);
+				start(e);
 			}
 			
 			accept(e);
 			
 			if(node != body){
 				deck.outputScripts(b, set, uri);
-				end(e,r);
+				end(e);
 			}
 		}else if(e.getNodeName().equals("script")){
 			if(!inHead){
-				start(e,r);
+				start(e);
 				inScript = true;
 				accept(e);
 				inScript = false;
-				end(e,r);
+				end(e);
 			}
 		}else if(e.getNodeName().equals("style")){
 		}else if(e.getNodeName().equals("link")){
 		}else if(e.getNodeName().equals("meta")){
 			if(e.getAttribute("name").equals("extends")){
 			}else{
-				start(e,r);
+				start(e);
 				accept(e);
-				end(e,r);
+				end(e);
 			}
 		}else if(e.getNodeName().equals("pre") || e.getNodeName().equals("code") || e.getNodeName().equals("textarea")){
 			formatting++;
-			start(e,r);
+			start(e);
 			accept(e);
-			end(e,r);
+			end(e);
 			formatting--;
 		}else if(e.getNodeName().equals("meta")){
 			if(e.getAttribute("name").equals("extends")){
 			}else{
-				start(e,r);
+				start(e);
 				accept(e);
-				end(e,r);
+				end(e);
 			}
-		}else{
-			start(e,r);
+		}else if(e.getNodeName().equals("form")){
+			start(e);
 			accept(e);
-			end(e,r);
+			append("<input type=\"hidden\" name=\".ticket\" value=\"" + ticket + "\"/>");
+			end(e);
+		}else{
+			start(e);
+			accept(e);
+			end(e);
 		}
+		
+		
 	}
 
 	@Override
@@ -126,44 +131,6 @@ public class HTML5Selializer extends HTML5TagWriter{
 		}else{
 			append(escape(n.getNodeValue()));
 		}
-	}
-
-	private List<HTML5TagResult> getTagResult(Element e) {
-		List<HTML5TagResult> l = om.getTagResult(e);
-		if(t == null) return l;
-		
-		final HTML5Element n = t.get(e);
-		if(n != null){
-			if(l == null){
-				l = new ArrayList<HTML5TagResult>();
-			}
-			l.add(new HTML5TagResult() {
-				@Override
-				public String prestart(String ticket) {
-					accept(n.before);
-					return null;
-				}
-				
-				@Override
-				public String preend(String ticket) {
-					accept(n.append);
-					return null;
-				}
-				
-				@Override
-				public String poststart(String ticket) {
-					accept(n.prepend);
-					return null;
-				}
-				
-				@Override
-				public String postend(String ticket) {
-					accept(n.after);
-					return null;
-				}
-			});
-		}
-		return l;
 	}
 
 	protected void accept(Element e) {

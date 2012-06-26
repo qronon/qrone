@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -181,44 +180,4 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 			b.append(bs.toString());
 		}
 	}
-
-
-	protected void start(Element e, List<HTML5TagResult> r) {
-		if(r != null){
-			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
-			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
-					.hasNext();) {
-				append(iterator.next().prestart(ticket));
-			}
-			
-			start(e);
-			
-			Collections.reverse(rr);
-			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
-					.hasNext();) {
-				append(iterator.next().poststart(ticket));
-			}
-		}else{
-			start(e);
-		}
-	}
-
-	protected void end(Element e, List<HTML5TagResult> r) {
-		if(r != null){
-			List<HTML5TagResult> rr = new ArrayList<HTML5TagResult>(r);
-			for (Iterator<HTML5TagResult> iterator = r.iterator(); iterator
-					.hasNext();) {
-				append(iterator.next().preend(ticket));
-			}
-			end(e);
-			Collections.reverse(rr);
-			for (Iterator<HTML5TagResult> iterator = rr.iterator(); iterator
-					.hasNext();) {
-				append(iterator.next().postend(ticket));
-			}
-		}else{
-			end(e);
-		}
-	}
-
 }

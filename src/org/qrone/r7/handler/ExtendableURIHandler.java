@@ -14,7 +14,6 @@ import org.qrone.r7.script.ext.MapPrototype;
 import org.qrone.r7.script.window.WindowEncodes;
 import org.qrone.r7.script.window.WindowFileSystem;
 import org.qrone.r7.script.window.WindowFormats;
-import org.qrone.r7.tag.SecurityTicketHandler;
 
 public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 	protected CascadeResolver resolver;
@@ -51,8 +50,6 @@ public abstract class ExtendableURIHandler implements URIHandler, Extendable{
 		e.addExtension(ClassPrototype.class);
 		e.addExtension(MapPrototype.class);
 		e.addExtension(ListPrototype.class);
-		
-		e.addExtension(SecurityTicketHandler.class);
 		
 		e.addExtension(WindowEncodes.class);
 		e.addExtension(WindowFormats.class);

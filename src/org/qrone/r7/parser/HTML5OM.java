@@ -23,8 +23,6 @@ import org.qrone.coder.QState;
 import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.parser.HTML5Deck.HTML5Set;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.tag.HTML5TagHandler;
-import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -57,7 +55,6 @@ public class HTML5OM {
 	
 	private DOMNodeSelector nodeselector;
 
-	private Map<Element, List<HTML5TagResult>> extmap = new Hashtable<Element, List<HTML5TagResult>>();
 	private Map<String, Set<Node>> selectcache = new Hashtable<String, Set<Node>>();
 	
 	private URI uri;
@@ -161,19 +158,6 @@ public class HTML5OM {
 			
 			@Override
 			public void visit(Element e) {
-				for (Iterator<HTML5TagHandler> i = deck.getTagHandlers().iterator(); i
-						.hasNext();) {
-					HTML5TagHandler h = i.next();
-					HTML5TagResult r = h.process(new HTML5Element(HTML5OM.this, null, e));
-					if(r != null){
-						List<HTML5TagResult> l = extmap.get(e);
-						if(l == null){
-							l = new ArrayList<HTML5TagResult>();
-							extmap.put(e, l);
-						}
-						l.add(r);
-					}
-				}
 				
 				NamedNodeMap map = e.getAttributes();
 				for (int i = 0; i < map.getLength(); i++) {
@@ -262,11 +246,6 @@ public class HTML5OM {
 		while (matcher.find()) {
 			requires.add(matcher.group(1));
 		}
-	}
-	
-	
-	public List<HTML5TagResult> getTagResult(Element e){
-		return extmap.get(e);
 	}
 	
 	public void process(final HTML5Writer w, final HTML5Template t,

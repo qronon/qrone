@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.qrone.r7.script.browser.Function;
-import org.qrone.r7.tag.HTML5TagResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSStyleDeclaration;
