@@ -45,7 +45,6 @@ public class HTML5OM {
 	
 	private Document document;
 	private Element body;
-	private Map<Node, List<CSS3Rule>> map = new Hashtable<Node, List<CSS3Rule>>();
 	
 	private List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
 	private List<String> javascripts = new LinkedList<String>();
@@ -83,10 +82,6 @@ public class HTML5OM {
 	
 	public List<CSS3OM> getStyleSheets(){
 		return stylesheets;
-	}
-	
-	public Map<Node, List<CSS3Rule>> getCSSRuleMap(){
-		return map;
 	}
 	
 	public Document getDocument(){
@@ -292,33 +287,6 @@ public class HTML5OM {
 	}
 	
 	private void parseStyleSheet(final CSS3OM cssom) throws IOException{
-		CSS3Visitor v = new CSS3Visitor(){
-			@Override
-			public void visit(CSSMediaRule rule){
-				MediaList list = rule.getMedia();
-				if(list.getMediaText().indexOf("all") >= 0 || list.getMediaText().indexOf("screen") >= 0){
-					accept(rule);
-				}
-			}
-			
-			@Override
-			public void visit(CSSStyleRule style) {
-				Set<Node> set = select(style.getSelectorText());
-				if(set != null){
-					for (Iterator<Node> i = set.iterator(); i
-							.hasNext();) {
-						Node node = i.next();
-						List<CSS3Rule> list = map.get(node);
-						if(list == null){
-							list = new ArrayList<CSS3Rule>();
-							map.put(node, list);
-						}
-						list.add(new CSS3Rule(cssom, style));
-					}
-				}
-			}
-		};
-		v.visit(cssom.getStyleSheet());
 		stylesheets.add(cssom);
 	}
 

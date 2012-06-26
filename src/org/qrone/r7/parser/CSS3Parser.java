@@ -114,7 +114,7 @@ public class CSS3Parser{
 		}
 	}
 
-	public static String serialize(CSSStyleSheet stylesheet) throws IOException{
+	private static String serialize(CSSStyleSheet stylesheet) throws IOException{
 		StringWriter w = new StringWriter();
 		serialize(stylesheet);
 		return w.toString();

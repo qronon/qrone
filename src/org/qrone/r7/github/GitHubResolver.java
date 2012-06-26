@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ho.yaml.Yaml;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.handler.URIHandler;
@@ -48,9 +50,14 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 	private Map<String,String> getFiles(){
 		if(blobs == null){
 			try {
-				Map map = (Map)Yaml.load(fetcher.fetch("http://github.com/api/v2/yaml/blob/all/" 
-						+ user + "/" + repo + "/" + treesha));
-				blobs = (Map<String,String>)map.get("blobs");
+				Map map = (Map)JSON.decode(fetcher.fetch("https://api.github.com/repos/" 
+						+ user + "/" + repo + "/git/trees/" + treesha + "?recursive=1"));
+				List<Map> list = (List<Map>)map.get("tree");
+				
+				blobs = new HashMap<String, String>();
+				for (Map o : list) {
+					blobs.put(o.get("path").toString(), o.get("url").toString());
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -74,21 +81,26 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		Map<String,String> map = getFiles();
-		String sha = map.get("htdocs" + uri.toString());
+		String url = map.get("htdocs" + uri.toString());
 		InputStream in = cacheresolver.getInputStream(uri);
 		if(in != null) return in;
 		
 		if(map != null){
-			if(sha != null){
-				InputStream fin =  fetcher.fetch("http://github.com/api/v2/yaml/blob/show/" 
-						+ user + "/" + repo + "/" + sha);
-				byte[] bytes = Stream.read(fin);
+			if(url != null){
+				InputStream fin =  fetcher.fetch(url);
+				Map m = JSON.decode(fin);
+				String encoding = m.get("encoding").toString();
+				byte[] bytes = null;
+				if(encoding.equals("base64")){
+					bytes = Base64.decodeBase64(m.get("content").toString());
+				}else{
+					bytes = m.get("content").toString().getBytes();
+				}
 				
 				OutputStream out = cacheresolver.getOutputStream(uri);
 				out.write(bytes);
 				out.flush();
 				out.close();
-				
 				return new ByteArrayInputStream(bytes);
 			}
 		}

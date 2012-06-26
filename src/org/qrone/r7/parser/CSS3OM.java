@@ -57,7 +57,7 @@ public class CSS3OM{
 		return stylesheet;
 	}
 	
-	public String serialize(){
+	private String serialize(){
 		StringBuffer css = new StringBuffer();
 		CSSRuleList l = getStyleSheet().getCssRules();
 		for (int i = 0; i < l.getLength(); i++) {

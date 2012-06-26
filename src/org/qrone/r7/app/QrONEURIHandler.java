@@ -9,14 +9,12 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.qrone.database.DatabaseService;
-import org.qrone.img.ImageSpriteService;
 import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.kvs.LocalKeyValueStoreService;
 import org.qrone.login.CookieHandler;
 import org.qrone.memcached.LocalMemcachedService;
 import org.qrone.mongo.MongoDatabaseService;
 import org.qrone.mongo.MongoResolver;
-import org.qrone.png.PNGMemoryImageService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.fetcher.HTTPFetcher;
 import org.qrone.r7.fetcher.LocalHTTPFetcher;
@@ -78,13 +76,6 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			CookieHandler cookie = new CookieHandler(service.getMasterToken(), service);
 			handler.add(cookie);
 			
-			// Scale9 Service
-			PNGMemoryImageService imagebufferservice = new PNGMemoryImageService();
-			ImageSpriteService imagespriteservice = new ImageSpriteService(resolver, cache, imagebufferservice);
-			
-			service.setImageBufferService(imagebufferservice);
-			service.setImageSpriteService(imagespriteservice);
-			resolver.add(imagespriteservice);
 			
 			// Github Admintool
 			github = new GitHubResolver(fetcher, cache, 

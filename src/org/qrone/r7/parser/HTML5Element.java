@@ -21,7 +21,6 @@ public class HTML5Element implements HTML5Node{
 	private HTML5Template t;
 	private Element e;
 	private Element oe;
-	private Map<Node, List<CSS3Rule>> map;
 	
 	public Object content;
 	public List before;
@@ -35,7 +34,6 @@ public class HTML5Element implements HTML5Node{
 		this.om = om;
 		this.t = t;
 		this.e = e;
-		this.map = om.getCSSRuleMap();
 	}
 	
 	public HTML5OM getOM(){
@@ -80,21 +78,8 @@ public class HTML5Element implements HTML5Node{
 	}
 	
 	public CSS3Value getPropertyValue(String prop){
-		List<CSS3Rule> l = map.get(e);
 		CSS3Value value = null;
 		CSS3Value imporantValue = null;
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				CSS3Rule rule = iter.next();
-				CSS3Value v = rule.getProperty(prop);
-				if(v != null){
-					if(v.isImportant())
-						imporantValue = v;
-					else
-						value = v;
-				}
-			}
-		}
 		String attr = get().getAttribute("style");
 		if(attr != null){
 			try {
@@ -129,17 +114,6 @@ public class HTML5Element implements HTML5Node{
 	}
 
 	public void renameProperty(String prop, String newprop){
-		List<CSS3Rule> l = map.get(e);
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				CSS3Rule rule = iter.next();
-				CSS3Value v = rule.getProperty(prop);
-				if(v != null){
-					rule.setProperty(newprop, v.getValue(), v.isImportant());
-					rule.removeProperty(prop);
-				}
-			}
-		}
 		
 		String attr = get().getAttribute("style");
 		if(attr != null){
@@ -157,12 +131,6 @@ public class HTML5Element implements HTML5Node{
 	}
 	
 	public void removeProperty(String prop){
-		List<CSS3Rule> l = map.get(e);
-		if(l != null){
-			for (Iterator<CSS3Rule> iter = l.iterator(); iter.hasNext();) {
-				iter.next().removeProperty(prop);
-			}
-		}
 		
 		String attr = get().getAttribute("style");
 		if(attr != null){

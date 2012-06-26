@@ -137,11 +137,6 @@
   	</dependency>
   	<dependency>
   		<groupId>qrone</groupId>
-  		<artifactId>qrone-png</artifactId>
-  		<version>0.1</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>qrone</groupId>
   		<artifactId>qrone-coder</artifactId>
   		<version>0.1</version>
   	</dependency>
