@@ -107,16 +107,11 @@ public class CSS3Parser{
 		return r;
 	}
 	
-	public static void serialize(Writer w, CSSStyleSheet stylesheet) throws IOException{
-		CSSRuleList l = stylesheet.getCssRules();
-		for (int i = 0; i < l.getLength(); i++) {
-			w.append(l.item(i).getCssText());
-		}
+	private static void serialize(Writer w, CSSStyleSheet stylesheet) throws IOException{
+		w.append(new CSS3Serializer().append(stylesheet).toString());
 	}
 
 	private static String serialize(CSSStyleSheet stylesheet) throws IOException{
-		StringWriter w = new StringWriter();
-		serialize(stylesheet);
-		return w.toString();
+		return new CSS3Serializer().append(stylesheet).toString();
 	}
 }

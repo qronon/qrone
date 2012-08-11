@@ -44,11 +44,7 @@ public class CSS3OM{
 				return c;
 		}
 		
-		StringBuffer css = new StringBuffer();
-		CSSRuleList l = getStyleSheet().getCssRules();
-		for (int i = 0; i < l.getLength(); i++) {
-			css.append(l.item(i).getCssText());
-		}
+		String css = new CSS3Serializer().append(getStyleSheet()).toString();
 		cache = new SoftReference(css.toString());
 		return css.toString();
 	}
@@ -57,6 +53,7 @@ public class CSS3OM{
 		return stylesheet;
 	}
 	
+	/*
 	private String serialize(){
 		StringBuffer css = new StringBuffer();
 		CSSRuleList l = getStyleSheet().getCssRules();
@@ -79,4 +76,6 @@ public class CSS3OM{
 		}
 		return css.toString();
 	}
+	*/
+	
 }

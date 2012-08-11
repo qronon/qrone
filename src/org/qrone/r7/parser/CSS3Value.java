@@ -28,11 +28,6 @@ public class CSS3Value {
 	public boolean isImportant(){
 		return style.getPropertyPriority(prop).equals("important");
 	}
-	
-	@Override
-	public String toString() {
-		return getValue();
-	}
 
 	public String getURL() {
 		return uri.resolve(pullurl(getValue())).toString();

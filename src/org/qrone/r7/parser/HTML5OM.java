@@ -23,6 +23,7 @@ import org.qrone.coder.QState;
 import org.qrone.coder.render.QLangJQuery;
 import org.qrone.r7.parser.HTML5Deck.HTML5Set;
 import org.qrone.r7.resolver.URIResolver;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -173,6 +174,13 @@ public class HTML5OM {
 							e.setAttribute(n.getNodeName(), "javascript:" + JSParser.compress(js,true)
 									.replace("__QRONE_PREFIX_NAME__", 
 									  "qrone('" + getURI().toString() + "','__QRONE_ID__')"));
+						}
+					}else if(n.getNodeName().equals("style")){
+						String css = n.getNodeValue();
+						try {
+							e.setAttribute("style", new CSS3Serializer().append(CSS3Parser.parsestyle(css)).toString());
+						} catch (DOMException e1) {
+						} catch (IOException e1) {
 						}
 					}
 				}

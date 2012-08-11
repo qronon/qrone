@@ -26,14 +26,16 @@ public class CSS3Serializer {
 		return str.toString();
 	}
 	
-	public void append(CSSStyleSheet ss){
+	public CSS3Serializer append(CSSStyleSheet ss){
 		append(ss.getCssRules());
+		return this;
 	}
 
-	public void append(CSSRuleList list){
+	public CSS3Serializer append(CSSRuleList list){
 		for (int i = 0; i < list.getLength(); i++) {
 			dispatch(list.item(i));
 		}
+		return this;
 	}
 	
 	public void dispatch(CSSRule rule){
@@ -52,45 +54,52 @@ public class CSS3Serializer {
 		}
 	}
 
-	public void append(String s){
+	public CSS3Serializer append(String s){
 		str.append(s);
+		return this;
 	}
 	
-	public void append(CSSCharsetRule rule){
+	public CSS3Serializer append(CSSCharsetRule rule){
 		append("@charset \"" + rule.getEncoding() + "\";");
+		return this;
 	}
 	
-	public void append(CSSFontFaceRule rule){
+	public CSS3Serializer append(CSSFontFaceRule rule){
 		append("@font-face{");
 		append(rule.getStyle());
 		append("}");
+		return this;
 	}
 	
-	public void append(CSSMediaRule rule){
+	public CSS3Serializer append(CSSMediaRule rule){
 		MediaList ml = rule.getMedia();
 		append("@media " + ml.getMediaText() + "{");
 		append(rule.getCssRules());
 		append("}");
+		return this;
 	}
 	
-	public void append(CSSPageRule rule) {
+	public CSS3Serializer append(CSSPageRule rule) {
 		append("@page " + rule.getSelectorText() + "{");
 		append(rule.getStyle());
 		append("}");
+		return this;
 		
 	}
 	
-	public void append(CSSStyleRule rule) {
+	public CSS3Serializer append(CSSStyleRule rule) {
 		append(rule.getSelectorText() + "{");
 		append(rule.getStyle());
 		append("}");
+		return this;
 	}
 	
-	public void append(CSSUnknownRule rule) {
+	public CSS3Serializer append(CSSUnknownRule rule) {
 		append(rule.getCssText());
+		return this;
 	}
 	
-	public void append(CSSStyleDeclaration styles){
+	public CSS3Serializer append(CSSStyleDeclaration styles){
 		boolean ispie = false;
 		for (int i = 0; i < styles.getLength(); i++) {
 			String property = styles.item(i);
@@ -100,16 +109,17 @@ public class CSS3Serializer {
 			}
 			String priority = styles.getPropertyPriority(property);
 			
-			if(priority == null || priority.equals("")){
-				append("!" + priority);
+			if(priority != null && !priority.equals("")){
+				append(" !" + priority);
 			}
 			
 			append(";");
 		}
 		
 		if(ispie){
-			append("behavior: url(/PIE.htc);");
+			append("behavior: url(/system/resource/PIE.htc);");
 		}
+		return this;
 	}
 	
 	private Pattern lg = Pattern.compile("linear\\-gradient\\s*\\(([^\\),]+),([^\\),]+)\\)");
