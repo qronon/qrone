@@ -56,33 +56,18 @@ public class JSParser {
 	}
 
 	public static String compress(String r){
-		return compress(r, false);
+		return compress(r, null);
 	}
 
-	private static Map<String, String> compressionCacheTrue = new WeakHashMap<String, String>();
-	private static Map<String, String> compressionCacheFalse = new WeakHashMap<String, String>();
-	public static String compress(String r, boolean qroneSymbol){
-		if(qroneSymbol){
-			String c = compressionCacheTrue.get(r);
-			if(c != null){
-				return c;
-			}
-		}else{
-			String c = compressionCacheFalse.get(r);
-			if(c != null){
-				return c;
-			}
-		}
-		
+	public static String compress(String r, String replace){
 		try {
 			StringWriter w = new StringWriter();
-			compress(new StringReader(r), w, qroneSymbol);
-			if(qroneSymbol){
-				compressionCacheTrue.put(r, w.toString());
-			}else{
-				compressionCacheFalse.put(r, w.toString());
+			compress(new StringReader(r), w, replace != null);
+			String wstr = w.toString();
+			if(replace != null){
+				wstr = wstr.replace("__QRONE_PREFIX_NAME__",replace);
 			}
-			return w.toString();
+			return wstr;
 		} catch (EvaluatorException e) {
 		} catch (IOException e) {
 		}

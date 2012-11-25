@@ -2,6 +2,7 @@ package org.qrone.r7.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -48,10 +49,11 @@ public class HTML5OM {
 	private List<CSS3OM> stylesheets = new LinkedList<CSS3OM>();
 	private List<String> javascripts = new LinkedList<String>();
 
-	private List<String> requires = new LinkedList<String>();
-	private List<Element> jslibs = new LinkedList<Element>();
+	private List<String> jslibs = new LinkedList<String>();
 	private List<Element> csslibs = new LinkedList<Element>();
 
+	private boolean hasQroneObjectInJS = false;
+	
 	private Map<String, String> metamap = new Hashtable<String, String>();
 	
 	private DOMNodeSelector nodeselector;
@@ -76,10 +78,6 @@ public class HTML5OM {
 
 	public URI getURI(){
 		return uri;
-	}
-	
-	public List<CSS3OM> getStyleSheets(){
-		return stylesheets;
 	}
 	
 	public Document getDocument(){
@@ -164,16 +162,12 @@ public class HTML5OM {
 				for (int i = 0; i < map.getLength(); i++) {
 					Node n = map.item(i);
 					if(n.getNodeName().startsWith("on")){
-						e.setAttribute(n.getNodeName(), JSParser.compress(n.getNodeValue(),true)
-								.replace("__QRONE_PREFIX_NAME__", 
-								"qrone('" + getURI().toString() + "','__QRONE_ID__')"));
+						e.setAttribute(n.getNodeName(), JSParser.compress(n.getNodeValue(),"__QRONE_ID__"));
 					}else if(n.getNodeName().equals("href") && n.getNodeValue().startsWith("javascript:")){
 						String js = n.getNodeValue();
 						if(js.startsWith("javascript:")){
 							js = js.substring("javascript:".length());
-							e.setAttribute(n.getNodeName(), "javascript:" + JSParser.compress(js,true)
-									.replace("__QRONE_PREFIX_NAME__", 
-									  "qrone('" + getURI().toString() + "','__QRONE_ID__')"));
+							e.setAttribute(n.getNodeName(), "javascript:" + JSParser.compress(js,"__QRONE_ID__"));
 						}
 					}else if(n.getNodeName().equals("style")){
 						String css = n.getNodeValue();
@@ -198,7 +192,7 @@ public class HTML5OM {
 						accept(e);
 						inScript = false;
 						if(e.hasAttribute("src"))
-							jslibs.add(e);
+							jslibs.add(e.getAttribute("src"));
 					}
 				}else if(e.getNodeName().equals("style")){
 					inStyle = true;
@@ -233,8 +227,12 @@ public class HTML5OM {
 			@Override
 			public void visit(Text n) {
 				if(inScript){
-					findRequires(n.getNodeValue());
-					javascripts.add(JSParser.clean(n.getNodeValue()));
+					String js = n.getNodeValue();
+					String cjs = JSParser.compress(JSParser.clean(js),"__QRONE_ID__");
+					if(cjs.indexOf("__QRONE_ID__")>=0){
+						hasQroneObjectInJS = true;
+					}
+					javascripts.add(cjs);
 				}else if(inStyle){
 					CSS3OM cssom;
 					try {
@@ -247,14 +245,6 @@ public class HTML5OM {
 		};
 		visitor.visit(document);
 	}
-
-	private void findRequires(String js){
-		Pattern pattern = Pattern.compile("require\\s*\\(\\s*[\"'](.*?)[\"']\\s*\\)\\s*;?");
-		Matcher matcher = pattern.matcher(js);
-		while (matcher.find()) {
-			requires.add(matcher.group(1));
-		}
-	}
 	
 	public void process(final HTML5Writer w, final HTML5Template t,
 			final Node node, String id, final Set<HTML5OM> xomlist, final String ticket){
@@ -264,7 +254,7 @@ public class HTML5OM {
 		
 		final HTML5Set set;
 		if(node == document){
-			set = getRecurseHeader(getURI(), xomlist, ticket);
+			set = getRecursive(id, xomlist, ticket);
 		}else{
 			set = null;
 		}
@@ -278,107 +268,45 @@ public class HTML5OM {
 	}
 
 	private String scriptCache = null;
-	private String scriptCacheNoHTML = null;
-	private String getScripts(boolean html, String ticket){
-		if(html){
-			if(scriptCache != null){
+	public String getScripts(boolean inline){
+		if(scriptCache != null){
 				return scriptCache;
-			}
-		}else{
-			if(scriptCacheNoHTML != null){
-				return scriptCacheNoHTML;
-			}
 		}
-
-		final QClass jqueryclass = new QClass(getURI().toString());
-		final QFunc method = jqueryclass.constructor();
-		method.arg("String", "id");
-		final QState jqueryhtml = method.state().returns();
-		
-		final HTML5Writer t = new HTML5Writer() {
-			@Override
-			public void append(String key, String value) {
-				jqueryhtml.var("String", key);
-			}
-			
-			@Override
-			public void append(String str) {
-				jqueryhtml.str(str);
-			}
-			
-			@Override
-			public void append(char c) {
-				jqueryhtml.str(String.valueOf(c));
-			}
-		};
-		process(t, null, body, null, null, ticket);
 		
 		StringBuilder b = new StringBuilder();
-		if(!html){
+		if(inline){
 			b.append("qrone[\"" + getURI().toString() + "\"]=function(){};");
-		}else{
-			QLangJQuery q = new QLangJQuery();
-			q.accept(jqueryclass);
-			b.append(q.build());
 		}
 		
 		for (Iterator<String> i = javascripts.iterator(); i
 				.hasNext();) {
-			String userjs = i.next();
-			b.append(JSParser.compress(userjs.toString(), true)
-				.replace("__QRONE_PREFIX_NAME__","qrone[\"" + getURI().toString() + "\"]"));
+			b.append(i.next().replaceAll("__QRONE_ID__", "qrone[\"" + getURI().toString() + "\"]"));
 		}
 		
-
-		if(html){
-			scriptCache = b.toString();
-		}else{
-			scriptCacheNoHTML = b.toString();
-		}
+		scriptCache = b.toString();
 		return b.toString();
 	}
 	
-	private HTML5Set getRecurseHeader(URI file, Set<HTML5OM> xomlist, String ticket){
-		return getRecursive(file, xomlist, ticket);
-	}
-	
-	private HTML5Set getRecursive(URI file, Set<HTML5OM> xomlist, String ticket){
+	private HTML5Set getRecursive(String id, Set<HTML5OM> xomlist, String ticket){
 		HTML5Set set = new HTML5Set();
-		Set<URI> s = new HashSet<URI>();
-		getRecursive(file, set.js, set.css, set.jslibs, set.csslibs, s, true,ticket);
 		if(xomlist != null){
 			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
+				if(i.next().hasQroneObjectInJS){
+					set.js.append("if(!window.qrone)window.qrone=function(){};");
+					jslibs.add("/system/resource/qrone.js");
+					break;
+				}
+			}
+			
+			for (Iterator<HTML5OM> i = xomlist.iterator(); i.hasNext();) {
 				HTML5OM xom = i.next();
-				getRecursive(xom.getURI(), set.js, set.css, set.jslibs, set.csslibs, s, true,ticket);
+				set.js.append(xom.getScripts(xom.hasQroneObjectInJS));
+				set.css.addAll(xom.stylesheets);
+				
+				set.jslibs.addAll(xom.jslibs);
+				set.csslibs.addAll(xom.csslibs);
 			}
 		}
 		return set;
-	}
-
-	private void getRecursive(URI file, 
-			StringBuffer js, List<CSS3OM> css, 
-			List<Element> jslibs, List<Element> csslibs, 
-			Set<URI> clses, boolean first, String ticket){
-		if(file == null || clses.contains(file)) return;
-		clses.add(file);
-		
-		HTML5OM c = deck.compile(file);
-		if(c != null){
-			String extend = metamap.get("extends");
-			if(extend != null)
-				getRecursive(file.resolve(extend), js, css, jslibs, csslibs, clses, false,ticket);
-			
-			if(first)
-				js.append("if(!window.qrone)window.qrone=function(){};");
-			js.append(c.getScripts(!first,ticket));
-			css.addAll(stylesheets);
-			
-			jslibs.addAll(this.jslibs);
-			csslibs.addAll(this.csslibs);
-	
-			for (Iterator<String> iter = requires.iterator(); iter.hasNext();) {
-				getRecursive(file.resolve(iter.next()), js, css, jslibs, csslibs, clses, false,ticket);
-			}
-		}
 	}
 }

@@ -1,8 +1,8 @@
-package org.qrone.r7.parser;
+package org.qrone.r7.script;
 
 import org.mozilla.javascript.ClassShutter;
 
-public class JSClassShutter implements ClassShutter{
+public class ServerJSClassShutter implements ClassShutter{
 
 	public static final String[] denyClasses = {
 		"java.lang.System",

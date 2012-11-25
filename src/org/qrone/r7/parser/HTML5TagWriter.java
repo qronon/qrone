@@ -1,5 +1,6 @@
 package org.qrone.r7.parser;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,28 +20,15 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 	public static final Set<String> noendtaglist = new HashSet<String>();
 	protected HTML5Writer b;
 	protected String id;
+	protected URI uri;
 	protected String ticket;
 
-	public HTML5TagWriter(HTML5Writer b, String id, String ticket) {
+	public HTML5TagWriter(HTML5Writer b, String id, URI uri, String ticket) {
 		super();
 		this.b = b;
 		this.id = id;
+		this.uri = uri;
 		this.ticket = ticket;
-	}
-
-	protected void append_js(String attr, String js) {
-		b.append(' ');
-		b.append(attr);
-		b.append('=');
-		b.append('"');
-		String[] jslist = js.split("__QRONE_ID__");
-		for (int j = 0; j < jslist.length; j++) {
-			if(j != 0){
-				b.append("id",id);
-			}
-			b.append(jslist[j]);
-		}
-		b.append('"');
 	}
 	
 	protected void append_pre(String str) {
@@ -119,65 +107,70 @@ public abstract class HTML5TagWriter extends HTML5Visitor {
 	}
 
 	protected void start(Element e) {
-		if(e.hasAttribute("qrone.starttag")){
-			b.append(e.getAttribute("qrone.starttag"));
-		}else{
-			
-			HTML5StringWriter bw = new HTML5StringWriter();
-			bw.append('<');
-			bw.append(e.getNodeName());
 		
-			NamedNodeMap map = e.getAttributes();
-			for (int i = 0; i < map.getLength(); i++) {
-				Node n = map.item(i);
-				if(n.getNodeName().equals("id")){
-		
-					bw.append(' ');
-					bw.append(n.getNodeName());
-					bw.append('=');
-					bw.append('"');
-					
-					String rawid = n.getNodeValue();
-					if(rawid.startsWith("qrone.")){
-						bw.append("qrone.");
-						bw.append("id",id);
-						bw.append(".");
-						bw.append(escape(rawid.substring("qrone.".length())));
-					}else{
-						bw.append(escape(rawid));
-					}
-					bw.append('"');
-				}else if(!n.getNodeName().startsWith("qrone.")){
-					Attr attr = (Attr)n;
-					bw.append(' ');
-					bw.append(attr.getNodeName());
-					bw.append('=');
-					bw.append('"');
-					bw.append(escape(attr.getNodeValue()));
-					bw.append('"');
+		b.append('<');
+		b.append(e.getNodeName());
+	
+		NamedNodeMap map = e.getAttributes();
+		for (int i = 0; i < map.getLength(); i++) {
+			Node n = map.item(i);
+			if(n.getNodeName().equals("id")){
+	
+				b.append(' ');
+				b.append(n.getNodeName());
+				b.append('=');
+				b.append('"');
+				
+				String rawid = n.getNodeValue();
+				if(rawid.startsWith("qrone.")){
+					b.append("qrone.");
+					b.append("id",id);
+					b.append(".");
+					b.append(escape(rawid.substring("qrone.".length())));
+				}else{
+					b.append(escape(rawid));
 				}
+				b.append('"');
+			}else if(n.getNodeValue().indexOf("__QRONE_ID__") >= 0 && (
+						n.getNodeName().startsWith("on") || (
+							n.getNodeName().startsWith("href") 
+							&& n.getNodeValue().startsWith("javascript:")
+					))){
+				
+				b.append(' ');
+				b.append(n.getNodeName());
+				b.append('=');
+				b.append('"');
+				String[] jslist = n.getNodeValue().split("__QRONE_ID__");
+				for (int j = 0; j < jslist.length; j++) {
+					if(j != 0){
+						b.append(escape("qrone(\"" + uri.toString() + "\",\""));
+						b.append("id",id);
+						b.append(escape("\")"));
+					}
+					b.append(jslist[j]);
+				}
+				b.append('"');
+				
+			}else{
+				Attr attr = (Attr)n;
+				b.append(' ');
+				b.append(attr.getNodeName());
+				b.append('=');
+				b.append('"');
+				b.append(escape(attr.getNodeValue()));
+				b.append('"');
 			}
-			bw.append('>');
-
-			e.setAttribute("qrone.starttag",bw.toString());
-			b.append(bw.toString());
 		}
+		b.append('>');
 	}
 
 	protected void end(Element e) {
-		if(e.hasAttribute("qrone.endtag")){
-			b.append(e.getAttribute("qrone.endtag"));
-		}else{
-			StringBuilder bs = new StringBuilder();
-			if(!noendtaglist.contains(e.getNodeName())){
-				bs.append('<');
-				bs.append('/');
-				bs.append(e.getNodeName());
-				bs.append('>');
-			}
-			
-			e.setAttribute("qrone.endtag",bs.toString());
-			b.append(bs.toString());
+		if(!noendtaglist.contains(e.getNodeName())){
+			b.append('<');
+			b.append('/');
+			b.append(e.getNodeName());
+			b.append('>');
 		}
 	}
 }

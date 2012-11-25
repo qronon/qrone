@@ -20,12 +20,14 @@ public class Document extends HTML5Template{
 	private HttpServletRequest request;
 	private Writer writer;
 	private HTML5StreamWriter streamWriter;
+	private User user;
 	
-	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri, String ticket) throws IOException{
-		super(deck, uri, ticket);
+	public Document(HttpServletRequest request, HttpServletResponse response, HTML5Deck deck, String uri, User user) throws IOException{
+		super(deck, uri);
 		this.request = request;
 		this.writer = new BufferedWriter(response.getWriter());
 		this.streamWriter = new HTML5StreamWriter(writer);
+		this.user = user;
 	}
 	
 	public String getCookie(){
@@ -37,7 +39,7 @@ public class Document extends HTML5Template{
 			writer.append((String)out);
 		}else if(out instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)out;
-			t.out(streamWriter, om.getDocument());
+			t.out(streamWriter, om.getDocument(), user.getTicket());
 		}else if(out instanceof XMLObject){
 			XMLObject xo = (XMLObject)out;
 			String o = xo.callMethod(xo, "toXMLString", null).toString();
@@ -49,7 +51,7 @@ public class Document extends HTML5Template{
 	
 	public void flush() throws IOException{
 		if(loaded){
-			super.out(streamWriter, om.getDocument());
+			super.out(streamWriter, om.getDocument(), user.getTicket());
 		}
 		writer.flush();
 	}

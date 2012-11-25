@@ -34,10 +34,10 @@ import org.qrone.r7.format.YAML;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
 import org.qrone.r7.parser.HTML5Template;
-import org.qrone.r7.parser.JSDeck;
-import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIFileSystem;
+import org.qrone.r7.script.ServerJSDeck;
+import org.qrone.r7.script.ServerJSOM;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.util.Digest;
 import org.qrone.util.QrONEUtils;
@@ -49,8 +49,8 @@ public class Window{
 	private PortingService service;
 	private Scriptable scope;
 	private HTML5Deck deck;
-	private JSDeck vm;
-	private Set<JSOM> required = new ConcurrentSkipListSet<JSOM>();
+	private ServerJSDeck vm;
+	private Set<ServerJSOM> required = new ConcurrentSkipListSet<ServerJSOM>();
 	private URIResolver resolver;
 	private ServletScope ss;
 	
@@ -75,7 +75,7 @@ public class Window{
 	public String home = new File(".").getAbsoluteFile().getParentFile().getAbsolutePath();
 	
 	public Window(ServletScope ss, Scriptable scope, 
-			HTML5Deck deck, JSDeck vm, PortingService service) throws IOException, URISyntaxException{
+			HTML5Deck deck, ServerJSDeck vm, PortingService service) throws IOException, URISyntaxException{
 		this.ss = ss;
 		this.request = ss.request;
 		this.response = ss.response;
@@ -93,8 +93,7 @@ public class Window{
 		user = (User)request.getAttribute("User");
 		
 		document = new Document(request, response, deck, 
-				ss.uri.toString().replaceAll("\\.server\\.js$", ".html"),
-				user.getTicket());
+				ss.uri.toString().replaceAll("\\.server\\.js$", ".html"), user);
 		location = new Location(request);
 		navigator = new Navigator(request);
 		
@@ -156,7 +155,7 @@ public class Window{
 	
 	
 	public void require(String path) throws IOException, URISyntaxException{
-		JSOM om = vm.compile(resolvePath(path));
+		ServerJSOM om = vm.compile(resolvePath(path));
 		if(!required.contains(om)){
 			required.add(om);
 		}
@@ -164,7 +163,7 @@ public class Window{
 	}
 	
 	public void require_once(String path) throws IOException, URISyntaxException{
-		JSOM om = vm.compile(resolvePath(path));
+		ServerJSOM om = vm.compile(resolvePath(path));
 		if(!required.contains(om)){
 			required.add(om);
 			om.run(scope);
@@ -176,7 +175,7 @@ public class Window{
 		if(resolver.exist(u.toString())){
 			HTML5OM om = deck.compile(u);
 			if(om != null){
-				return new HTML5Template(om, u, user.getTicket());
+				return new HTML5Template(document, om, u);
 			}
 		}
 		return null;

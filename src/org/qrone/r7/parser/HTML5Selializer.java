@@ -30,13 +30,12 @@ public class HTML5Selializer extends HTML5TagWriter{
 			HTML5Set set, HTML5Deck deck, 
 			Node node, URI uri, 
 			HTML5Writer w, HTML5Template t, HTML5OM om, String id, String ticket){
-		super(w, id, ticket);
+		super(w, id, uri, ticket);
 		
 		this.body = body;
 		this.set = set;
 		this.node = node;
 		this.deck = deck;
-		this.uri = uri;
 		this.t = t;
 		this.om = om;
 	}
@@ -109,7 +108,9 @@ public class HTML5Selializer extends HTML5TagWriter{
 		}else if(e.getNodeName().equals("form")){
 			start(e);
 			accept(e);
-			append("<input type=\"hidden\" name=\".ticket\" value=\"" + ticket + "\"/>");
+			if(ticket != null){
+				append("<input type=\"hidden\" name=\".ticket\" value=\"" + ticket + "\"/>");
+			}
 			end(e);
 		}else{
 			start(e);
@@ -123,9 +124,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 	@Override
 	public void visit(Text n) {
 		if(inScript){
-			append(JSParser.compress(n.getNodeValue(), true)
-					.replace("__QRONE_PREFIX_NAME__", 
-							"qrone[\"" + uri.toString() + "\"]"));
+			append(n.getNodeValue());
 		}else if(formatting>0){
 			append_pre(n.getNodeValue());
 		}else{
@@ -158,7 +157,7 @@ public class HTML5Selializer extends HTML5TagWriter{
 			if(et == t){
 				super.accept(e.get());
 			}else{
-				et.out(b, e);
+				et.out(b, e, ticket);
 			}
 		}else{
 			dispatch(e.content);
@@ -182,8 +181,11 @@ public class HTML5Selializer extends HTML5TagWriter{
 			if(et == t){
 				dispatch(set.get());
 			}else{
-				et.out(b, set);
+				et.out(b, set, ticket);
 			}
+		}else if(o instanceof HTML5Template){
+			HTML5Template t = (HTML5Template)o;
+			t.out(b, t.getBody(), ticket);
 		}else{
 			append(o.toString());
 		}

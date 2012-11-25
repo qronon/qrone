@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.json.JsonParser;
 import org.mozilla.javascript.json.JsonParser.ParseException;
-import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ServerJSDeck;
 
 import org.mozilla.javascript.Context;
 public class JSON extends XFormat<Object>{

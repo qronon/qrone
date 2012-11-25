@@ -33,7 +33,6 @@ public class HTML5Deck extends XDeck<HTML5OM>{
     	super(service.getURIResolver());
     	this.services = service;
     	cssdeck = new CSS3Deck(resolver);
-    
     }
     
     public PortingService getPortingService(){
@@ -48,56 +47,23 @@ public class HTML5Deck extends XDeck<HTML5OM>{
 		return xom;
 	}
 	
-	private Map<String, String> inlineJSMap = new Hashtable<String, String>();
-
 	public void outputScripts(HTML5Writer b, HTML5Set set, URI file){
 
 		//---------------
 		// script src
 		//---------------
-		Set<String> hash = new HashSet<String>();
-		for (Iterator<Element> i = set.jslibs.iterator(); i.hasNext();) {
-			Element el = i.next();
-			if(!hash.contains(el.getAttribute("src"))){
-				hash.add(el.getAttribute("src"));
-				if(!el.hasAttribute("inline")){
-					b.append("<script src=\"");
-					b.append(QrONEUtils.escape(el.getAttribute("src")));
-					b.append("\"></script>");
-				}
-			}
+		for (Iterator<String> i = set.jslibs.iterator(); i.hasNext();) {
+			String src = i.next();
+			
+			b.append("<script src=\"");
+			b.append(QrONEUtils.escape(src));
+			b.append("\"></script>");
 		}
 
 		//---------------
 		// script inline
 		//---------------
 		StringBuffer js = new StringBuffer();
-		hash = new HashSet<String>();
-		for (Iterator<Element> i = set.jslibs.iterator(); i.hasNext();) {
-			Element el = i.next();
-			if(!hash.contains(el.getAttribute("src"))){
-				hash.add(el.getAttribute("src"));
-				if(el.hasAttribute("inline")){
-					String key = el.getAttribute("src");
-					String ijsc = inlineJSMap.get(key);
-					if(ijsc == null){
-						try {
-							String ijs = JSParser.compress(
-									new String(Stream.read(
-											resolver.getInputStream(
-													file.resolve(key))),"utf8"));
-							inlineJSMap.put(key, ijs);
-							js.append(ijs);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					}else{
-						js.append(ijsc);
-					}
-				}
-			}
-		}
-		
 		js.append(set.js.toString());
 		if(js.length() > 0){
 			b.append("<script>");
@@ -138,7 +104,7 @@ public class HTML5Deck extends XDeck<HTML5OM>{
 	public static class HTML5Set{
 		public StringBuffer js = new StringBuffer();
 		public List<CSS3OM> css = new ArrayList<CSS3OM>();
-		public List<Element> jslibs = new ArrayList<Element>();
+		public List<String> jslibs = new ArrayList<String>();
 		public List<Element> csslibs = new ArrayList<Element>();
 	}
 }

@@ -1,4 +1,4 @@
-package org.qrone.r7.parser;
+package org.qrone.r7.script;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +15,12 @@ import org.qrone.r7.PortingService;
 import org.qrone.r7.script.browser.Window;
 import org.qrone.r7.script.window.WindowPrototype;
 
-public class JSOM implements Comparable<JSOM>{
+public class ServerJSOM implements Comparable<ServerJSOM>{
 	private URI uri;
-	private JSDeck deck;
+	private ServerJSDeck deck;
 	private Script script;
 
-	public JSOM(JSDeck deck) {
+	public ServerJSOM(ServerJSDeck deck) {
 		this.deck = deck;
 	}
 	
@@ -80,7 +80,7 @@ public class JSOM implements Comparable<JSOM>{
 	}
 
 	@Override
-	public int compareTo(JSOM o) {
+	public int compareTo(ServerJSOM o) {
 		return uri.compareTo(o.uri);
 	}
 

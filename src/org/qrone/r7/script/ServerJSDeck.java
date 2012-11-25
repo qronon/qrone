@@ -1,4 +1,4 @@
-package org.qrone.r7.parser;
+package org.qrone.r7.script;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -11,19 +11,19 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.handler.URIHandler;
+import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.resolver.URIResolver;
-import org.qrone.r7.script.SugarWrapFactory;
 import org.qrone.r7.script.window.WindowPrototype;
 import org.qrone.util.XDeck;
 
-public class JSDeck extends XDeck<JSOM> implements Extendable{
+public class ServerJSDeck extends XDeck<ServerJSOM> implements Extendable{
 	private HTML5Deck deck;
 	private Map<Thread, Context> map = new Hashtable<Thread, Context>();
 	private Scriptable globalScope;
 	private SugarWrapFactory wrapFactory;
 	private Set<Class> set = new HashSet<Class>();
 
-    public JSDeck(URIResolver resolver, HTML5Deck deck){
+    public ServerJSDeck(URIResolver resolver, HTML5Deck deck){
     	super(resolver);
     	this.deck = deck;
     	wrapFactory = new SugarWrapFactory();
@@ -34,9 +34,9 @@ public class JSDeck extends XDeck<JSOM> implements Extendable{
     }
 
 	@Override
-	public JSOM compile(URI uri, InputStream in, String encoding)
+	public ServerJSOM compile(URI uri, InputStream in, String encoding)
 			throws Exception {
-		JSOM om = new JSOM(this);
+		ServerJSOM om = new ServerJSOM(this);
 		om.parser(uri);
 		return om;
 	}

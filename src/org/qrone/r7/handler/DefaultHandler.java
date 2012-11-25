@@ -6,15 +6,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.qrone.r7.Extendable;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.JSDeck;
 import org.qrone.r7.resolver.URIResolver;
+import org.qrone.r7.script.ServerJSDeck;
 
 public class DefaultHandler implements URIHandler, Extendable{
 	private URIResolver resolver;
 	private HTML5Deck deck;
-	private JSDeck vm;
+	private ServerJSDeck vm;
 	private URIHandler pathFinderHandler;
 	private URIHandler html5Handler;
+	private URIHandler html5partsHandler;
 	private URIHandler jsHandler;
 	private URIHandler resolverHandler;
 	private URIHandler handler;
@@ -22,9 +23,10 @@ public class DefaultHandler implements URIHandler, Extendable{
 	public DefaultHandler(PortingService services) {
 		this.resolver = services.getURIResolver();
 		deck = new HTML5Deck(services);
-		vm = new JSDeck(resolver, deck);
-		
+		vm = new ServerJSDeck(resolver, deck);
+
 		html5Handler = new HTML5Handler(services, deck);
+		html5partsHandler = new HTML5PartsHandler(services, deck);
 		jsHandler = new JavaScriptHandler(services, vm, deck);
 		resolverHandler = new ResolverHandler(resolver);
 		handler = new URIHandler() {
@@ -63,6 +65,10 @@ public class DefaultHandler implements URIHandler, Extendable{
 			}
 
 			if(html5Handler.handle(request, response, uri + ".html", path, leftpath)){
+				return true;
+			}
+
+			if(uri.endsWith(".js") && html5partsHandler.handle(request, response, uri.substring(0, uri.length()-3) + ".html", path, leftpath)){
 				return true;
 			}
 		} catch (Exception e) {

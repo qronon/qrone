@@ -29,28 +29,26 @@ public class HTML5Template{
 	protected URI uri;
 	protected boolean loaded = false;
 	protected String id;
-	protected String ticket;
 	
-	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri, String ticket){
+	protected HTML5Template(HTML5OM om, Set<HTML5OM> xomlist, URI uri){
 		this.uri = uri;
 		this.om = om;
 		this.xomlist = xomlist;
-		this.ticket = ticket;
 		if(om != null)
 			loaded = true;
 	}
 
-	public HTML5Template(HTML5OM om, URI uri, String ticket){
-		this(om, new HashSet<HTML5OM>(), uri, ticket);
+	public HTML5Template(HTML5OM om, URI uri){
+		this(om, new HashSet<HTML5OM>(), uri);
 		id = QrONEUtils.uniqueid();
 	}
 	
 	public HTML5Template(HTML5OM om){
-		this(om, new HashSet<HTML5OM>(), null, null);
+		this(om, new HashSet<HTML5OM>(), null);
 	}
 	
-	public HTML5Template(HTML5Deck deck, String path, String ticket) throws IOException{
-		this(null, new HashSet<HTML5OM>(), null, ticket);
+	protected HTML5Template(HTML5Deck deck, String path) throws IOException{
+		this(null, new HashSet<HTML5OM>(), null);
 		if(deck.getResolver().exist(path)){
 			try {
 				uri = new URI(path);
@@ -61,6 +59,15 @@ public class HTML5Template{
 		}
 	}
 	
+	public HTML5Template(HTML5Template t, HTML5OM om, URI uri) {
+		this.uri = uri;
+		this.om = om;
+		this.xomlist = t.xomlist;
+		xomlist.add(om);
+		if(om != null)
+			loaded = true;
+	}
+
 	public void load(String path) throws IOException, URISyntaxException{
 		URI u = uri.resolve(path);
 		if(om.getDeck().getResolver().exist(u.toString())){
@@ -117,23 +124,27 @@ public class HTML5Template{
 		return select("#" + id);
 	}
 	
-	public void out(HTML5Writer w, HTML5NodeSet set) {
-		//final String uniqueid = QrONEUtils.uniqueid();
+	public void out(HTML5Writer w, HTML5NodeSet set, String ticket) {
+		final String uniqueid = QrONEUtils.uniqueid();
 		for (Iterator<Node> iter = set.get().iterator(); iter.hasNext();) {
-			om.process(w, this, iter.next(), null, xomlist, ticket);
+			om.process(w, this, iter.next(), uniqueid, xomlist, ticket);
 			
 		}
-		
 	}
 	
-	public void out(HTML5Writer w, HTML5Element e) {
-		//final String uniqueid = QrONEUtils.uniqueid();
-		om.process(w, this, e.get(), null, xomlist, ticket);
+	public void out(HTML5Writer w, Element e, String ticket) {
+		final String uniqueid = QrONEUtils.uniqueid();
+		om.process(w, this, e, uniqueid, xomlist, ticket);
 	}
 	
-	public void out(HTML5Writer w, Document e) {
-		//final String uniqueid = QrONEUtils.uniqueid();
-		om.process(w, this, e, null, xomlist, ticket);
+	public void out(HTML5Writer w, HTML5Element e, String ticket) {
+		final String uniqueid = QrONEUtils.uniqueid();
+		om.process(w, this, e.get(), uniqueid, xomlist, ticket);
+	}
+	
+	public void out(HTML5Writer w, Document e, String ticket) {
+		final String uniqueid = QrONEUtils.uniqueid();
+		om.process(w, this, e, uniqueid, xomlist, ticket);
 	}
 
 	public HTML5Element getBody() {
@@ -145,7 +156,7 @@ public class HTML5Template{
 	}
 	
 	public HTML5Template newTemplate() {
-		HTML5Template t =  new HTML5Template(om, xomlist, uri, ticket);
+		HTML5Template t =  new HTML5Template(om, xomlist, uri);
 		//t.id = id;
 		//t.node5map = node5map;
 		return t;

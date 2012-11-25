@@ -19,10 +19,10 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
-import org.qrone.r7.parser.JSDeck;
-import org.qrone.r7.parser.JSOM;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.script.Scriptables;
+import org.qrone.r7.script.ServerJSDeck;
+import org.qrone.r7.script.ServerJSOM;
 import org.qrone.r7.script.ServletScope;
 import org.qrone.r7.script.browser.User;
 import org.qrone.r7.script.browser.Window;
@@ -33,10 +33,10 @@ import org.qrone.util.Stream;
 public class JavaScriptHandler implements URIHandler{
 	private PortingService services;
 	private HTML5Deck deck;
-	private JSDeck vm;
+	private ServerJSDeck vm;
 	private URIResolver resolver;
 	
-	public JavaScriptHandler(PortingService services, JSDeck vm, HTML5Deck deck) {
+	public JavaScriptHandler(PortingService services, ServerJSDeck vm, HTML5Deck deck) {
 		this.services = services;
 		this.resolver = services.getURIResolver();
 		this.deck = deck;
@@ -50,7 +50,7 @@ public class JavaScriptHandler implements URIHandler{
 		try {
 			if(resolver.exist(uri)){
 				URI urio = new URI(uri);
-				JSOM om = vm.compile(urio);
+				ServerJSOM om = vm.compile(urio);
 				if(om != null){
 					
 					
@@ -76,7 +76,7 @@ public class JavaScriptHandler implements URIHandler{
 					
 					
 					Scriptable subscope = vm.createScope();
-					JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
+					ServerJSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 					defaultom.run(subscope);
 					
 					Object result = 
@@ -132,10 +132,10 @@ public class JavaScriptHandler implements URIHandler{
 				ServletScope ss = new ServletScope(request,response,urio, path, leftpath);
 				scope.put("exception", scope, new MapPrototype(scope, map));
 				
-				JSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
+				ServerJSOM defaultom = vm.compile(new URI("/system/resource/default.js"));
 				defaultom.run(scope);
 				
-				JSOM om = vm.compile(urio);
+				ServerJSOM om = vm.compile(urio);
 				Window window = new Window(ss,scope,deck,vm,services);
 				window.init(scope);
 				
