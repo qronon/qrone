@@ -73,7 +73,7 @@ public class QrONEURIHandler extends ExtendableURIHandler {
 			}
 			
 			// Login/Crumb Service
-			CookieHandler cookie = new CookieHandler(service.getMasterToken(), service);
+			CookieHandler cookie = new CookieHandler(service);
 			handler.add(cookie);
 			
 			

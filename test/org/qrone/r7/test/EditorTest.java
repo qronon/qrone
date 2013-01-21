@@ -29,20 +29,30 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.qrone.r7.app.QrONEApp;
 import org.qrone.util.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import ch.qos.logback.classic.Level;
+
 import static org.junit.Assert.*;
 
 public class EditorTest {
+	private static Logger log = LoggerFactory.getLogger(EditorTest.class);
+	
 	private static QrONEApp app;
 	private static HttpClient c;
 	private static DocumentBuilder db;
 	
 	@BeforeClass
 	public static void beforeClass(){
-		app = new QrONEApp(9601, 9699, "../qrone-admintool/htdocs");
+    	log.info("StartingTest.");
+    	QrONEApp.setLogLevel(Level.DEBUG);
+    	
+		app = new QrONEApp(9601, 9699 );
+		app.setHtdocsPath("../qrone-admintool/htdocs");
 		app.start();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

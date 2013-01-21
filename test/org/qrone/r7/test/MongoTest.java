@@ -1,4 +1,4 @@
-package org.qrone.mongo;
+package org.qrone.r7.test;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;

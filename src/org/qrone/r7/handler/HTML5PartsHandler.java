@@ -7,6 +7,7 @@ import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.qrone.login.AccessToken;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5OM;
@@ -43,7 +44,7 @@ public class HTML5PartsHandler implements URIHandler{
 					
 					HTML5ScriptWriter w = new HTML5ScriptWriter(uri);
 					HTML5Template t = new HTML5Template(om, urio);
-					t.out(w, om.getBody(), user.getTicket());
+					t.out(w, om.getBody(), user.getTicket(AccessToken.WRITE));
 					
 					out.append(w.toString());
 					out.append('\n');

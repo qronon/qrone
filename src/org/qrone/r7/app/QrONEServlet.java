@@ -9,8 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class QrONEServlet extends HttpServlet {
+	private static Logger log = LoggerFactory.getLogger(QrONEServlet.class);
 	
 	private String path;
 	private Map<String, QrONEURIHandler> map = new Hashtable<String, QrONEURIHandler>();
@@ -22,6 +26,7 @@ public class QrONEServlet extends HttpServlet {
 			h = new QrONEURIHandler(getServletContext(), host, path);
 			map.put(host, h);
 		}
+		log.debug(request.getPathInfo());
 		h.handle(request, response, request.getPathInfo(), "", "");
 	}
 	

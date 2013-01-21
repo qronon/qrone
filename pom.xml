@@ -32,11 +32,6 @@
   		<version>1.6.4</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-simple</artifactId>
-  		<version>1.6.4</version>
-  	</dependency>
-  	<dependency>
   		<groupId>org.apache.httpcomponents</groupId>
   		<artifactId>httpclient</artifactId>
   		<version>4.2-beta1</version>
@@ -143,7 +138,7 @@
     <dependency>
    	    <groupId>qrone</groupId>
  	    <artifactId>qrone-xmlsocket-nio</artifactId>
- 	    <version>1.0</version>
+ 	    <version>1.2</version>
     </dependency>
   	
     <dependency>
@@ -155,6 +150,11 @@
     	<groupId>commons-fileupload</groupId>
     	<artifactId>commons-fileupload</artifactId>
     	<version>1.2.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>ch.qos.logback</groupId>
+    	<artifactId>logback-classic</artifactId>
+    	<version>1.0.9</version>
     </dependency>
   </dependencies>
   

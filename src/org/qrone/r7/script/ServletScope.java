@@ -16,6 +16,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.qrone.login.AccessToken;
 import org.qrone.r7.script.browser.User;
 import org.qrone.util.QrONEUtils;
 import org.qrone.util.QueryString;
@@ -45,9 +46,13 @@ public class ServletScope{
 		this.leftpath = leftpath;
 		
 		get = parseQueryString(request.getQueryString());
-		
 		user = (User)request.getAttribute("User");
-		secure = user.validateTicket(getParameter(".ticket"));
+		
+		Object ticket = get.get(".ticket");
+		if(ticket != null && user.validateTicket(get.get(".ticket").toString(), AccessToken.WRITE)){
+			secure = true;
+		}
+		
 		if(!isMultipart()){
 			parseForm();
 		}else{
@@ -78,7 +83,7 @@ public class ServletScope{
 			Map<String, Object> p = parseQueryString(text);
 
 			Object pt = p.get(".ticket");
-			if( secure || user.validateTicket((String)pt) ){
+			if( secure || user.validateTicket((String)pt, AccessToken.WRITE) ){
 				post = p;
 				body = b;
 				text = t;
@@ -120,7 +125,7 @@ public class ServletScope{
 			}
 			
 			Object pt = p.get(".ticket");
-			if( secure || user.validateTicket((String)pt) ){
+			if( secure || user.validateTicket((String)pt, AccessToken.WRITE) ){
 				post = p;
 			}
 			

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.arnx.jsonic.JSON;
 
 import org.mozilla.javascript.xml.XMLObject;
+import org.qrone.login.AccessToken;
 import org.qrone.r7.parser.HTML5Deck;
 import org.qrone.r7.parser.HTML5StreamWriter;
 import org.qrone.r7.parser.HTML5Template;
@@ -39,7 +40,7 @@ public class Document extends HTML5Template{
 			writer.append((String)out);
 		}else if(out instanceof HTML5Template){
 			HTML5Template t = (HTML5Template)out;
-			t.out(streamWriter, om.getDocument(), user.getTicket());
+			t.out(streamWriter, om.getDocument(), user.getTicket(AccessToken.WRITE));
 		}else if(out instanceof XMLObject){
 			XMLObject xo = (XMLObject)out;
 			String o = xo.callMethod(xo, "toXMLString", null).toString();
@@ -51,7 +52,7 @@ public class Document extends HTML5Template{
 	
 	public void flush() throws IOException{
 		if(loaded){
-			super.out(streamWriter, om.getDocument(), user.getTicket());
+			super.out(streamWriter, om.getDocument(), user.getTicket(AccessToken.WRITE));
 		}
 		writer.flush();
 	}

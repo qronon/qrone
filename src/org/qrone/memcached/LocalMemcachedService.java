@@ -12,11 +12,14 @@ import java.util.Set;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.mongo.MongoTable;
 import org.qrone.r7.script.AbstractScriptable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.danga.MemCached.MemCachedClient;
 import com.danga.MemCached.SockIOPool;
 
 public class LocalMemcachedService extends AbstractScriptable implements MemcachedService{
+	private static Logger log = LoggerFactory.getLogger(LocalMemcachedService.class);
 	private static SockIOPool pool;
 	
 	private String domain;
@@ -64,21 +67,25 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 		
 		@Override
 		public void clearAll() {
+			log.debug("Memcached FLUSHALL (collection:{})", collection);
 			client.flushAll();
 		}
 
 		@Override
 		public boolean contains(String key) {
+			log.debug("Memcached KEYEXISTS (collection:{} key:{})", collection, key);
 			return client.keyExists(collection + key);
 		}
 
 		@Override
 		public boolean remove(String key) {
+			log.debug("Memcached DELETE (collection:{} key:{})", collection, key);
 			return client.delete(collection + key);
 		}
 
 		@Override
 		public boolean remove(String key, long millisNoReAdd) {
+			log.debug("Memcached DELETE (collection:{} key:{})", collection, key);
 			return client.delete(collection + key, new Date(System.currentTimeMillis()+millisNoReAdd));
 		}
 
@@ -106,12 +113,13 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 
 		@Override
 		public Object get(String key) {
-			System.out.println(collection + key);
+			log.debug("Memcached GET (collection:{} key:{})", collection, key);
 			return client.get(collection + key);
 		}
 
 		@Override
 		public Map<String, Object> getAll(Collection<String> keys) {
+			log.debug("Memcached GETMULTI (collection:{} key:{})", collection, keys);
 			String[] keysori = keys.toArray(new String[keys.size()]);
 			String[] keysary = new String[keys.size()];
 			for (int i = 0; i < keysary.length; i++) {
@@ -122,22 +130,25 @@ public class LocalMemcachedService extends AbstractScriptable implements Memcach
 
 		@Override
 		public long increment(String key, long delta) {
+			log.debug("Memcached INCREMENT (collection:{} key:{})", collection, key);
 			return client.incr(collection + key, delta);
 		}
 
 		@Override
 		public void put(String key, Object value) {
-			System.out.println(collection + key);
+			log.debug("Memcached SET (collection:{} key:{})", collection, key);
 			client.set(collection + key, value);
 		}
 
 		@Override
 		public void put(String key, Object value, int ttlmillis) {
+			log.debug("Memcached SET (collection:{} key:{})", collection, key);
 			client.set(collection + key, value, new Date(System.currentTimeMillis()+ttlmillis));
 		}
 
 		@Override
 		public void put(String key, Object value, Date expire) {
+			log.debug("Memcached SET (collection:{} key:{})", collection, key);
 			client.set(collection + key, value, expire);
 		}
 

@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +49,7 @@ public class ResolverHandler implements URIHandler{
 			
 			if(resolver.exist(uri)){
 				if(etag == null){
-					etag = new Token(null,"L",null).toString();
+					etag = UUID.randomUUID().toString();
 					cacheMap.put(uri, etag);
 				}
 				

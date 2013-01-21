@@ -1,5 +1,7 @@
 package org.qrone.r7;
 
+import java.util.UUID;
+
 import org.qrone.database.DatabaseService;
 import org.qrone.kvs.KeyValueStore;
 import org.qrone.kvs.KeyValueStoreService;
@@ -61,20 +63,36 @@ public class PortingService {
 		this.fileSystemService = fileSystemService;
 	}
 	
-	private Token key;
-	public Token getMasterToken(){
-		if(key == null){
+	private UUID consumer_id;
+	public UUID getConsumerID(){
+		if(consumer_id == null){
 			KeyValueStore kvs = keyValueStoreService.getKeyValueStore("qrone.setting");
-			byte[] keybytes = (byte[])kvs.get("secretkey");
+			String keybytes = (String)kvs.get("consumer_id");
 			if(keybytes == null){
-				key = new Token(key, "M",null);
-				kvs.set("secretkey", key.getBytes());
+				consumer_id = UUID.randomUUID();
+				kvs.set("consumer_id", consumer_id.toString());
 			}else{
-				key = new Token();
+				consumer_id = UUID.fromString(keybytes);
 			}
 		}
 		
-		return key;
+		return consumer_id;
+	}
+
+	private UUID consumer_secret;
+	public UUID getConsumerSecret(){
+		if(consumer_secret == null){
+			KeyValueStore kvs = keyValueStoreService.getKeyValueStore("qrone.setting");
+			String keybytes = (String)kvs.get("consumer_secret");
+			if(keybytes == null){
+				consumer_secret = UUID.randomUUID();
+				kvs.set("consumer_secret", consumer_secret.toString());
+			}else{
+				consumer_secret = UUID.fromString(keybytes);
+			}
+		}
+		
+		return consumer_secret;
 	}
 	
 }

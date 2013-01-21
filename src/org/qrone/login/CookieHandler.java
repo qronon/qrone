@@ -25,11 +25,9 @@ import org.qrone.util.Token;
 
 public class CookieHandler implements URIHandler{
 
-	private Token key;
 	private PortingService service;
 	
-	public CookieHandler(Token key, PortingService service){
-		this.key = key;
+	public CookieHandler(PortingService service){
 		this.service = service;
 	}
 	
@@ -37,7 +35,7 @@ public class CookieHandler implements URIHandler{
 	@Override
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response, String uri, String path, String pathArg) {
-		request.setAttribute("User", new User(request, response, key, service));
+		request.setAttribute("User", new User(request, response, service));
 		return false;
 	}
 

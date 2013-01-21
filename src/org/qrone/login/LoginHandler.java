@@ -130,7 +130,7 @@ public class LoginHandler implements URIHandler, LoginService{
 					reqURL.toString() + "/verify?.done=" + QrONEUtils.escape(req.getParameter(".done")));
 			FetchRequest fetch = FetchRequest.createFetchRequest();
 			
-			store.set("openid-discover:" + user.getDeviceId(), Serialization.serialize(discovered), true);
+			store.set("openid-discover:" + user.getBrowserId(), Serialization.serialize(discovered), true);
 			
 			for (Iterator<Entry<String, String>> i = attributes.entrySet().iterator(); i
 					.hasNext();) {
@@ -160,7 +160,7 @@ public class LoginHandler implements URIHandler, LoginService{
             ParameterList response =
                     new ParameterList(req.getParameterMap());
             DiscoveryInformation discovered = 
-            	(DiscoveryInformation)Serialization.unserialize((byte[])store.get("openid-discover:" + user.getDeviceId()));
+            	(DiscoveryInformation)Serialization.unserialize((byte[])store.get("openid-discover:" + user.getBrowserId()));
 
             StringBuffer receivingURL = req.getRequestURL();
             String queryString = req.getQueryString();

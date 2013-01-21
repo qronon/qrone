@@ -31,15 +31,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.resolver.URIResolver;
 import org.qrone.r7.resolver.URIResolver.Listener;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 public class QrONEApp {
+	private static Logger log = LoggerFactory.getLogger(QrONEApp.class);
+			
 	private int port;
 	private int mport;
 	private String path;
 	private Server server = null;
 	private QrONEServlet servlet;
 	
-	public QrONEApp(int port, int mport, String path){
+	public QrONEApp(int port, int mport){
 		this.port = port;
 		this.mport = mport;
 		this.path = path;
@@ -64,12 +71,29 @@ public class QrONEApp {
 		context.addFilter(gzip, "/*", all);
 		server.setHandler(context);
 		
-        if(path != null){
-        	servlet.setLocalFilePath(path);
-        }
+	}
+	
+	public void startWithWindow(){
+		start();
+		showDisplay();
+	}
+
+	public void startAndWait(){
+    	log.info("Starting QrONE Server.");
+		try {
+            try {
+    			server.start();
+    			server.join();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	public void start(){
+    	log.info("Starting QrONE Server.");
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -81,25 +105,6 @@ public class QrONEApp {
 			}
 		});
 		t.start();
-	}
-
-	public void startAndWait(boolean window){
-
-		try {
-            if(!window){
-            	try {
-	    			server.start();
-	    			server.join();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-            }else{
-            	start();
-    			showDisplay();
-            }
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
 	}
 	
 	public void stop(){
@@ -161,7 +166,7 @@ public class QrONEApp {
         CmdLineParser parser = new CmdLineParser();
         CmdLineParser.Option helpOpt     = parser.addBooleanOption('h', "help");
         CmdLineParser.Option verboseOpt  = parser.addBooleanOption('v', "verbose");
-        CmdLineParser.Option cliOpt      = parser.addBooleanOption('c', "cli");
+        CmdLineParser.Option winOpt      = parser.addBooleanOption('w', "win");
         CmdLineParser.Option portOpt     = parser.addIntegerOption('p', "port");
         CmdLineParser.Option mportOpt     = parser.addIntegerOption('m', "mport");
         CmdLineParser.Option dirOpt     = parser.addStringOption('d', "dir");
@@ -172,7 +177,7 @@ public class QrONEApp {
             usage();
             System.exit(1);
         }
-
+        
         Boolean help = (Boolean) parser.getOptionValue(helpOpt);
         if(help != null && help.booleanValue()){
         	usage();
@@ -188,22 +193,48 @@ public class QrONEApp {
         if(mport == null){
         	mport = 9699;
         }
-        
-        String path = (String) parser.getOptionValue(dirOpt);
-        
-        QrONEApp app = new QrONEApp(port, mport, path);
 
-        Boolean cli = (Boolean) parser.getOptionValue(cliOpt);
-        if(cli == null || !cli.booleanValue()){
-        	app.startAndWait(true);
+
+        Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
+        if(verbose != null && verbose.booleanValue()){
+        	setLogLevel(Level.DEBUG);
+        	log.info("Setting LogLevel to DEBUG.");
+        }else{
+        	setLogLevel(Level.INFO);
+        	log.info("Setting LogLevel to INFO.");
+        }
+        
+        QrONEApp app = new QrONEApp(port, mport);
+
+        String path = (String) parser.getOptionValue(dirOpt);
+        if(path != null){
+        	app.setHtdocsPath(path);
+        }
+        
+
+        Boolean win = (Boolean) parser.getOptionValue(winOpt);
+        if(win == null || !win.booleanValue()){
+        	app.start();
         	app.stop();
         }else{
-        	app.startAndWait(false);
+        	app.startWithWindow();
         	app.stop();
         }
 	}
 	
-    private static void usage() {
+    public static void setLogLevel(Level ll) {
+    	ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+    	root.setLevel(ll);
+    	
+    	if(ll.equals(Level.DEBUG))
+    		root.getLoggerContext().addTurboFilter(new QrONEAppLogTurboFilter());
+	}
+
+	public void setHtdocsPath(String path) {
+        servlet.setLocalFilePath(path);
+	}
+
+	private static void usage() {
         System.out.println(
                 "\nUsage: java -jar qrone-x.y.z.jar [options] <file>\n\n"
 
@@ -211,7 +242,7 @@ public class QrONEApp {
                         + "  -h, --help                Displays this information\n"
                         + "  -v, --verbose             Display informational messages and warnings\n"
                         + "\n"
-                        + "  -c, --cli                 Launch Webserver in CLI mode\n"
+                        + "  -w, --win                 Launch Webserver in Window mode\n"
                         + "  -p, --port <port>         Set port (default 9601)\n"
                         
                         );

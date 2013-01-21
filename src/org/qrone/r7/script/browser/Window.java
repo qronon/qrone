@@ -226,15 +226,6 @@ public class Window{
 		return service.getLoginService().getLogoutURL(doneURL);
 	}
 	*/
-	
-	
-	public void login(String id){
-		user.login(id);
-	}
-	
-	public void logout(){
-		user.logout();
-	}
 
 	public void close() throws IOException {
 

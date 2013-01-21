@@ -6,7 +6,7 @@ document.write({
 	"user" : {
 		"name" : user.name,
 		"id" : user.id,
-		"deviceId" : user.deviceId,
+		"browserId" : user.browserId,
 		"store" : user.store
 	}
 });

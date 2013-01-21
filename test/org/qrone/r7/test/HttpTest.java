@@ -27,22 +27,33 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.qrone.memcached.LocalMemcachedService;
 import org.qrone.r7.app.QrONEApp;
 import org.qrone.util.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import ch.qos.logback.classic.Level;
+
 import static org.junit.Assert.*;
 
 public class HttpTest {
+	private static Logger log = LoggerFactory.getLogger(HttpTest.class);
+	
 	private static QrONEApp app;
 	private static HttpClient c;
 	private static DocumentBuilder db;
 	
 	@BeforeClass
 	public static void beforeClass(){
-		app = new QrONEApp(9601, 9699, "./htdocs");
+    	log.info("StartingTest.");
+    	QrONEApp.setLogLevel(Level.DEBUG);
+    	
+		app = new QrONEApp(9601, 9699 );
+		app.setHtdocsPath("./htdocs");
 		app.start();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -109,13 +120,13 @@ public class HttpTest {
 		assertEquals("OK", map.get("status"));
 
 		map = fetchJSON("/test/user");
-		assertEquals(null, map.get("id"));
+		assertNotSame("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 
 		map = fetchJSON("/test/user_login");
-		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		assertEquals("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 
 		map = fetchJSON("/test/user");
-		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		assertEquals("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 		
 	}
 
@@ -132,7 +143,7 @@ public class HttpTest {
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
 		
 		map = fetchJSON("/test/user_logout");
-		assertEquals(null, ((Map)map.get("user")).get("id"));
+		assertNotSame("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 
 		map = fetchJSON("/test/user_store");
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
@@ -149,7 +160,7 @@ public class HttpTest {
 		assertEquals("OK", map.get("status"));
 
 		map = fetchJSON("/test/user_login");
-		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		assertEquals("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 		
 		map = fetchJSON("/test/user_store");
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
@@ -158,11 +169,11 @@ public class HttpTest {
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
 		
 		map = fetchJSON("/test/user_logout");
-		assertEquals(null, ((Map)map.get("user")).get("id"));
-		assertEquals(null, ((Map)map.get("user")).get("store"));
+		assertNotSame("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
+		assertNotSame("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("store"));
 
 		map = fetchJSON("/test/user_login");
-		assertEquals("testuser", ((Map)map.get("user")).get("id"));
+		assertEquals("d789037d-379f-4c5b-990f-eaa9091ba4c9", ((Map)map.get("user")).get("id"));
 
 		map = fetchJSON("/test/user");
 		assertEquals("stored", ((Map)((Map)map.get("user")).get("store")).get("userdata"));
@@ -278,7 +289,7 @@ public class HttpTest {
 		try {
 			HttpResponse res = c.execute(r);
 			String body = new String(Stream.read(res.getEntity().getContent()),"utf8");
-			System.out.println(body);
+			log.debug(body);
 			return db.parse(new InputSource(new StringReader(body)));
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -304,7 +315,7 @@ public class HttpTest {
 			HttpResponse res = c.execute(r);
 			
 			String body = new String(Stream.read(res.getEntity().getContent()),"utf8");
-			System.out.println(body);
+			log.debug(body);
 			
 			return JSON.decode(body);
 		} catch (ClientProtocolException e) {

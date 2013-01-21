@@ -7,10 +7,14 @@ import java.util.Map;
 import org.qrone.database.DatabaseCursor;
 import org.qrone.database.DatabaseService;
 import org.qrone.database.DatabaseTable;
+import org.qrone.memcached.LocalMemcachedService;
 import org.qrone.memcached.Memcached;
 import org.qrone.memcached.MemcachedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalKeyValueStoreService implements KeyValueStoreService{
+	private static Logger log = LoggerFactory.getLogger(LocalKeyValueStoreService.class);
 
 	private DatabaseService db;
 	private MemcachedService mems;
@@ -38,7 +42,7 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 			Object v;
 			v = mem.get(key);
 			if(v != null){
-				System.out.println("Memcached:get:" + key + ":" + v);
+				log.debug("KVS Memcached READ (key:{})", key);
 				return v;
 			}
 
@@ -49,7 +53,7 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 			if(result == null) return null;
 			v = result.get("value");
 			if(v != null){
-				System.out.println("Database:get:" + key + ":" + v);
+				log.debug("KVS Database READ (key:{})", key);
 				return v;
 			}
 			return null;
@@ -63,8 +67,8 @@ public class LocalKeyValueStoreService implements KeyValueStoreService{
 			map.put("_id", key);
 			map.put("value", value);
 			table.save(map);
-			
-			System.out.println("Database/Memcached:set:" + key + ":" + value);
+
+			log.debug("KVS Database WRITE (key:{})", key);
 		}
 
 		@Override
