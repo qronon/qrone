@@ -61,7 +61,7 @@ public class HttpTest {
 			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {}
 	}
-
+	
 	@Before
 	public void before(){
 		ClientConnectionManager cm = new ThreadSafeClientConnManager();

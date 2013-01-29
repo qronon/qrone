@@ -23,6 +23,7 @@ import org.apache.commons.codec.net.URLCodec;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.qrone.database.DatabaseService;
+import org.qrone.kvs.KeyValueStoreService;
 import org.qrone.memcached.MemcachedService;
 import org.qrone.r7.PortingService;
 import org.qrone.r7.RepositoryService;
@@ -64,6 +65,7 @@ public class Window{
 	public User user;
 
 	public DatabaseService db;
+	public KeyValueStoreService kvs;
 	public MemcachedService memcached;
 	public RepositoryService repository;
 	public HTTPFetcher http;
@@ -85,6 +87,7 @@ public class Window{
 		
 		this.service = service;
 		db = service.getDatabaseService();
+		kvs = service.getKeyValueStoreService();
 		memcached = service.getMemcachedService();
 		repository = service.getRepositoryService();
 		resolver = service.getURIResolver();

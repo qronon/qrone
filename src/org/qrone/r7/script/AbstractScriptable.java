@@ -66,8 +66,7 @@ public abstract class AbstractScriptable implements Scriptable{
 
 	@Override
 	public void put(int arg0, Scriptable arg1, Object arg2) {
-		throw new UnsupportedOperationException();
-		
+		put(String.valueOf(arg0), arg1, arg2);
 	}
 
 	@Override

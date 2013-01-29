@@ -16,6 +16,9 @@ import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchResponse;
+import org.qrone.database.DatabaseCursor;
+import org.qrone.database.DatabaseService;
+import org.qrone.database.DatabaseTable;
 import org.qrone.kvs.KeyValueStore;
 import org.qrone.login.AccessToken;
 import org.qrone.login.ID;
@@ -34,10 +37,12 @@ public class User{
 	private AccessToken userToken = null;
 	private AccessToken browserToken = null;
 	private Map<String, String> cookies = new HashMap<String, String>();
-
+	
 	private String initialstore = null;
 	private Map store = null;
 	private boolean opened = false;
+	
+	private DatabaseService db;
 	
 	public User(HttpServletRequest request, HttpServletResponse response, PortingService service){
 		
@@ -118,23 +123,6 @@ public class User{
 		ticket.sign(service.getConsumerSecret());
 		return ticket.toString();
 	}
-	
-	public Object getStore(){
-		if(!opened){
-			open();
-		}
-		return store;
-	}
-	
-	public void setStore(Object s){
-		if(s instanceof Scriptable){
-			store = Scriptables.asMap(s);
-		}else if(s instanceof Map){
-			store = (Map)s;
-		}else{
-			throw new IllegalArgumentException();
-		}
-	}
 
 	public void openidLogin(Identifier verified, AuthSuccess authSuccess) {
 		// TODO Not implemented yet.
@@ -166,29 +154,42 @@ public class User{
 		uck.setPath("/");
 		userToken = browserToken;
 		response.addCookie(uck);
-	}
-	
-	public void open(){
-		KeyValueStore kvs = service.getKeyValueStoreService()
-			.getKeyValueStore("qrone.user");
+	}	
 		
-		Object o = kvs.get("l." + userToken.getId());
-		if(o != null){
-			initialstore = o.toString();
-			store = JSON.decode(initialstore);
+	public Object getStore(){
+		if(!opened){
+			opened = true;
+			
+			KeyValueStore kvs = service.getKeyValueStoreService().getKeyValueStore("qrone.user");
+			initialstore = (String)kvs.get("l." + getId());
+			if(initialstore != null){
+				store = JSON.decode(initialstore);
+			}else{
+				store = new HashMap();
+			}
+		}
+		return store;
+	}	
+		
+	public void setStore(Object s){
+		opened = true;
+		if(s instanceof Scriptable){
+			store = Scriptables.asMap(s);
+		}else if(s instanceof Map){
+			store = (Map)s;
+		}else{
+			throw new IllegalArgumentException();
 		}
 	}
-
+	
 	public void close() {
-		if(store != null){
-			String currentstore = JSON.encode(Scriptables.asMap(store));
-			if(currentstore != null && !currentstore.equals(initialstore)){
-				KeyValueStore kvs = service.getKeyValueStoreService()
-					.getKeyValueStore("qrone.user");
-				kvs.set("l." + userToken.getId(), currentstore);
+		if(store != null && opened){
+			String currentstore = JSON.encode(store);
+			if(!currentstore.equals(initialstore)){
+				KeyValueStore kvs = service.getKeyValueStoreService().getKeyValueStore("qrone.user");
+				kvs.set("l." + getId(), currentstore);
 			}
 		}
 	}
-
-
+	
 }
