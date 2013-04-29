@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>qrone</groupId>
   <artifactId>qrone</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.3</version>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -211,6 +211,29 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+	    <groupId>com.github.goldin</groupId>
+	    <artifactId>sshexec-maven-plugin</artifactId>
+	    <version>0.2.5</version>
+	    <executions>
+	      <execution>
+	        <id>restart</id>
+	        <phase>deploy</phase>
+	        <goals>
+	          <goal>sshexec</goal>
+	        </goals>
+	        <configuration>
+	          <runIf>{{ true }}</runIf>
+	          <location>scp://qronon:dummy@qrone.org:/home/qronon</location>
+	          <command>/home/qronon/qrone-server/qroned</command>
+	          <keyfile>${user.home}/.ssh/id_rsa.nopass</keyfile>
+	          <passphrase>nopass</passphrase>
+	          <echoCommands>true</echoCommands>
+	        </configuration>
+	      </execution>
+	    </executions>
+	  </plugin>
     </plugins>
   </build>
   

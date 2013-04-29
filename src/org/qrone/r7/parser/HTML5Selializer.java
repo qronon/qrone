@@ -85,6 +85,11 @@ public class HTML5Selializer extends HTML5TagWriter{
 			}
 		}else if(e.getNodeName().equals("style")){
 		}else if(e.getNodeName().equals("link")){
+			if(!HTML5OM.isCSSLinkTab(e)){
+				start(e);
+				accept(e);
+				end(e);
+			}
 		}else if(e.getNodeName().equals("meta")){
 			if(e.getAttribute("name").equals("extends")){
 			}else{

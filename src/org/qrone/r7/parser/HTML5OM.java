@@ -199,22 +199,8 @@ public class HTML5OM {
 					accept(e);
 					inStyle = false;
 				}else if(e.getNodeName().equals("link")){
-					if(e.hasAttribute("href")){
-						if(e.hasAttribute("include")){
-							try {
-								URI cssuri = uri.resolve(new URI(e.getAttribute("href")));
-								CSS3OM cssom = cssdeck.compile(cssuri);
-								if(cssom != null){
-									parseStyleSheet(cssom);
-								}
-							} catch (URISyntaxException e1) {
-								csslibs.add(e);
-							} catch (IOException e1) {
-								csslibs.add(e);
-							}
-						}else{
-							csslibs.add(e);
-						}
+					if(isCSSLinkTab(e)){
+						csslibs.add(e);
 					}
 				}else if(e.getNodeName().equals("meta")){
 					metamap.put(e.getAttribute("name"), e.getAttribute("content"));
@@ -244,6 +230,27 @@ public class HTML5OM {
 			
 		};
 		visitor.visit(document);
+	}
+	
+	public static boolean isCSSLinkTab(Element e){
+		String href = e.getAttribute("href");
+		if(href != null){
+			if(href.toLowerCase().endsWith(".css")){
+				return true;
+			}
+			
+			String rel = e.getAttribute("rel");
+			if(rel != null && rel.toLowerCase().equals("stylesheet")){
+				return true;
+			}
+
+			String type = e.getAttribute("type");
+			if(type != null && type.toLowerCase().equals("text/css")){
+				return true;
+			}
+			
+		}
+		return false;
 	}
 	
 	public void process(final HTML5Writer w, final HTML5Template t,
