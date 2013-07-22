@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class CookieHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String uri, String path, String pathArg) {
+			HttpServletResponse response, String uri, String path, String pathArg, List<String> arg) {
 		request.setAttribute("User", new User(request, response, service));
 		return false;
 	}

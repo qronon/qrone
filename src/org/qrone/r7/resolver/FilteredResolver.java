@@ -33,6 +33,13 @@ public class FilteredResolver extends AbstractURIResolver{
 	}
 
 	@Override
+	public boolean existPath(String uri) {
+		if(uri.startsWith(prefix))
+			return r.existPath(uri.substring(prefix.length()));
+		return false;
+	}
+
+	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		uri = prefixed(uri);
 		if(uri != null)

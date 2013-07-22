@@ -106,11 +106,11 @@ public class GitHubRepositoryService implements URIHandler, RepositoryService{
 	@Override
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response, String uri, String requestPath,
-			String requestPathArg) {
+			String requestPathArg, List<String> arg) {
 		List l = cascade.asList();
 		for (Object o : l) {
 			
-			((URIHandler)o).handle(request, response, uri, requestPath, requestPathArg);
+			((URIHandler)o).handle(request, response, uri, requestPath, requestPathArg, arg);
 		}
 		return false;
 	}

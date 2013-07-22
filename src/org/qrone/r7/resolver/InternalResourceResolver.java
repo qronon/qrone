@@ -26,6 +26,11 @@ public class InternalResourceResolver implements URIResolver{
 	}
 
 	@Override
+	public boolean existPath(String path) {
+		return false;
+	}
+
+	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		return new UnicodeInputStream(QrONEUtils.getResourceAsStream(uri.toString(),cx));
 	}

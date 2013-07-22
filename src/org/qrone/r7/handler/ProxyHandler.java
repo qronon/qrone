@@ -2,6 +2,7 @@ package org.qrone.r7.handler;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -35,7 +36,7 @@ public class ProxyHandler implements URIHandler{
 	}
 	@Override
 	public boolean handle(final HttpServletRequest request,
-			final HttpServletResponse response, final String uri, final String path, final String leftpath) {
+			final HttpServletResponse response, final String uri, final String path, final String leftpath, List<String> arg) {
 		try {
 			ProxyServlet serv = new ProxyServlet(){
 				@Override

@@ -34,6 +34,7 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 	private String treesha;
 	
 	private Map<String,String> blobs;
+	private Map<String,String> trees;
 	
 	public GitHubResolver(HTTPFetcher fetcher, URIResolver cacheresolver, String user, String repo, String treesha){
 		this.fetcher = fetcher;
@@ -55,8 +56,14 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 				List<Map> list = (List<Map>)map.get("tree");
 				
 				blobs = new HashMap<String, String>();
+				trees = new HashMap<String, String>();
 				for (Map o : list) {
-					blobs.put(o.get("path").toString(), o.get("url").toString());
+					if(o.get("type").equals("blob")){
+						blobs.put(o.get("path").toString(), o.get("url").toString());
+					}else{
+						trees.put(o.get("path").toString(), o.get("url").toString());
+					}
+					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -75,6 +82,14 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 		if(cacheresolver.exist(path)) return true;
 		if(blobs != null)
 			return blobs.containsKey("htdocs" + path);
+		return false;
+	}
+
+	@Override
+	public boolean existPath(String path) {
+		getFiles();
+		if(trees != null)
+			return trees.containsKey("htdocs" + path);
 		return false;
 	}
 
@@ -114,7 +129,7 @@ public class GitHubResolver extends AbstractURIResolver implements URIHandler {
 
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String uri, String path, String pathArg) {
+			HttpServletResponse response, String uri, String path, String pathArg, List<String> arg) {
 		if(path.equals("/system/github-post-receive")){
 			try {
 				log.config("Github post-receive hooks.");

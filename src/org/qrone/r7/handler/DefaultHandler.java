@@ -1,5 +1,7 @@
 package org.qrone.r7.handler;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,11 +35,11 @@ public class DefaultHandler implements URIHandler, Extendable{
 			@Override
 			public boolean handle(HttpServletRequest request,
 					HttpServletResponse response, String uri, String path,
-					String pathArg) {
-				return mainHandle(request, response, uri, path, pathArg);
+					String pathArg, List<String> arg) {
+				return mainHandle(request, response, uri, path, pathArg, arg);
 			}
 		};
-		pathFinderHandler = new PathFinderHandler(handler);
+		pathFinderHandler = new PathFinderHandler(handler, resolver);
 	}
 	
 	public void addExtension(Class c){
@@ -45,30 +47,30 @@ public class DefaultHandler implements URIHandler, Extendable{
 	}
 	
 	public boolean mainHandle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String leftpath) {
+			String uri, String path, String leftpath, List<String> arg) {
 
 		try {
 			response.setCharacterEncoding("utf8");
 			
 			if(uri.endsWith(".server.js") && 
-					jsHandler.handle(request, response, uri, path, leftpath)){
+					jsHandler.handle(request, response, uri, path, leftpath, arg)){
 				return true;
 			}
 			
-			if(jsHandler.handle(request, response, uri + ".server.js", path, leftpath)){
+			if(jsHandler.handle(request, response, uri + ".server.js", path, leftpath, arg)){
 				return true;
 			}
 			
 			if(uri.endsWith(".html") && 
-					html5Handler.handle(request, response, uri, path, leftpath)){
+					html5Handler.handle(request, response, uri, path, leftpath, arg)){
 				return true;
 			}
 
-			if(html5Handler.handle(request, response, uri + ".html", path, leftpath)){
+			if(html5Handler.handle(request, response, uri + ".html", path, leftpath, arg)){
 				return true;
 			}
 
-			if(uri.endsWith(".js") && html5partsHandler.handle(request, response, uri.substring(0, uri.length()-3) + ".html", path, leftpath)){
+			if(uri.endsWith(".js") && html5partsHandler.handle(request, response, uri.substring(0, uri.length()-3) + ".html", path, leftpath, arg)){
 				return true;
 			}
 		} catch (Exception e) {
@@ -76,7 +78,7 @@ public class DefaultHandler implements URIHandler, Extendable{
 		}
 		
 		if(!uri.endsWith(".server.js") && 
-				resolverHandler.handle(request, response, uri, path, leftpath)){
+				resolverHandler.handle(request, response, uri, path, leftpath, arg)){
 			return true;
 		}
 		return false;
@@ -84,16 +86,16 @@ public class DefaultHandler implements URIHandler, Extendable{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg) {
-		if(pathFinderHandler.handle(request, response, uri, path, pathArg)){
+			String uri, String path, String pathArg, List<String> arg) {
+		if(pathFinderHandler.handle(request, response, uri, path, pathArg, arg)){
 			return true;
 		}
 		
-		if(jsHandler.handle(request, response, "/404.server.js", path, pathArg)){
+		if(jsHandler.handle(request, response, "/404.server.js", path, pathArg, arg)){
 			return true;
 		}
 
-		if(html5Handler.handle(request, response, "/404.html", path, pathArg)){
+		if(html5Handler.handle(request, response, "/404.html", path, pathArg, arg)){
 			return true;
 		}
 		

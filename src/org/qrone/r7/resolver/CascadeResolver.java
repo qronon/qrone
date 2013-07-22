@@ -35,6 +35,16 @@ public class CascadeResolver implements URIResolver{
 	}
 
 	@Override
+	public boolean existPath(String uri) {
+		for (Iterator<URIResolver> i = list.iterator(); i
+				.hasNext();) {
+			URIResolver r = i.next();
+			if(r.existPath(uri)) return true;
+		}
+		return false;
+	}
+
+	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		for (Iterator<URIResolver> i = list.iterator(); i
 				.hasNext();) {

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,7 @@ public class FaviconHandler implements URIHandler{
 	
 	@Override
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, String uri, String path, String leftpath) {
+			HttpServletResponse response, String uri, String path, String leftpath, List<String> arg) {
 		if(path.equals("/favicon.ico")){
 			try {
 				InputStream in;

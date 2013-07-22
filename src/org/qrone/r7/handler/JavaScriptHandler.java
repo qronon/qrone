@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class JavaScriptHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String leftpath) {
+			String uri, String path, String leftpath, List<String> arg) {
 		Scriptable globalscope = null;
 		try {
 			if(resolver.exist(uri)){
@@ -55,7 +56,7 @@ public class JavaScriptHandler implements URIHandler{
 					
 					
 					globalscope = vm.createScope();
-					ServletScope ss = new ServletScope(request, response, urio, path, leftpath);
+					ServletScope ss = new ServletScope(request, response, urio, path, leftpath, arg);
 					Window window = new Window(ss,globalscope,deck,vm,services);
 					window.init(globalscope);
 					
@@ -129,7 +130,7 @@ public class JavaScriptHandler implements URIHandler{
 				
 				URI urio = new URI("/admin/error.server.js");
 				Scriptable scope = vm.createScope();
-				ServletScope ss = new ServletScope(request,response,urio, path, leftpath);
+				ServletScope ss = new ServletScope(request,response,urio, path, leftpath, arg);
 				scope.put("exception", scope, new MapPrototype(scope, map));
 				
 				ServerJSOM defaultom = vm.compile(new URI("/system/resource/default.js"));

@@ -3,6 +3,7 @@ package org.qrone.r7.handler;
 import java.io.BufferedWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +30,7 @@ public class HTML5PartsHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String leftpath) {
+			String uri, String path, String leftpath, List<String> arg) {
 		try {
 			if(resolver.exist(uri)){
 				URI urio = new URI(uri);

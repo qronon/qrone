@@ -22,6 +22,11 @@ public class MemoryResolver extends AbstractURIResolver{
 	}
 
 	@Override
+	public boolean existPath(String uri) {
+		return false;
+	}
+
+	@Override
 	public InputStream getInputStream(URI uri) throws IOException {
 		MemoryOutputStream out = map.get(uri);
 		if(out != null)

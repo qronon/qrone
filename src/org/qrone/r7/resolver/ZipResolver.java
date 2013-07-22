@@ -58,6 +58,11 @@ public class ZipResolver extends AbstractURIResolver{
 	public boolean exist(String path) {
 		return get(path) != null;
 	}
+	
+	@Override
+	public boolean existPath(String path) {
+		return false;
+	}
 
 	@Override
 	public InputStream getInputStream(URI uri) throws IOException {

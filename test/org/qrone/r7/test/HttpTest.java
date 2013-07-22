@@ -278,6 +278,30 @@ public class HttpTest {
 		assertEquals(2, l.size());
 	}
 	
+
+	@Test
+	public void testAny(){
+		Map map;
+		List l;
+		map = fetchJSON("/test/test1/hello");
+		l = (List)map.get("arg");
+		assertEquals("test1", l.get(0));
+		
+		map = fetchJSON("/test/qrone/hello");
+		l = (List)map.get("arg");
+		assertEquals("qrone", l.get(0));
+
+		map = fetchJSON("/test/test1/test2/hello");
+		l = (List)map.get("arg");
+		assertEquals("test1", l.get(0));
+		assertEquals("test2", l.get(1));
+		
+		map = fetchJSON("/test/qrone/qronon/hello");
+		l = (List)map.get("arg");
+		assertEquals("qrone", l.get(0));
+		assertEquals("qronon", l.get(1));
+	}
+	
 	
 	public Document fetchXML(String path){
 		HttpGet r = new HttpGet("http://localhost:9601" + path);

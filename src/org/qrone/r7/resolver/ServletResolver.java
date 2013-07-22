@@ -37,6 +37,11 @@ public class ServletResolver implements URIResolver{
 	}
 
 	@Override
+	public boolean existPath(String uri) {
+		return false;
+	}
+
+	@Override
 	public InputStream getInputStream(URI u) throws IOException {
 		try {
 			String uri = u.toString();

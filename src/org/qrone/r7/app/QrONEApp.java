@@ -164,6 +164,7 @@ public class QrONEApp {
 
 	public static void main(String[] args) {
         CmdLineParser parser = new CmdLineParser();
+        CmdLineParser.Option consoleOpt     = parser.addBooleanOption('c', "console");
         CmdLineParser.Option helpOpt     = parser.addBooleanOption('h', "help");
         CmdLineParser.Option verboseOpt  = parser.addBooleanOption('v', "verbose");
         CmdLineParser.Option winOpt      = parser.addBooleanOption('w', "win");

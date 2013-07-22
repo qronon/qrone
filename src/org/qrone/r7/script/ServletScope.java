@@ -28,6 +28,7 @@ public class ServletScope{
 	public URI uri;
 	public String path;
 	public String leftpath;
+	public List<String> arg;
 
 	public byte[] body;
 	public String text;
@@ -38,12 +39,13 @@ public class ServletScope{
 	
 	private User user;
 	
-	public ServletScope(HttpServletRequest request, HttpServletResponse response, URI uri, String path, String leftpath) {
+	public ServletScope(HttpServletRequest request, HttpServletResponse response, URI uri, String path, String leftpath, List<String> arg) {
 		this.request = request;
 		this.response = response;
 		this.uri = uri;
 		this.path = path;
 		this.leftpath = leftpath;
+		this.arg = arg;
 		
 		get = parseQueryString(request.getQueryString());
 		user = (User)request.getAttribute("User");

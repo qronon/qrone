@@ -114,6 +114,7 @@ public class Window{
 		req.put("url", req, request.getRequestURL().toString());
 		req.put("uri", req, ss.uri.toString());
 		req.put("path", req, ss.path.toString());
+		req.put("arg", req, ss.arg);
 		if(ss.leftpath.length() > 0)
 			req.put("leftpath", req, ss.leftpath.toString());
 		

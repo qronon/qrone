@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class ResolverHandler implements URIHandler{
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String leftpath){
+			String uri, String path, String leftpath, List<String> arg){
 		InputStream in = null;
 		try{
 			URI urio = new URI(uri);

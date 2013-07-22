@@ -47,6 +47,12 @@ public class FileResolver extends AbstractURIResolver{
 	}
 
 	@Override
+	public boolean existPath(String uri) {
+		File f = new File(root, uri.substring(1));
+		return f.isDirectory();
+	}
+
+	@Override
 	public InputStream getInputStream(URI uri) throws FileNotFoundException {
 		File f = new File(root, uri.getPath().substring(1));
 		if(f.exists())

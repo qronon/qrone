@@ -27,7 +27,7 @@ public class QrONEServlet extends HttpServlet {
 			map.put(host, h);
 		}
 		log.debug(request.getPathInfo());
-		h.handle(request, response, request.getPathInfo(), "", "");
+		h.handle(request, response, request.getPathInfo(), request.getPathInfo(), "", null);
 	}
 	
 	public void clean(){

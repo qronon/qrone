@@ -77,6 +77,11 @@ public class MongoResolver extends AbstractURIFileSystem{
 	}
 
 	@Override
+	public boolean existPath(String path) {
+		return false;
+	}
+
+	@Override
 	public boolean remove(URI uri) {
 		BasicDBObject obj = new BasicDBObject();
 		obj.put(ID, uri.toString());

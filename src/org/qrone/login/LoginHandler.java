@@ -48,7 +48,7 @@ public class LoginHandler implements URIHandler, LoginService{
 	
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, 
-			String uri, String path, String pathArg) {
+			String uri, String path, String pathArg, List<String> arg) {
 		
 		if(path.equals("/system/openid/login")){
 			handleOpenIDLogin(request, response);
